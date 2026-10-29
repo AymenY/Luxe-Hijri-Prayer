@@ -1,11 +1,11 @@
 """Reference renderer: a Python mirror of source/LuxeHijriPrayerView.mc.
 
 It reads the real layout constants (source/Layout.mc), presets (source/Themes.mc), strings
-(resources*/strings/strings.xml), background geometry (resources/jsonData/*.json) and the
-generated bitmap fonts (resources/fonts/*.fnt/png), and draws a 280 x 280 frame with the
-same primitives and order as the Monkey C code. Shapes are rasterised with 4x supersampling
-(approximating the device anti-aliasing) and the frame is reduced to the 64-colour palette
-of the fenix 7X Pro MIP display.
+(resources*/strings/strings.xml), vector art (resources/jsonData/*.json) and the generated
+bitmap fonts of the requested screen size (resources[-round-WxH]/fonts), and draws a frame
+with the same primitives, order and scaling as the Monkey C code. Shapes are rasterised with
+4x supersampling (approximating device anti-aliasing); frames can be reduced to the 64-colour
+MIP palette.
 
 These images are REFERENCE RENDERS of the layout, not screenshots of the compiled watch face.
 Prayer times, Hijri date and sun times are computed by tools/luxe_ref/calc.py (the mirror of
@@ -23,6 +23,7 @@ from luxe_ref import calc
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 S = 4  # supersampling factor
+BASE = 280
 
 
 def _consts(path):
@@ -34,16 +35,20 @@ L = type("Layout", (), _consts("source/Layout.mc"))
 T = _consts("source/Themes.mc")
 
 
-def presets():
+def _themes():
     src = open(os.path.join(ROOT, "source", "Themes.mc")).read()
-    body = src[src.index("PRESETS"):]
+    body = src[src.index("const PRESETS"):src.index("const MULTICOLOR")]
     rows = re.findall(r"\[([^\[\]]+)\]", body)
-    return [[int(x, 16) for x in re.findall(r"0x[0-9A-Fa-f]{6}", r)] for r in rows]
+    presets = [[int(x, 16) for x in re.findall(r"0x[0-9A-Fa-f]{6}", r)] for r in rows]
+    multi = [v == "true" for v in re.findall(r"true|false", src[src.index("const MULTICOLOR"):src.index("const SOURCE_COLORS")])]
+    srccol = [int(x, 16) for x in re.findall(r"0x[0-9A-Fa-f]{6}", src[src.index("const SOURCE_COLORS"):])]
+    return presets, multi, srccol
 
 
-PRESETS = presets()
+PRESETS, MULTICOLOR, SOURCE_COLORS = _themes()
 PRESET_NAMES = ["Luxury Blue", "Royal Gold", "Emerald Night", "Burgundy Royale", "Ice Silver", "Stealth"]
 BACKGROUNDS = ["bg_mosque", "bg_geometric", "bg_marble", "bg_night"]
+RESOLUTIONS = [218, 240, 260, 280, 360, 390, 416, 454]
 
 
 def strings(lang="eng"):
@@ -60,8 +65,8 @@ def rgb(c):
 
 # ------------------------------------------------------------------ fonts
 class BmFont:
-    def __init__(self, name):
-        path = os.path.join(ROOT, "resources", "fonts", name + ".fnt")
+    def __init__(self, folder, name):
+        path = os.path.join(folder, name + ".fnt")
         self.chars = {}
         for line in open(path):
             kv = dict(re.findall(r"(\w+)=(\"[^\"]*\"|\S+)", line))
@@ -69,19 +74,24 @@ class BmFont:
                 self.height = int(kv["lineHeight"])
             elif line.startswith("char "):
                 self.chars[int(kv["id"])] = {k: int(v) for k, v in kv.items() if k != "page"}
-        self.atlas = Image.open(os.path.join(ROOT, "resources", "fonts", name + ".png")).getchannel("A")
+        self.atlas = Image.open(os.path.join(folder, name + ".png")).getchannel("A")
 
     def width(self, text):
         return sum(self.chars.get(ord(ch), self.chars[32])["xadvance"] for ch in text)
 
 
-FONTS = {}
+_FONTS = {}
 
 
-def font(name):
-    if name not in FONTS:
-        FONTS[name] = BmFont(name)
-    return FONTS[name]
+def font_dir(size):
+    return os.path.join(ROOT, "resources" if size == BASE else "resources-round-%dx%d" % (size, size), "fonts")
+
+
+def font(name, size=BASE):
+    key = (name, size)
+    if key not in _FONTS:
+        _FONTS[key] = BmFont(font_dir(size), name)
+    return _FONTS[key]
 
 
 # ------------------------------------------------------------------ Dc emulation
@@ -95,8 +105,8 @@ class Dc:
         self.img = Image.new("RGB", (w * S, h * S))
         self.d = ImageDraw.Draw(self.img)
         self.fg = (255, 255, 255)
+        self.bg = (0, 0, 0)
         self.pen = 1
-        self.text_ops = []
 
     @staticmethod
     def _p(x, y):
@@ -115,6 +125,13 @@ class Dc:
 
     def fillRectangle(self, x, y, w, h):
         self.d.rectangle([x * S, y * S, (x + w) * S - 1, (y + h) * S - 1], fill=self.fg)
+
+    def fillRoundedRectangle(self, x, y, w, h, r):
+        self.d.rounded_rectangle([x * S, y * S, (x + w) * S - 1, (y + h) * S - 1], radius=r * S, fill=self.fg)
+
+    def drawRoundedRectangle(self, x, y, w, h, r):
+        self.d.rounded_rectangle([x * S, y * S, (x + w) * S - 1, (y + h) * S - 1], radius=r * S, outline=self.fg,
+                                 width=max(1, int(self.pen * S)))
 
     def drawPoint(self, x, y):
         self.fillRectangle(x, y, 1, 1)
@@ -146,7 +163,7 @@ class Dc:
     def drawLine(self, x1, y1, x2, y2):
         w = max(1, int(self.pen * S))
         self.d.line([self._p(x1, y1), self._p(x2, y2)], fill=self.fg, width=w)
-        if self.pen > 1:  # round caps
+        if self.pen > 1:
             for (x, y) in ((x1, y1), (x2, y2)):
                 cx, cy = self._p(x, y)
                 rr = self.pen * S / 2.0
@@ -184,12 +201,11 @@ MIP_LEVELS = (0x00, 0x55, 0xAA, 0xFF)
 
 
 def to_mip(img):
-    """Nearest of the 64 MIP colours per pixel (no dithering)."""
     lut = [min(MIP_LEVELS, key=lambda l: abs(l - v)) for v in range(256)]
     return img.point(lut * 3)
 
 
-def circular(img, outside=(18, 18, 18)):
+def circular(img, outside=(0, 0, 0)):
     mask = Image.new("L", (img.width * 4, img.height * 4), 0)
     ImageDraw.Draw(mask).ellipse([0, 0, img.width * 4 - 1, img.height * 4 - 1], fill=255)
     mask = mask.resize(img.size, Image.LANCZOS)
@@ -198,17 +214,7 @@ def circular(img, outside=(18, 18, 18)):
     return out
 
 
-# ------------------------------------------------------------------ face (mirror of the view)
-def polar(r, a, side=0):
-    return [int(round(L.CX + r * math.sin(a) + side * math.cos(a))),
-            int(round(L.CY - r * math.cos(a) + side * math.sin(a)))]
-
-
-def rotate_poly(pts, a):
-    sn, cs = math.sin(a), math.cos(a)
-    return [(int(round(L.CX + x * cs - y * sn)), int(round(L.CY + x * sn + y * cs))) for x, y in pts]
-
-
+# ------------------------------------------------------------------ helpers mirrored from the view
 def format_count(n):
     if n < 10000:
         return str(n)
@@ -252,285 +258,392 @@ def format_time(minutes, is24=True):
     return "%d:%02d" % (h, mm)
 
 
-class Face:
-    def __init__(self, settings, lang="eng"):
-        self.s = settings
-        self.c = PRESETS[settings["preset"]]
-        self.str = strings(lang)
-        self.bg_ops = json.load(open(os.path.join(ROOT, "resources", "jsonData",
-                                                  BACKGROUNDS[settings["background"]] + ".json")))
-        self.f_xs, self.f_s, self.f_m = font("luxe_xs"), font("luxe_s"), font("luxe_m")
-        self.f_l, self.f_ayah = font("luxe_l"), font("ayah")
+LABELS = ["LabelSteps", "LabelHeart", "LabelCalories", "LabelBattery", "LabelKm", "LabelFloors",
+          "LabelBodyBattery", "LabelStress"]
+PRAYER_NAMES = {0: "Prayer0", 2: "Prayer2", 3: "Prayer3", 5: "Prayer5", 6: "Prayer6"}
 
-    # ---- background interpreter (mirror of Backgrounds.draw)
-    def draw_background(self, dc):
-        c = self.c
-        for op in self.bg_ops:
+
+class Face:
+    def __init__(self, settings, lang="eng", size=BASE):
+        self.s = settings
+        self.size = size
+        self.k = size / float(BASE)
+        self.c = PRESETS[settings["preset"]]
+        self.multi = MULTICOLOR[settings["preset"]]
+        self.str = strings(lang)
+        load = lambda n: json.load(open(os.path.join(ROOT, "resources", "jsonData", n + ".json")))
+        self.bg_ops = load(BACKGROUNDS[settings["background"]])
+        self.frame_ops = load("frame")
+        f = lambda n: font(n, size)
+        self.f_num, self.f_l, self.f_m, self.f_s, self.f_xs, self.f_ayah = (
+            f("luxe_num"), f("luxe_l"), f("luxe_m"), f("luxe_s"), f("luxe_xs"), f("ayah"))
+
+    # ---- scaling (mirror of LuxeHijriPrayerView.p())
+    def p(self, v):
+        return int(math.floor(v * self.k + 0.5))
+
+    def pen(self, w):
+        return max(1, int(math.floor(w * self.k + 0.5)))
+
+    def polar(self, r, a):
+        c = self.size / 2.0
+        return [int(math.floor(c + r * self.k * math.sin(a) + 0.5)), int(math.floor(c - r * self.k * math.cos(a) + 0.5))]
+
+    def rotate_poly(self, pts, a):
+        sn, cs = math.sin(a), math.cos(a)
+        c = self.size / 2.0
+        k = self.k
+        return [(int(math.floor(c + (x * cs - y * sn) * k + 0.5)), int(math.floor(c + (x * sn + y * cs) * k + 0.5)))
+                for x, y in pts]
+
+    # ---- vector art interpreter (mirror of Backgrounds.draw)
+    def draw_ops(self, dc, ops):
+        c, p = self.c, self.p
+        for op in ops:
             code = op[0]
             dc.setColor(c[op[1]], -1)
             if code == 0:
-                dc.fillPolygon([(op[k], op[k + 1]) for k in range(2, len(op) - 1, 2)])
+                dc.fillPolygon([(p(op[k]), p(op[k + 1])) for k in range(2, len(op) - 1, 2)])
             elif code == 1:
-                dc.fillCircle(op[2], op[3], op[4])
+                dc.fillCircle(p(op[2]), p(op[3]), p(op[4]))
             elif code == 2:
-                dc.setPenWidth(op[2]); dc.drawLine(op[3], op[4], op[5], op[6])
+                dc.setPenWidth(self.pen(op[2])); dc.drawLine(p(op[3]), p(op[4]), p(op[5]), p(op[6]))
             elif code == 3:
-                dc.setPenWidth(op[2])
+                dc.setPenWidth(self.pen(op[2]))
                 for k in range(3, len(op) - 3, 2):
-                    dc.drawLine(op[k], op[k + 1], op[k + 2], op[k + 3])
+                    dc.drawLine(p(op[k]), p(op[k + 1]), p(op[k + 2]), p(op[k + 3]))
             elif code == 4:
-                size = op[2]
+                size = self.pen(op[2])
                 for k in range(3, len(op) - 1, 2):
                     if size <= 1:
-                        dc.drawPoint(op[k], op[k + 1])
+                        dc.drawPoint(p(op[k]), p(op[k + 1]))
                     else:
-                        dc.fillRectangle(op[k], op[k + 1], size, size)
+                        dc.fillRectangle(p(op[k]), p(op[k + 1]), size, size)
             elif code == 5:
-                dc.setPenWidth(op[2]); dc.drawCircle(op[3], op[4], op[5])
+                dc.setPenWidth(self.pen(op[2])); dc.drawCircle(p(op[3]), p(op[4]), p(op[5]))
             elif code == 6:
-                dc.fillRectangle(op[2], op[3], op[4], op[5])
+                dc.fillRectangle(p(op[2]), p(op[3]), max(1, p(op[4])), max(1, p(op[5])))
             elif code == 7:
-                dc.setPenWidth(op[2])
-                x, y, r = op[3], op[4], op[5]
-                d = int(r * 0.7071 + 0.5)
-                for (a, b, e, f) in [(x, y - r, x + r, y), (x + r, y, x, y + r), (x, y + r, x - r, y),
-                                     (x - r, y, x, y - r), (x - d, y - d, x + d, y - d), (x + d, y - d, x + d, y + d),
-                                     (x + d, y + d, x - d, y + d), (x - d, y + d, x - d, y - d)]:
-                    dc.drawLine(a, b, e, f)
+                dc.setPenWidth(self.pen(op[2]))
+                self.star8(dc, p(op[3]), p(op[4]), p(op[5]))
             elif code == 8:
-                dc.fillRectangle(0, 0, 280, 280)
+                dc.fillRectangle(0, 0, self.size, self.size)
             elif code == 9:
-                dc.fillCircle(op[3], op[4], op[5])
+                dc.fillCircle(p(op[3]), p(op[4]), p(op[5]))
                 dc.setColor(c[op[2]], -1)
-                dc.fillCircle(op[3] + op[6], op[4] + op[7], op[8])
+                dc.fillCircle(p(op[3] + op[6]), p(op[4] + op[7]), p(op[8]))
+            elif code == 10:
+                dc.fillRoundedRectangle(p(op[2]), p(op[3]), p(op[4]), p(op[5]), p(op[6]))
+            elif code == 11:
+                dc.setPenWidth(self.pen(op[2]))
+                dc.drawRoundedRectangle(p(op[3]), p(op[4]), p(op[5]), p(op[6]), p(op[7]))
         dc.setPenWidth(1)
 
-    def draw_chapter_ring(self, dc):
-        c = self.c
-        dc.setPenWidth(1)
-        dc.setColor(c[T["GOLD_DK"]], -1)
+    @staticmethod
+    def star8(dc, x, y, r):
+        d = int(r * 0.7071 + 0.5)
+        for (a, b, e, f) in [(x, y - r, x + r, y), (x + r, y, x, y + r), (x, y + r, x - r, y), (x - r, y, x, y - r),
+                             (x - d, y - d, x + d, y - d), (x + d, y - d, x + d, y + d), (x + d, y + d, x - d, y + d),
+                             (x - d, y + d, x - d, y - d)]:
+            dc.drawLine(a, b, e, f)
+
+    # ---- static layer (mirror of drawStaticLayer)
+    def draw_static(self, dc):
+        c, p = self.c, self.p
+        dc.setColor(c[T["BG"]], c[T["BG"]]); dc.clear()
+        self.draw_ops(dc, self.bg_ops)
+        self.draw_ops(dc, self.frame_ops)
+        # minute track
+        dc.setPenWidth(self.pen(1))
+        dc.setColor(c[T["TICK"]], -1)
         for i in range(60):
             if i % 5:
                 a = i * math.pi / 30
-                p0, p1 = polar(L.TRACK_R_IN, a), polar(L.TRACK_R_OUT, a)
+                p0, p1 = self.polar(L.TICK_R_IN, a), self.polar(L.TICK_R_OUT, a)
                 dc.drawLine(p0[0], p0[1], p1[0], p1[1])
-        dc.drawCircle(L.CX, L.CY, L.TRACK_R_OUT + 1)
-        dc.setColor(c[T["GOLD"]], -1)
-        for h in range(1, 12):
+        # hour indices (two-tone), numerals at 12 / 3 / 6 / 9
+        for h in range(12):
+            if h % 3 == 0:
+                continue
             a = h * math.pi / 6
-            if h in (3, 9):
-                dc.fillPolygon(rotate_poly([(-2.5, -L.IDX_CARD_R_IN), (2.5, -L.IDX_CARD_R_IN),
-                                            (2.5, -L.IDX_R_OUT), (-2.5, -L.IDX_R_OUT)], a))
-            elif h != 6:
-                dc.fillPolygon(rotate_poly([(-1.5, -L.IDX_R_IN), (1.5, -L.IDX_R_IN),
-                                            (L.IDX_W, -L.IDX_R_OUT), (-L.IDX_W, -L.IDX_R_OUT)], a))
-        g = L.IDX_12_GAP
-        for sgn in (-1, 1):
-            dc.fillPolygon(rotate_poly([(sgn * g - 2, -L.IDX_CARD_R_IN), (sgn * g + 2, -L.IDX_CARD_R_IN),
-                                        (sgn * g + 2, -L.IDX_R_OUT), (sgn * g - 2, -L.IDX_R_OUT)], 0.0))
-        x, y, r = L.CX, L.STAR6_Y, L.STAR6_R
-        d = int(r * 0.7071 + 0.5)
-        dc.fillPolygon([(x, y - r), (x + r, y), (x, y + r), (x - r, y)])
-        dc.fillPolygon([(x - d, y - d), (x + d, y - d), (x + d, y + d), (x - d, y + d)])
+            wi, wo, ri, ro = L.IDX_W_IN, L.IDX_W_OUT, L.IDX_R_IN, L.IDX_R_OUT
+            dc.setColor(c[T["GOLD"]], -1)
+            dc.fillPolygon(self.rotate_poly([(-wi, -ri), (0, -ri), (0, -ro), (-wo, -ro)], a))
+            dc.setColor(c[T["GOLD_DK"]], -1)
+            dc.fillPolygon(self.rotate_poly([(0, -ri), (wi, -ri), (wo, -ro), (0, -ro)], a))
+        for h, txt in ((0, "12"), (3, "3"), (6, "6"), (9, "9")):
+            x, y = self.polar(L.NUM_R, h * math.pi / 6)
+            dc.setColor(c[T["PLATE"]], -1)
+            dc.drawText(x + 1, y + 1, self.f_num, txt, CENTER | VCENTER)
+            dc.setColor(c[T["GOLD"]], -1)
+            dc.drawText(x, y, self.f_num, txt, CENTER | VCENTER)
+        # crescent above the date block
+        dc.setColor(c[T["GOLD"]], -1)
+        dc.fillCircle(p(140), p(L.CRESCENT_Y), p(6))
         dc.setColor(c[T["BG"]], -1)
-        dc.fillCircle(x, y, 2)
-
-    def two_tone(self, dc, x, y, f, a, ca, b, cb):
-        wa, wb, sp = f.width(a), f.width(b), f.width(" ")
-        x0 = x - (wa + sp + wb) // 2
-        dc.setColor(ca, -1); dc.drawText(x0, y, f, a, LEFT | VCENTER)
-        dc.setColor(cb, -1); dc.drawText(x0 + wa + sp, y, f, b, LEFT | VCENTER)
-
-    def draw_gauge(self, dc, x, y, src, sensors):
-        c = self.c
-        r = L.GAUGE_R
-        dc.setColor(c[T["PLATE"]], -1); dc.fillCircle(x, y, L.GAUGE_DISC_R)
-        dc.setPenWidth(L.GAUGE_PEN)
-        dc.setColor(c[T["TRACK"]], -1); dc.drawArc(x, y, r, CLOCKWISE, 225, 315)
-        value, progress, flag = read_source(src, sensors)
-        if progress is not None:
-            p = min(progress, 1.0)
-            sweep = int(270.0 * p)
-            if sweep >= 2:
-                end = 225 - sweep
-                if end < 0:
-                    end += 360
-                warn = src == 3 and flag == 1
-                dc.setColor(c[T["WARN"]] if warn else c[T["ACCENT"]], -1)
-                dc.drawArc(x, y, r, CLOCKWISE, 225, end)
+        dc.fillCircle(p(143), p(L.CRESCENT_Y - 2), p(5))
+        # gauge discs and tracks
+        for (x, y) in self.gauge_centres():
+            dc.setColor(c[T["PLATE"]], -1); dc.fillCircle(x, y, p(L.GAUGE_DISC_R))
+            dc.setPenWidth(self.pen(1)); dc.setColor(c[T["GOLD_DK"]], -1); dc.drawCircle(x, y, p(L.GAUGE_DISC_R))
+            dc.setPenWidth(self.pen(L.GAUGE_PEN)); dc.setColor(c[T["TRACK"]], -1); dc.drawCircle(x, y, p(L.GAUGE_R))
         dc.setPenWidth(1)
-        color = c[T["TEXT"]]
-        if value is None:
-            value, color = "--", c[T["DIM"]]
-        elif flag == 1:
-            color = c[T["WARN"]] if src == 3 else c[T["DIM"]]
-        f = self.f_l if src == 3 else self.f_m
-        inner = 2 * (r - L.GAUGE_PEN // 2) - 2
-        if f.width(value) > inner:
-            f = self.f_m
-            if f.width(value) > inner:
-                f = self.f_s
-        dc.setColor(color, -1)
-        dc.drawText(x, y + L.GAUGE_VALUE_DY, f, value, CENTER | VCENTER)
-        dc.setColor(c[T["ACCENT2"]], -1)
-        self.draw_gauge_icon(dc, x, y + L.GAUGE_ICON_DY, src)
+        # diamond under the hub
+        dc.setColor(c[T["GOLD"]], -1)
+        cx, dy = p(140), p(L.HUB_DIAMOND_Y)
+        d = p(4)
+        dc.fillPolygon([(cx, dy - d), (cx + d, dy), (cx, dy + d), (cx - d, dy)])
 
-    def draw_gauge_icon(self, dc, x, y, src):
-        unit = {2: self.str["LabelCalories"], 3: self.str["LabelBattery"],
-                4: self.str["LabelMi" if self.s.get("statute") else "LabelKm"]}.get(src)
-        if unit is not None:
-            dc.drawText(x, y, font("luxe_xxs"), unit, CENTER | VCENTER)
-            return
+    def gauge_centres(self):
+        p = self.p
+        return [(p(140 - L.GAUGE_UP_DX), p(L.GAUGE_UP_Y)), (p(140 + L.GAUGE_UP_DX), p(L.GAUGE_UP_Y)),
+                (p(140 - L.GAUGE_SIDE_DX), p(L.GAUGE_SIDE_Y)), (p(140 + L.GAUGE_SIDE_DX), p(L.GAUGE_SIDE_Y))]
+
+    # ---- dynamic content
+    def gauge_icon(self, dc, x, y, src):
+        q = self.k
+        P = lambda v: int(math.floor(v * q + 0.5))
         if src == 0:
-            dc.fillEllipse(x - 3, y + 1, 2, 4); dc.fillEllipse(x + 3, y - 1, 2, 4)
+            dc.fillEllipse(x - P(3), y + P(1), P(2), P(4)); dc.fillEllipse(x + P(3), y - P(1), P(2), P(4))
         elif src == 1:
-            dc.fillCircle(x - 2, y - 2, 3); dc.fillCircle(x + 2, y - 2, 3)
-            dc.fillPolygon([(x - 5, y - 1), (x + 5, y - 1), (x, y + 5)])
+            dc.fillCircle(x - P(2), y - P(2), P(3)); dc.fillCircle(x + P(2), y - P(2), P(3))
+            dc.fillPolygon([(x - P(5), y - P(1)), (x + P(5), y - P(1)), (x, y + P(5))])
+        elif src == 2:  # flame
+            dc.fillPolygon([(x, y - P(6)), (x + P(4), y + P(1)), (x + P(3), y + P(4)), (x - P(3), y + P(4)), (x - P(4), y + P(1))])
+        elif src == 3:  # battery
+            dc.fillRectangle(x - P(6), y - P(3), P(11), P(7)); dc.fillRectangle(x + P(5), y - P(1), P(2), P(3))
+        elif src == 4:  # route arrow
+            dc.setPenWidth(self.pen(2)); dc.drawLine(x - P(5), y + P(4), x + P(4), y - P(4)); dc.setPenWidth(1)
+            dc.fillPolygon([(x + P(5), y - P(5)), (x, y - P(4)), (x + P(4), y)])
         elif src == 5:
-            dc.setPenWidth(2)
-            pts = [(x - 6, y + 4), (x - 3, y + 4), (x - 3, y + 1), (x, y + 1), (x, y - 2), (x + 3, y - 2),
-                   (x + 3, y - 5), (x + 6, y - 5)]
+            dc.setPenWidth(self.pen(2))
+            pts = [(x - P(6), y + P(4)), (x - P(3), y + P(4)), (x - P(3), y + P(1)), (x, y + P(1)), (x, y - P(2)),
+                   (x + P(3), y - P(2)), (x + P(3), y - P(5)), (x + P(6), y - P(5))]
             for i in range(len(pts) - 1):
                 dc.drawLine(*pts[i], *pts[i + 1])
             dc.setPenWidth(1)
         elif src == 6:
-            dc.fillPolygon([(x + 2, y - 6), (x - 3, y + 1), (x + 1, y + 1)])
-            dc.fillPolygon([(x - 1, y - 1), (x + 3, y - 1), (x - 2, y + 6)])
+            dc.fillPolygon([(x + P(2), y - P(6)), (x - P(3), y + P(1)), (x + P(1), y + P(1))])
+            dc.fillPolygon([(x - P(1), y - P(1)), (x + P(3), y - P(1)), (x - P(2), y + P(6))])
         elif src == 7:
-            dc.setPenWidth(2)
-            pts = [(x - 6, y + 1), (x - 3, y - 3), (x, y + 3), (x + 3, y - 3), (x + 6, y + 1)]
+            dc.setPenWidth(self.pen(2))
+            pts = [(x - P(6), y + P(1)), (x - P(3), y - P(3)), (x, y + P(3)), (x + P(3), y - P(3)), (x + P(6), y + P(1))]
             for i in range(len(pts) - 1):
                 dc.drawLine(*pts[i], *pts[i + 1])
             dc.setPenWidth(1)
 
-    def draw_sun(self, dc, rising, minutes):
-        c = self.c
-        text = format_time(minutes, self.s.get("is24", True))
-        tw = self.f_xs.width(text)
-        gw = L.SUN_ICON_W + 3 + tw
-        left = L.CX - L.SUN_GAP // 2 - gw if rising else L.CX + L.SUN_GAP // 2
-        y = L.SUN_Y
-        ix = left + L.SUN_ICON_W // 2
-        dc.setColor(c[T["GOLD"]], -1)
-        dc.setPenWidth(2); dc.drawArc(ix, y + 3, 4, COUNTER_CLOCKWISE, 0, 180)
-        dc.setPenWidth(1); dc.drawLine(ix - 6, y + 3, ix + 7, y + 3)
+    def draw_gauge(self, dc, x, y, src, sensors):
+        c, p = self.c, self.p
+        color = SOURCE_COLORS[src] if self.multi else c[T["ACCENT"]]
+        value, progress, flag = read_source(src, sensors)
+        if progress is not None:
+            pr = max(0.0, min(progress, 1.0))
+            sweep = int(360.0 * pr)
+            if sweep >= 2:
+                end = 90 - sweep
+                if end < 0:
+                    end += 360
+                col = c[T["WARN"]] if (src == 3 and flag == 1) else color
+                dc.setColor(col, -1)
+                dc.setPenWidth(self.pen(L.GAUGE_PEN))
+                dc.drawArc(x, y, p(L.GAUGE_R), CLOCKWISE, 90, end)
+                dc.setPenWidth(1)
+        batt = src == 3
+        dc.setColor(color, -1)
+        self.gauge_icon(dc, x, y + p(L.GAUGE_BATT_ICON_DY if batt else L.GAUGE_ICON_DY), src)
+        tcol = c[T["TEXT"]]
+        if value is None:
+            value, tcol = "--", c[T["DIM"]]
+        elif flag == 1:
+            tcol = c[T["WARN"]] if src == 3 else c[T["DIM"]]
+        f = self.f_l if src == 3 else self.f_m
+        inner = 2 * (p(L.GAUGE_R) - self.pen(L.GAUGE_PEN) // 2) - 2
+        if f.width(value) > inner:
+            f = self.f_m
+            if f.width(value) > inner:
+                f = self.f_s
+        dc.setColor(tcol, -1)
+        dc.drawText(x, y + p(L.GAUGE_VALUE_DY), f, value, CENTER | VCENTER)
+        label = self.str[LABELS[src]]
+        if src == 4 and self.s.get("statute"):
+            label = self.str["LabelMi"]
+        dc.setColor(color, -1)
+        dc.drawText(x, y + p(L.GAUGE_BATT_LABEL_DY if batt else L.GAUGE_LABEL_DY), self.f_xs, label, CENTER | VCENTER)
+
+    def sun_icon(self, dc, x, y, rising):
+        p = self.p
+        dc.setColor(self.c[T["GOLD"]], -1)
+        dc.setPenWidth(self.pen(2)); dc.drawArc(x, y + p(2), p(5), COUNTER_CLOCKWISE, 0, 180)
+        dc.setPenWidth(self.pen(1))
+        dc.drawLine(x - p(8), y + p(2), x + p(8), y + p(2))
+        for ang in (30, 90, 150):
+            a = math.radians(ang)
+            dc.drawLine(x + int(round(p(7) * math.cos(a))), y + p(2) - int(round(p(7) * math.sin(a))),
+                        x + int(round(p(9) * math.cos(a))), y + p(2) - int(round(p(9) * math.sin(a))))
+        dc.setPenWidth(1)
         if rising:
-            dc.fillPolygon([(ix, y - 7), (ix - 3, y - 3), (ix + 3, y - 3)])
+            dc.fillPolygon([(x, y + p(3)), (x - p(2), y + p(6)), (x + p(2), y + p(6))])
         else:
-            dc.fillPolygon([(ix, y - 2), (ix - 3, y - 6), (ix + 3, y - 6)])
-        dc.setColor(c[T["TEXT"]], -1)
-        dc.drawText(left + L.SUN_ICON_W + 3, y, self.f_xs, text, LEFT | VCENTER)
+            dc.fillPolygon([(x, y + p(7)), (x - p(2), y + p(4)), (x + p(2), y + p(4))])
+
+    def panel_icon(self, dc, x, y, kind):
+        p = self.p
+        dc.setColor(self.c[T["GOLD"]], -1)
+        if kind == 0:   # small mosque: dome + base + finial
+            dc.fillCircle(x, y, p(4)); dc.fillRectangle(x - p(5), y, p(10) + 1, p(6))
+            dc.fillRectangle(x, y - p(7), 1, p(3))
+        else:           # crescent and star
+            dc.fillCircle(x, y, p(5))
+            dc.setColor(self.c[T["PLATE"]], -1); dc.fillCircle(x + p(2), y - p(2), p(4))
+            dc.setColor(self.c[T["GOLD"]], -1); dc.fillCircle(x + p(4), y + p(2), 1)
+
+    def draw_panel(self, dc, cx, kind, name, value, value_color):
+        p = self.p
+        x0 = cx - p(L.PANEL_W) // 2
+        self.panel_icon(dc, x0 + p(11), p(L.PANEL_Y0 + L.PANEL_H // 2), kind)
+        tx = x0 + p(20) + (p(L.PANEL_W) - p(22)) // 2
+        dc.setColor(self.c[T["TEXT"]], -1)
+        dc.drawText(tx, p(L.PANEL_Y0 + 8), self.f_xs, name, CENTER | VCENTER)
+        dc.setColor(value_color, -1)
+        dc.drawText(tx, p(L.PANEL_Y0 + 20), self.f_s, value, CENTER | VCENTER)
 
     def draw_prayers(self, dc, now, watch_offset):
-        c, s = self.c, self.s
+        c, s, p = self.c, self.s, self.p
+        is24 = s.get("is24", True)
         if s["lat"] == 0 and s["lon"] == 0:
             dc.setColor(c[T["DIM"]], -1)
-            dc.drawText(L.CX, L.NEXT_Y, self.f_m, self.str["SetLocation"], CENTER | VCENTER)
-            return
+            dc.drawText(p(140 - L.PANEL_DX), p(L.PANEL_Y0 + 8), self.f_xs, self.str["SetLocation"], CENTER | VCENTER)
+            dc.drawText(p(140 - L.PANEL_DX), p(L.PANEL_Y0 + 20), self.f_xs, self.str["SetLocation2"], CENTER | VCENTER)
+            return None
         offset = s["utc_offset"] if s.get("tz_manual") else watch_offset
         tz = offset / 3600.0
         day = calc.local_epoch_day(now, offset)
-        days = [calc.compute_day(day + k, s["lat"], s["lon"], tz, s["method"], s["asr"], s["highlat"])
-                for k in range(3)]
-        nxt = None
+        days = [calc.compute_day(day + k, s["lat"], s["lon"], tz, s["method"], s["asr"], s["highlat"]) for k in range(3)]
+        found = []
         for dd in range(3):
-            for p in calc.PRAYERS:
-                mo = calc.moment(day + dd, days[dd][p], tz)
+            for pr in calc.PRAYERS:
+                mo = calc.moment(day + dd, days[dd][pr], tz)
                 if mo is not None and mo > now:
-                    nxt = (p, mo, dd)
-                    break
-            if nxt:
+                    found.append((pr, mo, dd))
+                    if len(found) == 2:
+                        break
+            if len(found) == 2:
                 break
-        next_idx, next_day = (nxt[0], nxt[2]) if nxt else (-1, 0)
-        cell = L.SCHED_W // 5
-        x0 = L.CX - L.SCHED_W // 2 + cell // 2
-        for k, p in enumerate(calc.PRAYERS):
-            m = calc.to_minutes(days[next_day][p])
-            color = c[T["TEXT"]]
-            if p == next_idx:
-                color = c[T["ACCENT2"]]
-            elif nxt is None or (next_day == 0 and p < next_idx):
-                color = c[T["DIM"]]
-            x = x0 + k * cell
-            dc.setColor(color, -1)
-            dc.drawText(x, L.SCHED_Y, self.f_xs, format_time(m, s.get("is24", True)), CENTER | VCENTER)
-            if p == next_idx:
-                dc.fillRectangle(x - 8, L.SCHED_Y + 8, 16, 2)
-        names = {0: "Prayer0", 2: "Prayer2", 3: "Prayer3", 5: "Prayer5", 6: "Prayer6"}
-        if nxt:
-            self.two_tone(dc, L.CX, L.NEXT_Y, self.f_m, self.str[names[next_idx]], c[T["ACCENT2"]],
-                          calc.countdown_text(nxt[1] - now), c[T["ACCENT"]])
-        else:
-            dc.setColor(c[T["DIM"]], -1)
-            dc.drawText(L.CX, L.NEXT_Y, self.f_m, "--", CENTER | VCENTER)
-        self.draw_sun(dc, True, calc.to_minutes(days[0][1]))
-        self.draw_sun(dc, False, calc.to_minutes(days[0][4]))
-        return nxt
+        if found:
+            nxt = found[0]
+            self.draw_panel(dc, p(140 - L.PANEL_DX), 0, self.str[PRAYER_NAMES[nxt[0]]],
+                            calc.countdown_text(nxt[1] - now), c[T["GOLD"]])
+        if len(found) > 1:
+            fol = found[1]
+            self.draw_panel(dc, p(140 + L.PANEL_DX), 1, self.str[PRAYER_NAMES[fol[0]]],
+                            format_time(calc.to_minutes(days[fol[2]][fol[0]]), is24), c[T["TEXT"]])
+        for sgn, idx in ((-1, 1), (1, 4)):
+            x = p(140 + sgn * L.SUN_DX)
+            self.sun_icon(dc, x, p(L.SUN_ICON_Y), sgn < 0)
+            dc.setColor(c[T["TEXT"]], -1)
+            dc.drawText(x, p(L.SUN_TIME_Y), self.f_s, format_time(calc.to_minutes(days[0][idx]), is24), CENTER | VCENTER)
+        return found[0] if found else None
 
-    def dauphine(self, dc, a, ln, tail, w):
+    def hand(self, dc, a, ln, w, tail):
         c = self.c
-        dc.setColor(c[T["GOLD"]], -1); dc.fillPolygon(rotate_poly([(0, -ln), (-w, 0), (0, tail)], a))
-        dc.setColor(c[T["GOLD_DK"]], -1); dc.fillPolygon(rotate_poly([(0, -ln), (w, 0), (0, tail)], a))
+        dc.setColor(c[T["PLATE"]], -1)
+        dc.fillPolygon(self.rotate_poly([(-w - 1, tail + 1), (w + 1, tail + 1), (w, -ln - 1), (0, -ln - 5), (-w, -ln - 1)], a))
+        dc.setColor(c[T["GOLD"]], -1)
+        dc.fillPolygon(self.rotate_poly([(-w, tail), (w, tail), (w - 0.5, -ln), (0, -ln - 4), (-w + 0.5, -ln)], a))
+        dc.setColor(c[T["TEXT"]], -1)
+        dc.fillPolygon(self.rotate_poly([(-w + 1.5, -14), (w - 1.5, -14), (w - 1.5, -ln + 3), (-w + 1.5, -ln + 3)], a))
 
     def seconds_hand(self, dc, sec):
-        c = self.c
+        c, p = self.c, self.p
         a = sec * math.pi / 30
-        tip, tail = polar(L.SEC_LEN, a), polar(-L.SEC_TAIL, a)
-        weight = polar(-(L.SEC_TAIL - L.SEC_WEIGHT_R - 2), a)
+        tip, tail = self.polar(L.SEC_LEN, a), self.polar(-L.SEC_TAIL, a)
+        weight = self.polar(-(L.SEC_TAIL - L.SEC_WEIGHT_R - 2), a)
         dc.setColor(c[T["SECONDS"]], -1)
-        dc.setPenWidth(L.SEC_PEN); dc.drawLine(tail[0], tail[1], tip[0], tip[1]); dc.setPenWidth(1)
-        dc.fillCircle(weight[0], weight[1], L.SEC_WEIGHT_R)
-        dc.fillCircle(L.CX, L.CY, L.CAP_R - 1)
-        dc.setColor(c[T["PLATE"]], -1); dc.fillCircle(L.CX, L.CY, L.CAP_INNER_R)
+        dc.setPenWidth(self.pen(L.SEC_PEN)); dc.drawLine(tail[0], tail[1], tip[0], tip[1])
+        dc.setPenWidth(self.pen(2)); dc.drawCircle(weight[0], weight[1], p(L.SEC_WEIGHT_R)); dc.setPenWidth(1)
+        cx = self.size // 2
+        dc.setColor(c[T["GOLD"]], -1); dc.fillCircle(cx, cx, p(L.CAP_R))
+        dc.setColor(c[T["SECONDS"]], -1); dc.fillCircle(cx, cx, p(L.CAP_INNER_R))
+        dc.setColor(c[T["PLATE"]], -1); dc.fillCircle(cx, cx, max(1, p(1.5)))
 
-    def render(self, now, watch_offset, sensors, show_seconds=True):
-        """Returns (280x280 MIP-quantised image, info dict)."""
-        dc = Dc()
-        c, s = self.c, self.s
-        dc.setColor(c[T["BG"]], c[T["BG"]]); dc.clear()
-        self.draw_background(dc)
-        self.draw_chapter_ring(dc)
+    def render(self, now, watch_offset, sensors, show_seconds=True, mip=True):
+        dc = Dc(self.size, self.size)
+        c, s, p = self.c, self.s, self.p
+        self.draw_static(dc)
         local = now + watch_offset
         day = local // 86400
         hour, minute, sec = (local % 86400) // 3600, (local % 3600) // 60, local % 60
-        if s["ayah"] != 7:
-            code = str(s["ayah"] + 1)
-            if s["ayah"] == 5 and minute % 2 == 1:
-                code = "8"
-            dc.setColor(c[T["GOLD"]], -1)
-            dc.drawText(L.CX, L.AYAH_Y, self.f_ayah, code, CENTER | VCENTER)
+        # date block
         y, m, d = calc.civil_from_days(day)
-        months = [self.str["Month%d" % i] for i in range(1, 13)]
-        self.two_tone(dc, L.CX, L.GREG_Y, self.f_s, self.str["Day%d" % calc.day_of_week(day)], c[T["ACCENT"]],
-                      "%d %s %d" % (d, months[m - 1], y), c[T["TEXT"]])
+        dc.setColor(c[T["TEXT"]], -1)
+        dc.drawText(p(140), p(L.DAY_NAME_Y), self.f_xs, self.str["Day%d" % calc.day_of_week(day)], CENTER | VCENTER)
+        dc.drawText(p(140), p(L.DAY_NUM_Y), self.f_l, str(d), CENTER | VCENTER)
+        dc.drawText(p(140), p(L.MONTH_Y), self.f_xs, "%s %d" % (self.str["Month%d" % m], y), CENTER | VCENTER)
         hy, hm, hd = calc.hijri_for_epoch_day(day, s["hijri_corr"])
-        dc.setColor(c[T["ACCENT2"]], -1)
-        dc.drawText(L.CX, L.HIJRI_Y, self.f_s, "%d %s %d %s" % (hd, self.str["Hijri%d" % hm], hy,
-                                                                 self.str["HijriSuffix"]), CENTER | VCENTER)
+        dc.setColor(c[T["GOLD"]], -1)
+        dc.drawText(p(140), p(L.HIJRI_Y), self.f_xs, "%d %s %d %s" % (hd, self.str["Hijri%d" % hm], hy,
+                                                                     self.str["HijriSuffix"]), CENTER | VCENTER)
         g = s["gauges"]
-        self.draw_gauge(dc, L.CX - L.GAUGE_DX, L.GAUGE_TOP_Y, g[0], sensors)
-        self.draw_gauge(dc, L.CX + L.GAUGE_DX, L.GAUGE_TOP_Y, g[1], sensors)
-        self.draw_gauge(dc, L.CX - L.GAUGE_DX, L.GAUGE_BOT_Y, g[2], sensors)
-        self.draw_gauge(dc, L.CX + L.GAUGE_DX, L.GAUGE_BOT_Y, g[3], sensors)
+        for (x, yy), src in zip(self.gauge_centres(), g):
+            self.draw_gauge(dc, x, yy, src, sensors)
         nxt = self.draw_prayers(dc, now, watch_offset)
-        self.dauphine(dc, ((hour % 12) + minute / 60.0) * math.pi / 6, L.HOUR_LEN, L.HOUR_TAIL, L.HOUR_W)
-        self.dauphine(dc, minute * math.pi / 30, L.MIN_LEN, L.MIN_TAIL, L.MIN_W)
-        dc.setColor(c[T["GOLD"]], -1); dc.fillCircle(L.CX, L.CY, L.CAP_R)
-        dc.setColor(c[T["GOLD_DK"]], -1); dc.fillCircle(L.CX, L.CY, L.CAP_INNER_R)
+        # Ayah and reference
+        if s["ayah"] != 7:
+            code, ref = str(s["ayah"] + 1), self.str["AyahRef%d" % (s["ayah"] + 1)]
+            if s["ayah"] == 5:
+                verse = minute % 4
+                code = "6ABC"[verse]
+                ref = ref + str(verse + 1)
+            dc.setColor(c[T["GOLD"]], -1)
+            dc.drawText(p(140), p(L.AYAH_Y), self.f_ayah, code, CENTER | VCENTER)
+            dc.setColor(c[T["DIM"]], -1)
+            dc.drawText(p(140), p(L.AYAH_REF_Y), self.f_xs, ref, CENTER | VCENTER)
+        # hands
+        self.hand(dc, ((hour % 12) + minute / 60.0) * math.pi / 6, L.HOUR_LEN, L.HOUR_W, L.HOUR_TAIL)
+        self.hand(dc, minute * math.pi / 30, L.MIN_LEN, L.MIN_W, L.MIN_TAIL)
+        cx = self.size // 2
+        dc.setColor(c[T["GOLD"]], -1); dc.fillCircle(cx, cx, p(L.CAP_R))
+        dc.setColor(c[T["GOLD_DK"]], -1); dc.fillCircle(cx, cx, p(L.CAP_INNER_R))
         if show_seconds:
             self.seconds_hand(dc, sec)
-        return to_mip(dc.bitmap()), {"next": nxt, "hijri": (hy, hm, hd), "time": (hour, minute, sec)}
+        img = dc.bitmap()
+        return (to_mip(img) if mip else img), {"next": nxt, "hijri": (hy, hm, hd), "time": (hour, minute, sec)}
+
+    def render_aod(self, now, watch_offset):
+        """AMOLED always-on (burn-in protection) frame: mirror of drawAlwaysOn()."""
+        dc = Dc(self.size, self.size)
+        c, p = self.c, self.p
+        dc.setColor(0, 0); dc.clear()
+        local = now + watch_offset
+        hour, minute = (local % 86400) // 3600, (local % 3600) // 60
+        shift = (minute % 5) - 2
+        cx = self.size // 2 + shift
+        cy = self.size // 2 + shift
+        dc.setColor(c[T["DIM"]], -1)
+        for h in range(0, 12, 3):
+            x, y = self.polar(L.NUM_R + 6, h * math.pi / 6)
+            dc.fillCircle(x + shift, y + shift, max(1, p(2)))
+        dc.setPenWidth(self.pen(2))
+        for a, ln in ((((hour % 12) + minute / 60.0) * math.pi / 6, L.HOUR_LEN), (minute * math.pi / 30, L.MIN_LEN)):
+            tip = self.polar(ln, a)
+            dc.setColor(c[T["GOLD"]], -1)
+            dc.drawLine(cx, cy, tip[0] + shift, tip[1] + shift)
+        dc.setPenWidth(1)
+        dc.setColor(c[T["GOLD"]], -1); dc.drawCircle(cx, cy, p(4))
+        img = dc.bitmap()
+        lit = sum(1 for px in img.getdata() if max(px) > 16) / float(self.size * self.size)
+        return img, {"lit_fraction": lit}
 
 
-DEFAULT_SETTINGS = dict(preset=0, background=0, gauges=[0, 1, 2, 3], hijri_corr=0, ayah=0, method=0, asr=1,
+DEFAULT_SETTINGS = dict(preset=0, background=0, gauges=[0, 1, 2, 3], hijri_corr=0, ayah=6, method=0, asr=1,
                         highlat=1, lat=33.8754, lon=10.8575, tz_manual=False, utc_offset=3600, is24=True)
 
 # Simulated sensor values for previews (clearly NOT live data)
 DEFAULT_SENSORS = {
-    0: {"value": 8432, "goal": 10000},
-    1: {"value": 68},
-    2: {"value": 1840},
-    3: {"battery": 87.0},
+    0: {"value": 7385, "goal": 10000},
+    1: {"value": 72},
+    2: {"value": 1450},
+    3: {"battery": 76.0},
     4: {"value": 642000},
     5: {"value": 7, "goal": 10},
     6: {"value": 72},

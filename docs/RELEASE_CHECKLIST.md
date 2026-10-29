@@ -8,14 +8,16 @@ Legend: ✅ done in this repository · ⬜ to do on a machine with the Connect I
 * ✅ Static project checks pass — `python3 tools/check_project.py`
 * ✅ Monkey C syntax of all sources parses (open-source parser, part of the check above)
 * ✅ Prayer/sun/Hijri algorithms validated against independent libraries — `python3 tools/validate_calculations.py`
-* ✅ Circular layout validated with worst-case EN/FR content — `python3 tools/check_layout.py`
-* ✅ Reference renders of 6 styles, 4 backgrounds, 8 Ayah states and 13 edge cases — `python3 tools/make_previews.py`
+* ✅ Circular layout validated for all 8 screen sizes (218–454 px) — `python3 tools/check_layout.py`
+* ✅ Reference renders: 6 styles, 4 backgrounds, 8 screen sizes, AMOLED always-on, 11 Ayah states, 13 edge cases — `python3 tools/make_previews.py`
 
 ## Compile (requires the SDK)
 
-* ⬜ Install the Connect IQ SDK Manager, the current SDK and the **fēnix 7X Pro** device files
+* ⬜ Install the Connect IQ SDK Manager, the current SDK and the device files
+* ⬜ `python3 tools/update_products.py --write`, review the selected devices
 * ⬜ Generate a developer key (keep it **outside** the repository, never commit it)
-* ⬜ `monkeyc -f monkey.jungle -d fenix7xpro -o bin/LuxeHijriPrayer.prg -y <key.der> -w`
+* ⬜ Build at least one device per screen size and type: fenix7s (240 MIP), fenix7 (260 MIP), fenix7xpro (280 MIP), fr255s (218 MIP), venu2s (360 AMOLED), fr165 (390 AMOLED), epix2pro47mm (416 AMOLED), epix2pro51mm / fr965 (454 AMOLED)
+* ⬜ `monkeyc -f monkey.jungle -d <device> -o bin/<device>.prg -y <key.der> -w`
 * ⬜ Fix every compiler error or warning (none could be checked here: types and API signatures
   were reviewed by hand only)
 * ⬜ Check memory in the simulator (*File → View Memory*); the watch-face limit is shown there
@@ -25,7 +27,9 @@ Legend: ✅ done in this repository · ⬜ to do on a machine with the Connect I
 * ⬜ Unit tests: `monkeyc ... --unit-test -o bin/test.prg` then `monkeydo bin/test.prg fenix7xpro -t` (5 tests in `test/LuxeTests.mc`)
 * ⬜ Compare the simulator with `docs/previews/*` for each style and background
 * ⬜ *Settings → Trigger App Settings* (or the settings editor): change every setting, confirm the dial updates
-* ⬜ *Settings → Low Power Mode*: seconds hand keeps moving (option “Always”) or disappears (“Only after wrist raise”)
+* ⬜ *Settings → Low Power Mode* on MIP: seconds hand keeps moving (option “Always”) or disappears (“Only after wrist raise”)
+* ⬜ Low power on AMOLED: always-on frame only; *File → View Watchface Diagnostics* shows no burn-in warning
+* ⬜ Memory on the largest AMOLED (454 px): the static and frame buffers must be allocated (otherwise the face falls back to direct drawing)
 * ⬜ *File → View Watchface Diagnostics*: partial-update time below the budget; if not, the face disables low-power seconds by itself
 * ⬜ *Simulation → Activity Data*: steps/calories/floors/distance; HR and sensor history present and absent
 * ⬜ Set the simulator time to 23:59 → 00:00, the end of a Hijri month and 1 Muharram; check the dates and the Isha → Fajr countdown

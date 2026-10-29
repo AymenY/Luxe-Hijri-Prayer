@@ -55,15 +55,47 @@
   },
   {
    "code": "6",
-   "ref": "Al-Ikhlas 112:1-4",
+   "ref": "Al-Ikhlas 112:1",
    "name_fr": "Al-Ikhlâs 112:1-4",
    "lines": [
-    "قُلْ هُوَ اللَّهُ أَحَدٌ",
+    "قُلْ هُوَ اللَّهُ أَحَدٌ"
+   ],
+   "fr": "« Dis : Il est Allah, Unique. »",
+   "excerpt": false,
+   "note": "Glyphs 6, A, B, C hold verses 1-4; the watch face shows one verse per minute (minute % 4)."
+  },
+  {
+   "code": "A",
+   "ref": "Al-Ikhlas 112:2",
+   "name_fr": "Al-Ikhlâs 112:2",
+   "lines": [
     "اللَّهُ الصَّمَدُ"
    ],
-   "fr": "« Dis : Il est Allah, Unique. Allah, Le Seul à être imploré pour ce que nous désirons. Il n'a jamais engendré, n'a pas été engendré non plus. Et nul n'est égal à Lui. »",
+   "fr": "« Allah, Le Seul à être imploré pour ce que nous désirons. »",
    "excerpt": false,
-   "note": "Glyph 6 = verses 1-2, glyph 8 = verses 3-4; the watch face alternates them every minute so the whole surah is shown at a legible size."
+   "part_of": "6"
+  },
+  {
+   "code": "B",
+   "ref": "Al-Ikhlas 112:3",
+   "name_fr": "Al-Ikhlâs 112:3",
+   "lines": [
+    "لَمْ يَلِدْ وَلَمْ يُولَدْ"
+   ],
+   "fr": "« Il n'a jamais engendré, n'a pas été engendré non plus. »",
+   "excerpt": false,
+   "part_of": "6"
+  },
+  {
+   "code": "C",
+   "ref": "Al-Ikhlas 112:4",
+   "name_fr": "Al-Ikhlâs 112:4",
+   "lines": [
+    "وَلَمْ يَكُنْ لَهُ كُفُوًا أَحَدٌ"
+   ],
+   "fr": "« Et nul n'est égal à Lui. »",
+   "excerpt": false,
+   "part_of": "6"
   },
   {
    "code": "7",
@@ -74,18 +106,6 @@
    ],
    "fr": "« Et ma réussite ne dépend que d'Allah. »",
    "excerpt": true
-  },
-  {
-   "code": "8",
-   "ref": "Al-Ikhlas 112:3-4",
-   "name_fr": "Al-Ikhlâs 112:3-4",
-   "lines": [
-    "لَمْ يَلِدْ وَلَمْ يُولَدْ",
-    "وَلَمْ يَكُنْ لَهُ كُفُوًا أَحَدٌ"
-   ],
-   "fr": "« Dis : Il est Allah, Unique. Allah, Le Seul à être imploré pour ce que nous désirons. Il n'a jamais engendré, n'a pas été engendré non plus. Et nul n'est égal à Lui. »",
-   "excerpt": false,
-   "part_of": "6"
   }
  ]
 }

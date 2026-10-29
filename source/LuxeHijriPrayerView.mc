@@ -7,45 +7,58 @@ import Toybox.System;
 import Toybox.Time;
 import Toybox.WatchUi;
 
-// Luxe Hijri Prayer watch face for the fenix 7X Pro (280 x 280, 64-colour MIP).
+// Luxe Hijri Prayer watch face for round colour Garmin watches (218 to 454 px, MIP and AMOLED).
+//
+// Geometry is defined for a 280 x 280 dial (source/Layout.mc) and scaled to the screen with
+// p(); bitmap fonts come in one set per screen size (resource qualifiers).
 //
 // Update strategy
-//  * onUpdate() (every second after a wrist raise, once per minute in low power) draws the
-//    complete dial except the seconds hand into a full-screen buffered bitmap, copies it to
-//    the screen and draws the seconds hand on top.
-//  * onPartialUpdate() (every second in low power) only restores the area covered by the
-//    previous seconds hand from the buffer and draws the new hand, clipped to the union of
-//    both bounding boxes, to stay inside the watch-face power budget.
-//  * If the system reports that the budget was exceeded, or the user chose "Only after wrist
-//    raise", the seconds hand is hidden in low power instead of freezing.
+//  * The static layer (background art, frame, chapter ring, numerals, gauge discs) is drawn
+//    once into a buffered bitmap and redrawn only after a settings change.
+//  * onUpdate() copies the static layer, draws the live content (dates, gauges, prayers,
+//    Ayah, hour/minute hands) and then the seconds hand.
+//  * MIP screens: the frame without the seconds hand is also kept in a second buffer, so that
+//    onPartialUpdate() (every second in low power) only restores the area under the previous
+//    seconds hand and draws the new one, clipped. If the system reports the power budget was
+//    exceeded, or the user chose "Only after wrist raise", the seconds hand is hidden in low
+//    power instead of freezing.
+//  * AMOLED screens (burn-in protection): in always-on mode only thin hour/minute hands and four
+//    dots are drawn on black, shifted every minute; nothing else stays lit.
 // tools/face.py mirrors this drawing code for the reference previews.
 class LuxeHijriPrayerView extends WatchUi.WatchFace {
 
     hidden var mSettings as LuxeSettings;
     hidden var mSchedule as PrayerSchedule;
     hidden var mColors as Array<Number> = [] as Array<Number>;
+    hidden var mMulticolor as Boolean = false;
     hidden var mBgOps as Array? = null;
+    hidden var mFrameOps as Array? = null;
 
-    hidden var mFontXXS;
-    hidden var mFontXS;
-    hidden var mFontS;
-    hidden var mFontM;
+    hidden var mFontNum;
     hidden var mFontL;
+    hidden var mFontM;
+    hidden var mFontS;
+    hidden var mFontXS;
     hidden var mFontAyah;
 
     hidden var mDays as Array<String> = [];
     hidden var mMonths as Array<String> = [];
     hidden var mHijriMonths as Array<String> = [];
     hidden var mPrayerNames as Array = [];
-    hidden var mUnits as Array<String> = [];   // KCAL, %, KM, MI
+    hidden var mLabels as Array<String> = [];
+    hidden var mLabelMi as String = "MI";
+    hidden var mAyahRefs as Array<String> = [];
     hidden var mHijriSuffix as String = "";
     hidden var mSetLocation as String = "";
+    hidden var mSetLocation2 as String = "";
 
-    hidden var mIndexPolys as Array = [];
-    hidden var mTicks as Array = [];
+    hidden var mSize as Number = 280;
+    hidden var mK as Float = 1.0;
+    hidden var mBurnIn as Boolean = false;
 
-    hidden var mBufferRef = null;   // Graphics.BufferedBitmapReference (API 4+)
-    hidden var mBuffer = null;      // Graphics.BufferedBitmap fallback
+    hidden var mStaticRef = null;   // static layer (BufferedBitmapReference or BufferedBitmap)
+    hidden var mFrameRef = null;    // full frame without seconds hand (MIP only)
+    hidden var mStaticDirty as Boolean = true;
     hidden var mSleeping as Boolean = false;
     hidden var mPartialAllowed as Boolean = true;
     hidden var mLastSecBox as Array<Number>? = null;
@@ -55,28 +68,38 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         mSettings = new LuxeSettings();
         mSchedule = new PrayerSchedule();
         mColors = Themes.PRESETS[0] as Array<Number>;
+        var ds = System.getDeviceSettings();
+        mBurnIn = (ds has :requiresBurnInProtection) && ds.requiresBurnInProtection;
         loadStrings();
-        buildDialGeometry();
         applySettings();
     }
 
     function onLayout(dc as Graphics.Dc) as Void {
-        mFontXXS = WatchUi.loadResource(Rez.Fonts.LuxeXXS);
-        mFontXS = WatchUi.loadResource(Rez.Fonts.LuxeXS);
-        mFontS = WatchUi.loadResource(Rez.Fonts.LuxeS);
-        mFontM = WatchUi.loadResource(Rez.Fonts.LuxeM);
+        mSize = dc.getWidth();
+        mK = mSize / 280.0;
+        mFontNum = WatchUi.loadResource(Rez.Fonts.LuxeNum);
         mFontL = WatchUi.loadResource(Rez.Fonts.LuxeL);
+        mFontM = WatchUi.loadResource(Rez.Fonts.LuxeM);
+        mFontS = WatchUi.loadResource(Rez.Fonts.LuxeS);
+        mFontXS = WatchUi.loadResource(Rez.Fonts.LuxeXS);
         mFontAyah = WatchUi.loadResource(Rez.Fonts.Ayah);
-        createBuffer(dc.getWidth(), dc.getHeight());
+        mStaticRef = createBuffer(dc.getWidth(), dc.getHeight());
+        if (!mBurnIn) {
+            mFrameRef = createBuffer(dc.getWidth(), dc.getHeight());
+        }
+        mStaticDirty = true;
     }
 
     // ------------------------------------------------------------------ settings
     function applySettings() as Void {
         mSettings.load();
         mColors = Themes.PRESETS[mSettings.preset] as Array<Number>;
+        mMulticolor = Themes.MULTICOLOR[mSettings.preset] as Boolean;
         mBgOps = Backgrounds.load(mSettings.background);
+        mFrameOps = Backgrounds.loadFrame();
         mSchedule.configure(mSettings.latitude, mSettings.longitude, mSettings.method,
                             mSettings.asrFactor, mSettings.highLat);
+        mStaticDirty = true;
     }
 
     function disablePartialUpdates() as Void {
@@ -94,10 +117,15 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
                         s(Rez.Strings.Hijri9), s(Rez.Strings.Hijri10), s(Rez.Strings.Hijri11), s(Rez.Strings.Hijri12)];
         mPrayerNames = [s(Rez.Strings.Prayer0), null, s(Rez.Strings.Prayer2), s(Rez.Strings.Prayer3), null,
                         s(Rez.Strings.Prayer5), s(Rez.Strings.Prayer6)];
-        mUnits = [s(Rez.Strings.LabelCalories), s(Rez.Strings.LabelBattery), s(Rez.Strings.LabelKm),
-                  s(Rez.Strings.LabelMi)];
+        mLabels = [s(Rez.Strings.LabelSteps), s(Rez.Strings.LabelHeart), s(Rez.Strings.LabelCalories),
+                   s(Rez.Strings.LabelBattery), s(Rez.Strings.LabelKm), s(Rez.Strings.LabelFloors),
+                   s(Rez.Strings.LabelBodyBattery), s(Rez.Strings.LabelStress)];
+        mLabelMi = s(Rez.Strings.LabelMi);
+        mAyahRefs = [s(Rez.Strings.AyahRef1), s(Rez.Strings.AyahRef2), s(Rez.Strings.AyahRef3), s(Rez.Strings.AyahRef4),
+                     s(Rez.Strings.AyahRef5), s(Rez.Strings.AyahRef6), s(Rez.Strings.AyahRef7)];
         mHijriSuffix = s(Rez.Strings.HijriSuffix);
         mSetLocation = s(Rez.Strings.SetLocation);
+        mSetLocation2 = s(Rez.Strings.SetLocation2);
     }
 
     hidden function s(id) as String {
@@ -116,40 +144,56 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     }
 
     hidden function showSeconds() as Boolean {
-        return !mSleeping || (mSettings.secondsAlways && mPartialAllowed);
+        return !mSleeping || (!mBurnIn && mSettings.secondsAlways && mPartialAllowed);
     }
 
-    // ------------------------------------------------------------------ buffer
-    hidden function createBuffer(w as Number, h as Number) as Void {
+    // ------------------------------------------------------------------ buffers
+    hidden function createBuffer(w as Number, h as Number) {
         if (Graphics has :createBufferedBitmap) {
-            mBufferRef = Graphics.createBufferedBitmap({:width => w, :height => h});
-        } else {
-            mBuffer = new Graphics.BufferedBitmap({:width => w, :height => h});
+            return Graphics.createBufferedBitmap({:width => w, :height => h});
         }
+        return new Graphics.BufferedBitmap({:width => w, :height => h});
     }
 
-    hidden function getBuffer() {
-        if (mBufferRef != null) {
-            return mBufferRef.get();
+    // The bitmap behind a reference (API 4+) or the bitmap itself; null if it was reclaimed.
+    hidden function bitmapOf(ref) {
+        if (ref == null) {
+            return null;
         }
-        return mBuffer;
+        if (ref has :get) {
+            return ref.get();
+        }
+        return ref;
     }
 
     // ------------------------------------------------------------------ updates
     function onUpdate(dc as Graphics.Dc) as Void {
         var now = Time.now().value();
         var clock = System.getClockTime();
-        var buf = getBuffer();
-        if (buf == null) {
-            // The graphics pool may have reclaimed the buffer: recreate it once.
-            createBuffer(dc.getWidth(), dc.getHeight());
-            buf = getBuffer();
+        if (mSleeping && mBurnIn) {
+            drawAlwaysOn(dc, clock);
+            return;
         }
-        if (buf != null) {
-            drawDial(buf.getDc(), now, clock);
-            dc.drawBitmap(0, 0, buf);
+        var frame = bitmapOf(mFrameRef);
+        var target = (frame != null) ? frame.getDc() : dc;
+        setAntiAlias(target);
+
+        var stat = bitmapOf(mStaticRef);
+        if (stat != null) {
+            if (mStaticDirty) {
+                var sdc = stat.getDc();
+                setAntiAlias(sdc);
+                drawStaticLayer(sdc);
+                mStaticDirty = false;
+            }
+            target.drawBitmap(0, 0, stat);
         } else {
-            drawDial(dc, now, clock);
+            drawStaticLayer(target);
+        }
+        drawLive(target, now, clock);
+
+        if (frame != null) {
+            dc.drawBitmap(0, 0, frame);
         }
         mLastSecBox = null;
         if (showSeconds()) {
@@ -160,11 +204,11 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     }
 
     function onPartialUpdate(dc as Graphics.Dc) as Void {
-        if (!mPartialAllowed || !mSettings.secondsAlways) {
+        if (mBurnIn || !mPartialAllowed || !mSettings.secondsAlways) {
             return;
         }
-        var buf = getBuffer();
-        if (buf == null) {
+        var frame = bitmapOf(mFrameRef);
+        if (frame == null) {
             return;
         }
         var sec = System.getClockTime().sec;
@@ -179,7 +223,7 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
             clip = [x0, y0, x1 - x0, y1 - y0];
         }
         dc.setClip(clip[0], clip[1], clip[2], clip[3]);
-        dc.drawBitmap(0, 0, buf);
+        dc.drawBitmap(0, 0, frame);
         setAntiAlias(dc);
         drawSecondsHand(dc, sec);
         dc.clearClip();
@@ -192,311 +236,340 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         }
     }
 
-    // ------------------------------------------------------------------ dial
-    hidden function drawDial(dc as Graphics.Dc, now as Number, clock as System.ClockTime) as Void {
+    // ------------------------------------------------------------------ scaling helpers
+    // v in 280-px dial units -> device pixels
+    hidden function p(v as Numeric) as Number {
+        return Math.floor(v * mK + 0.5).toNumber();
+    }
+
+    hidden function pen(w as Numeric) as Number {
+        var v = p(w);
+        return (v < 1) ? 1 : v;
+    }
+
+    // Point at distance r (dial units) from the centre, direction a (radians clockwise from 12).
+    hidden function polar(r as Numeric, a as Numeric) as Array<Number> {
+        var c = mSize / 2.0;
+        return [Math.floor(c + r * mK * Math.sin(a) + 0.5).toNumber(),
+                Math.floor(c - r * mK * Math.cos(a) + 0.5).toNumber()];
+    }
+
+    // Rotates and scales points given in dial units around the centre (y towards 12 is negative).
+    hidden function rotatePoly(pts as Array, a as Numeric) as Array {
+        var sn = Math.sin(a);
+        var cs = Math.cos(a);
+        var c = mSize / 2.0;
+        var out = [];
+        for (var i = 0; i < pts.size(); i++) {
+            var pt = pts[i] as Array;
+            var x = pt[0];
+            var y = pt[1];
+            out.add([Math.floor(c + (x * cs - y * sn) * mK + 0.5).toNumber(),
+                     Math.floor(c + (x * sn + y * cs) * mK + 0.5).toNumber()]);
+        }
+        return out;
+    }
+
+    hidden function gaugeCentre(i as Number) as Array<Number> {
+        if (i < 2) {
+            var dx = (i == 0) ? -Layout.GAUGE_UP_DX : Layout.GAUGE_UP_DX;
+            return [p(Layout.CX + dx), p(Layout.GAUGE_UP_Y)];
+        }
+        var dx2 = (i == 2) ? -Layout.GAUGE_SIDE_DX : Layout.GAUGE_SIDE_DX;
+        return [p(Layout.CX + dx2), p(Layout.GAUGE_SIDE_Y)];
+    }
+
+    // ------------------------------------------------------------------ static layer
+    hidden function drawStaticLayer(dc as Graphics.Dc) as Void {
         var c = mColors;
-        setAntiAlias(dc);
+        var vc = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
         dc.setColor(c[Themes.BG], c[Themes.BG]);
         dc.clear();
         var bg = mBgOps;
         if (bg != null) {
-            Backgrounds.draw(dc, bg, c);
+            Backgrounds.draw(dc, bg, c, mK);
         }
-        drawChapterRing(dc);
+        var fr = mFrameOps;
+        if (fr != null) {
+            Backgrounds.draw(dc, fr, c, mK);
+        }
 
-        var day = CivilDate.localEpochDay(now, clock.timeZoneOffset);
-        drawAyah(dc, clock.min);
-        drawDates(dc, day);
-
-        var info = ActivityMonitor.getInfo();
-        var g = mSettings.gauges;
-        drawGauge(dc, Layout.CX - Layout.GAUGE_DX, Layout.GAUGE_TOP_Y, g[0], info);
-        drawGauge(dc, Layout.CX + Layout.GAUGE_DX, Layout.GAUGE_TOP_Y, g[1], info);
-        drawGauge(dc, Layout.CX - Layout.GAUGE_DX, Layout.GAUGE_BOT_Y, g[2], info);
-        drawGauge(dc, Layout.CX + Layout.GAUGE_DX, Layout.GAUGE_BOT_Y, g[3], info);
-
-        drawPrayers(dc, now, clock);
-        drawHourMinuteHands(dc, clock);
-    }
-
-    // Static dial geometry (minute track and hour indices) computed once.
-    hidden function buildDialGeometry() as Void {
-        mTicks = [];
+        // minute track
+        dc.setPenWidth(pen(1));
+        dc.setColor(c[Themes.TICK], Graphics.COLOR_TRANSPARENT);
         for (var i = 0; i < 60; i++) {
             if (i % 5 != 0) {
                 var a = i * Math.PI / 30.0;
-                mTicks.add([polar(Layout.TRACK_R_IN, a, 0), polar(Layout.TRACK_R_OUT, a, 0)]);
+                var p0 = polar(Layout.TICK_R_IN, a);
+                var p1 = polar(Layout.TICK_R_OUT, a);
+                dc.drawLine(p0[0], p0[1], p1[0], p1[1]);
             }
         }
-        mIndexPolys = [];
-        for (var h = 1; h < 12; h++) {
-            var a = h * Math.PI / 6.0;
-            if (h == 3 || h == 9) {
-                mIndexPolys.add(rotatePoly([[-2.5, -Layout.IDX_CARD_R_IN], [2.5, -Layout.IDX_CARD_R_IN],
-                                            [2.5, -Layout.IDX_R_OUT], [-2.5, -Layout.IDX_R_OUT]], a));
-            } else if (h != 6) {
-                mIndexPolys.add(rotatePoly([[-1.5, -Layout.IDX_R_IN], [1.5, -Layout.IDX_R_IN],
-                                            [Layout.IDX_W, -Layout.IDX_R_OUT], [-Layout.IDX_W, -Layout.IDX_R_OUT]], a));
+        // two-tone hour indices, numerals at 12 / 3 / 6 / 9
+        var wi = Layout.IDX_W_IN;
+        var wo = Layout.IDX_W_OUT;
+        var ri = Layout.IDX_R_IN;
+        var ro = Layout.IDX_R_OUT;
+        for (var h = 0; h < 12; h++) {
+            if (h % 3 != 0) {
+                var a = h * Math.PI / 6.0;
+                dc.setColor(c[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
+                dc.fillPolygon(rotatePoly([[-wi, -ri], [0, -ri], [0, -ro], [-wo, -ro]], a));
+                dc.setColor(c[Themes.GOLD_DK], Graphics.COLOR_TRANSPARENT);
+                dc.fillPolygon(rotatePoly([[0, -ri], [wi, -ri], [wo, -ro], [0, -ro]], a));
             }
         }
-        // 12 o'clock: two batons
-        var g = Layout.IDX_12_GAP;
-        mIndexPolys.add(rotatePoly([[-g - 2, -Layout.IDX_CARD_R_IN], [-g + 2, -Layout.IDX_CARD_R_IN],
-                                    [-g + 2, -Layout.IDX_R_OUT], [-g - 2, -Layout.IDX_R_OUT]], 0.0));
-        mIndexPolys.add(rotatePoly([[g - 2, -Layout.IDX_CARD_R_IN], [g + 2, -Layout.IDX_CARD_R_IN],
-                                    [g + 2, -Layout.IDX_R_OUT], [g - 2, -Layout.IDX_R_OUT]], 0.0));
-    }
-
-    hidden function drawChapterRing(dc as Graphics.Dc) as Void {
-        var c = mColors;
-        dc.setPenWidth(1);
-        dc.setColor(c[Themes.GOLD_DK], Graphics.COLOR_TRANSPARENT);
-        for (var i = 0; i < mTicks.size(); i++) {
-            var t = mTicks[i] as Array;
-            var p0 = t[0] as Array<Number>;
-            var p1 = t[1] as Array<Number>;
-            dc.drawLine(p0[0], p0[1], p1[0], p1[1]);
+        var nums = ["12", "3", "6", "9"];
+        for (var q = 0; q < 4; q++) {
+            var pt = polar(Layout.NUM_R, q * Math.PI / 2.0);
+            dc.setColor(c[Themes.PLATE], Graphics.COLOR_TRANSPARENT);
+            dc.drawText(pt[0] + 1, pt[1] + 1, mFontNum, nums[q], vc);
+            dc.setColor(c[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
+            dc.drawText(pt[0], pt[1], mFontNum, nums[q], vc);
         }
-        dc.drawCircle(Layout.CX, Layout.CY, Layout.TRACK_R_OUT + 1);
+        // crescent above the date block
         dc.setColor(c[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
-        for (var i = 0; i < mIndexPolys.size(); i++) {
-            dc.fillPolygon(mIndexPolys[i] as Array);
-        }
-        // 6 o'clock: 8-point star (two overlapping squares) with a dark centre
-        var x = Layout.CX;
-        var y = Layout.STAR6_Y;
-        var r = Layout.STAR6_R;
-        var d = (r * 0.7071 + 0.5).toNumber();
-        dc.fillPolygon([[x, y - r], [x + r, y], [x, y + r], [x - r, y]]);
-        dc.fillPolygon([[x - d, y - d], [x + d, y - d], [x + d, y + d], [x - d, y + d]]);
+        dc.fillCircle(p(140), p(Layout.CRESCENT_Y), p(6));
         dc.setColor(c[Themes.BG], Graphics.COLOR_TRANSPARENT);
-        dc.fillCircle(x, y, 2);
+        dc.fillCircle(p(143), p(Layout.CRESCENT_Y - 2), p(5));
+        // gauge discs, gold rims and tracks
+        for (var g = 0; g < 4; g++) {
+            var gc = gaugeCentre(g);
+            dc.setColor(c[Themes.PLATE], Graphics.COLOR_TRANSPARENT);
+            dc.fillCircle(gc[0], gc[1], p(Layout.GAUGE_DISC_R));
+            dc.setPenWidth(pen(1));
+            dc.setColor(c[Themes.GOLD_DK], Graphics.COLOR_TRANSPARENT);
+            dc.drawCircle(gc[0], gc[1], p(Layout.GAUGE_DISC_R));
+            dc.setPenWidth(pen(Layout.GAUGE_PEN));
+            dc.setColor(c[Themes.TRACK], Graphics.COLOR_TRANSPARENT);
+            dc.drawCircle(gc[0], gc[1], p(Layout.GAUGE_R));
+        }
+        dc.setPenWidth(1);
+        // small gold diamond under the hub
+        var cx = p(140);
+        var dy = p(Layout.HUB_DIAMOND_Y);
+        var d = p(4);
+        dc.setColor(c[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
+        dc.fillPolygon([[cx, dy - d], [cx + d, dy], [cx, dy + d], [cx - d, dy]]);
     }
 
-    hidden function drawAyah(dc as Graphics.Dc, minute as Number) as Void {
-        var a = mSettings.ayah;
-        if (a == LuxeSettings.AYAH_NONE) {
-            return;
-        }
-        // glyph "1".."7"; Al-Ikhlas alternates verses 1-2 ("6") and 3-4 ("8") every minute
-        var code = (a + 1).toString();
-        if (a == 5 && minute % 2 == 1) {
-            code = "8";
-        }
-        dc.setColor(mColors[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
-        dc.drawText(Layout.CX, Layout.AYAH_Y, mFontAyah, code,
-                    Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
-    }
-
-    hidden function drawDates(dc as Graphics.Dc, day as Number) as Void {
+    // ------------------------------------------------------------------ live content
+    hidden function drawLive(dc as Graphics.Dc, now as Number, clock as System.ClockTime) as Void {
         var c = mColors;
+        var vc = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
+        var day = CivilDate.localEpochDay(now, clock.timeZoneOffset);
+
+        // date block
         var ymd = CivilDate.fromDays(day);
-        var rest = ymd[2].toString() + " " + mMonths[ymd[1] - 1] + " " + ymd[0].toString();
-        drawTwoTone(dc, Layout.CX, Layout.GREG_Y, mFontS, mDays[CivilDate.dayOfWeek(day)], c[Themes.ACCENT],
-                    rest, c[Themes.TEXT]);
-
+        dc.setColor(c[Themes.TEXT], Graphics.COLOR_TRANSPARENT);
+        dc.drawText(p(140), p(Layout.DAY_NAME_Y), mFontXS, mDays[CivilDate.dayOfWeek(day)], vc);
+        dc.drawText(p(140), p(Layout.DAY_NUM_Y), mFontL, ymd[2].toString(), vc);
+        dc.drawText(p(140), p(Layout.MONTH_Y), mFontXS, mMonths[ymd[1] - 1] + " " + ymd[0].toString(), vc);
         var h = HijriCalendar.forEpochDay(day, mSettings.hijriCorrection);
-        var hijri = h[2].toString() + " " + mHijriMonths[h[1] - 1] + " " + h[0].toString() + " " + mHijriSuffix;
-        dc.setColor(c[Themes.ACCENT2], Graphics.COLOR_TRANSPARENT);
-        dc.drawText(Layout.CX, Layout.HIJRI_Y, mFontS, hijri,
-                    Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
-    }
+        dc.setColor(c[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
+        dc.drawText(p(140), p(Layout.HIJRI_Y), mFontXS,
+                    h[2].toString() + " " + mHijriMonths[h[1] - 1] + " " + h[0].toString() + " " + mHijriSuffix, vc);
 
-    // Draws "a b" centred on x with two colours.
-    hidden function drawTwoTone(dc as Graphics.Dc, x as Number, y as Number, font, a as String, colA as Number,
-                                b as String, colB as Number) as Void {
-        var wa = dc.getTextWidthInPixels(a, font);
-        var wb = dc.getTextWidthInPixels(b, font);
-        var sp = dc.getTextWidthInPixels(" ", font);
-        var x0 = x - (wa + sp + wb) / 2;
-        var j = Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER;
-        dc.setColor(colA, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(x0, y, font, a, j);
-        dc.setColor(colB, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(x0 + wa + sp, y, font, b, j);
+        // gauges
+        var info = ActivityMonitor.getInfo();
+        for (var g = 0; g < 4; g++) {
+            var gc = gaugeCentre(g);
+            drawGauge(dc, gc[0], gc[1], mSettings.gauges[g], info);
+        }
+
+        drawPrayers(dc, now, clock);
+        drawAyah(dc, clock.min);
+        drawHourMinuteHands(dc, clock);
     }
 
     // ------------------------------------------------------------------ gauges
     hidden function drawGauge(dc as Graphics.Dc, x as Number, y as Number, source as Number,
                               info as ActivityMonitor.Info?) as Void {
         var c = mColors;
-        var r = Layout.GAUGE_R;
-        dc.setColor(c[Themes.PLATE], Graphics.COLOR_TRANSPARENT);
-        dc.fillCircle(x, y, Layout.GAUGE_DISC_R);
-        dc.setPenWidth(Layout.GAUGE_PEN);
-        dc.setColor(c[Themes.TRACK], Graphics.COLOR_TRANSPARENT);
-        dc.drawArc(x, y, r, Graphics.ARC_CLOCKWISE, 225, 315);
-
+        var color = c[Themes.ACCENT];
+        if (mMulticolor) {
+            color = Themes.SOURCE_COLORS[source] as Number;
+        }
         var data = DataFields.read(source, info);
         var value = data[0];
         var progress = data[1];
         var flag = data[2] as Number;
         if (progress != null) {
-            var p = progress as Float;
-            if (p > 1.0) {
-                p = 1.0;
+            var pr = progress as Float;
+            if (pr > 1.0) {
+                pr = 1.0;
             }
-            var sweep = (270.0 * p).toNumber();
+            var sweep = (360.0 * pr).toNumber();
             if (sweep >= 2) {
-                var end = 225 - sweep;
+                var end = 90 - sweep;
                 if (end < 0) {
                     end += 360;
                 }
                 var warn = (source == DataFields.BATTERY && flag == 1);
-                dc.setColor(warn ? c[Themes.WARN] : c[Themes.ACCENT], Graphics.COLOR_TRANSPARENT);
-                dc.drawArc(x, y, r, Graphics.ARC_CLOCKWISE, 225, end);
+                dc.setColor(warn ? c[Themes.WARN] : color, Graphics.COLOR_TRANSPARENT);
+                dc.setPenWidth(pen(Layout.GAUGE_PEN));
+                dc.drawArc(x, y, p(Layout.GAUGE_R), Graphics.ARC_CLOCKWISE, 90, end);
+                dc.setPenWidth(1);
             }
         }
-        dc.setPenWidth(1);
+        var isBatt = (source == DataFields.BATTERY);
+        dc.setColor(color, Graphics.COLOR_TRANSPARENT);
+        drawGaugeIcon(dc, x, y + p(isBatt ? Layout.GAUGE_BATT_ICON_DY : Layout.GAUGE_ICON_DY), source);
 
-        var color = c[Themes.TEXT];
+        var tcol = c[Themes.TEXT];
         if (value == null) {
             value = "--";
-            color = c[Themes.DIM];
+            tcol = c[Themes.DIM];
         } else if (flag == 1) {
-            color = (source == DataFields.BATTERY) ? c[Themes.WARN] : c[Themes.DIM];
+            tcol = (source == DataFields.BATTERY) ? c[Themes.WARN] : c[Themes.DIM];
         }
-        // Battery uses the large font; any value wider than the ring interior steps down.
+        // Battery uses the large font; a value wider than the ring interior steps down.
         var font = (source == DataFields.BATTERY) ? mFontL : mFontM;
-        var inner = 2 * (r - Layout.GAUGE_PEN / 2) - 2;
+        var inner = 2 * (p(Layout.GAUGE_R) - pen(Layout.GAUGE_PEN) / 2) - 2;
         if (dc.getTextWidthInPixels(value as String, font) > inner) {
             font = mFontM;
             if (dc.getTextWidthInPixels(value as String, font) > inner) {
                 font = mFontS;
             }
         }
-        dc.setColor(color, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(x, y + Layout.GAUGE_VALUE_DY, font, value as String,
+        dc.setColor(tcol, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(x, y + p(Layout.GAUGE_VALUE_DY), font, value as String,
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
 
-        dc.setColor(c[Themes.ACCENT2], Graphics.COLOR_TRANSPARENT);
-        drawGaugeIcon(dc, x, y + Layout.GAUGE_ICON_DY, source);
+        var label = mLabels[source];
+        if (source == DataFields.DISTANCE && System.getDeviceSettings().distanceUnits == System.UNIT_STATUTE) {
+            label = mLabelMi;
+        }
+        dc.setColor(color, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(x, y + p(isBatt ? Layout.GAUGE_BATT_LABEL_DY : Layout.GAUGE_LABEL_DY), mFontXS, label,
+                    Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 
-    // Unit or icon in the open bottom of the gauge ring (about 14 x 10 px).
+    // Icon above the value (about 13 x 12 dial units), in the current colour.
     hidden function drawGaugeIcon(dc as Graphics.Dc, x as Number, y as Number, source as Number) as Void {
-        var unit = null;
-        if (source == DataFields.CALORIES) {
-            unit = mUnits[0];
-        } else if (source == DataFields.BATTERY) {
-            unit = mUnits[1];
-        } else if (source == DataFields.DISTANCE) {
-            unit = (System.getDeviceSettings().distanceUnits == System.UNIT_STATUTE) ? mUnits[3] : mUnits[2];
-        }
-        if (unit != null) {
-            dc.drawText(x, y, mFontXXS, unit as String, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
-            return;
-        }
         if (source == DataFields.STEPS) {
-            // two footprints
-            dc.fillEllipse(x - 3, y + 1, 2, 4);
-            dc.fillEllipse(x + 3, y - 1, 2, 4);
+            dc.fillEllipse(x - p(3), y + p(1), p(2), p(4));
+            dc.fillEllipse(x + p(3), y - p(1), p(2), p(4));
         } else if (source == DataFields.HEART) {
-            dc.fillCircle(x - 2, y - 2, 3);
-            dc.fillCircle(x + 2, y - 2, 3);
-            dc.fillPolygon([[x - 5, y - 1], [x + 5, y - 1], [x, y + 5]]);
+            dc.fillCircle(x - p(2), y - p(2), p(3));
+            dc.fillCircle(x + p(2), y - p(2), p(3));
+            dc.fillPolygon([[x - p(5), y - p(1)], [x + p(5), y - p(1)], [x, y + p(5)]]);
+        } else if (source == DataFields.CALORIES) {
+            dc.fillPolygon([[x, y - p(6)], [x + p(4), y + p(1)], [x + p(3), y + p(4)], [x - p(3), y + p(4)],
+                            [x - p(4), y + p(1)]]);
+        } else if (source == DataFields.BATTERY) {
+            dc.fillRectangle(x - p(6), y - p(3), p(11), p(7));
+            dc.fillRectangle(x + p(5), y - p(1), p(2), p(3));
+        } else if (source == DataFields.DISTANCE) {
+            dc.setPenWidth(pen(2));
+            dc.drawLine(x - p(5), y + p(4), x + p(4), y - p(4));
+            dc.setPenWidth(1);
+            dc.fillPolygon([[x + p(5), y - p(5)], [x, y - p(4)], [x + p(4), y]]);
         } else if (source == DataFields.FLOORS) {
-            dc.setPenWidth(2);
-            dc.drawLine(x - 6, y + 4, x - 3, y + 4);
-            dc.drawLine(x - 3, y + 4, x - 3, y + 1);
-            dc.drawLine(x - 3, y + 1, x, y + 1);
-            dc.drawLine(x, y + 1, x, y - 2);
-            dc.drawLine(x, y - 2, x + 3, y - 2);
-            dc.drawLine(x + 3, y - 2, x + 3, y - 5);
-            dc.drawLine(x + 3, y - 5, x + 6, y - 5);
+            dc.setPenWidth(pen(2));
+            var st = [[-6, 4], [-3, 4], [-3, 1], [0, 1], [0, -2], [3, -2], [3, -5], [6, -5]];
+            for (var i = 0; i + 1 < st.size(); i++) {
+                var a = st[i] as Array<Number>;
+                var b = st[i + 1] as Array<Number>;
+                dc.drawLine(x + p(a[0]), y + p(a[1]), x + p(b[0]), y + p(b[1]));
+            }
             dc.setPenWidth(1);
         } else if (source == DataFields.BODY_BATTERY) {
-            // lightning bolt (two triangles)
-            dc.fillPolygon([[x + 2, y - 6], [x - 3, y + 1], [x + 1, y + 1]]);
-            dc.fillPolygon([[x - 1, y - 1], [x + 3, y - 1], [x - 2, y + 6]]);
+            dc.fillPolygon([[x + p(2), y - p(6)], [x - p(3), y + p(1)], [x + p(1), y + p(1)]]);
+            dc.fillPolygon([[x - p(1), y - p(1)], [x + p(3), y - p(1)], [x - p(2), y + p(6)]]);
         } else if (source == DataFields.STRESS) {
-            dc.setPenWidth(2);
-            dc.drawLine(x - 6, y + 1, x - 3, y - 3);
-            dc.drawLine(x - 3, y - 3, x, y + 3);
-            dc.drawLine(x, y + 3, x + 3, y - 3);
-            dc.drawLine(x + 3, y - 3, x + 6, y + 1);
+            dc.setPenWidth(pen(2));
+            var zz = [[-6, 1], [-3, -3], [0, 3], [3, -3], [6, 1]];
+            for (var i = 0; i + 1 < zz.size(); i++) {
+                var a = zz[i] as Array<Number>;
+                var b = zz[i + 1] as Array<Number>;
+                dc.drawLine(x + p(a[0]), y + p(a[1]), x + p(b[0]), y + p(b[1]));
+            }
             dc.setPenWidth(1);
         }
     }
 
-    // ------------------------------------------------------------------ prayers
+    // ------------------------------------------------------------------ prayers and sun
     hidden function drawPrayers(dc as Graphics.Dc, now as Number, clock as System.ClockTime) as Void {
         var c = mColors;
         var vc = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
         if (!mSettings.locationSet) {
             dc.setColor(c[Themes.DIM], Graphics.COLOR_TRANSPARENT);
-            dc.drawText(Layout.CX, Layout.NEXT_Y, mFontM, mSetLocation, vc);
+            dc.drawText(p(Layout.CX - Layout.PANEL_DX), p(Layout.PANEL_Y0 + 8), mFontXS, mSetLocation, vc);
+            dc.drawText(p(Layout.CX - Layout.PANEL_DX), p(Layout.PANEL_Y0 + 20), mFontXS, mSetLocation2, vc);
             return;
         }
         var offset = mSettings.tzManual ? mSettings.utcOffsetSeconds : clock.timeZoneOffset;
         mSchedule.update(now, offset);
-        var next = mSchedule.next(now);
-        var nextIdx = -1;
-        var nextDay = 0;
-        if (next != null) {
-            nextIdx = next[0] as Number;
-            nextDay = next[2] as Number;
-        }
         var is24 = System.getDeviceSettings().is24Hour;
-
-        // Schedule of the day the next prayer belongs to (tomorrow after Isha).
-        var cell = Layout.SCHED_W / 5;
-        var x0 = Layout.CX - Layout.SCHED_W / 2 + cell / 2;
-        for (var k = 0; k < 5; k++) {
-            var p = PrayerTimes.PRAYERS[k] as Number;
-            var m = mSchedule.minutes(nextDay, p);
-            var color = c[Themes.TEXT];
-            if (p == nextIdx) {
-                color = c[Themes.ACCENT2];
-            } else if (next == null || (nextDay == 0 && p < nextIdx)) {
-                color = c[Themes.DIM];
-            }
-            var x = x0 + k * cell;
-            dc.setColor(color, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(x, Layout.SCHED_Y, mFontXS, formatTime(m, is24), vc);
-            if (p == nextIdx) {
-                dc.fillRectangle(x - 8, Layout.SCHED_Y + 8, 16, 2);
-            }
+        var list = mSchedule.upcoming(now, 2);
+        if (list.size() > 0) {
+            var n = list[0] as Array;
+            var secs = ((n[1] as Long) - now).toNumber();
+            drawPanel(dc, p(Layout.CX - Layout.PANEL_DX), true, mPrayerNames[n[0] as Number] as String,
+                      countdown(secs), c[Themes.GOLD]);
         }
-
-        // Next prayer name and countdown
-        if (next != null) {
-            var secs = ((next[1] as Long) - now).toNumber();
-            drawTwoTone(dc, Layout.CX, Layout.NEXT_Y, mFontM, mPrayerNames[nextIdx] as String, c[Themes.ACCENT2],
-                        countdown(secs), c[Themes.ACCENT]);
-        } else {
-            dc.setColor(c[Themes.DIM], Graphics.COLOR_TRANSPARENT);
-            dc.drawText(Layout.CX, Layout.NEXT_Y, mFontM, "--", vc);
+        if (list.size() > 1) {
+            var f = list[1] as Array;
+            drawPanel(dc, p(Layout.CX + Layout.PANEL_DX), false, mPrayerNames[f[0] as Number] as String,
+                      formatTime(mSchedule.minutes(f[2] as Number, f[0] as Number), is24), c[Themes.TEXT]);
         }
-
-        // Sunrise and sunset (today, location time)
         drawSun(dc, true, mSchedule.minutes(0, PrayerTimes.SUNRISE), is24);
         drawSun(dc, false, mSchedule.minutes(0, PrayerTimes.SUNSET), is24);
     }
 
-    // Sunrise group left of the centre line, sunset group right of it.
+    // Cartouche content: icon on the left, name above value. `next` selects the mosque icon.
+    hidden function drawPanel(dc as Graphics.Dc, cx as Number, next as Boolean, name as String, value as String,
+                              valueColor as Number) as Void {
+        var c = mColors;
+        var vc = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
+        var x0 = cx - p(Layout.PANEL_W) / 2;
+        var ix = x0 + p(11);
+        var iy = p(Layout.PANEL_Y0 + Layout.PANEL_H / 2);
+        dc.setColor(c[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
+        if (next) {
+            dc.fillCircle(ix, iy, p(4));
+            dc.fillRectangle(ix - p(5), iy, p(10) + 1, p(6));
+            dc.fillRectangle(ix, iy - p(7), 1, p(3));
+        } else {
+            dc.fillCircle(ix, iy, p(5));
+            dc.setColor(c[Themes.PLATE], Graphics.COLOR_TRANSPARENT);
+            dc.fillCircle(ix + p(2), iy - p(2), p(4));
+            dc.setColor(c[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
+            dc.fillCircle(ix + p(4), iy + p(2), 1);
+        }
+        var tx = x0 + p(20) + (p(Layout.PANEL_W) - p(22)) / 2;
+        dc.setColor(c[Themes.TEXT], Graphics.COLOR_TRANSPARENT);
+        dc.drawText(tx, p(Layout.PANEL_Y0 + 8), mFontXS, name, vc);
+        dc.setColor(valueColor, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(tx, p(Layout.PANEL_Y0 + 20), mFontS, value, vc);
+    }
+
+    // Sun on the horizon with rays and an up/down arrow, time below.
     hidden function drawSun(dc as Graphics.Dc, rising as Boolean, minutes as Number?, is24 as Boolean) as Void {
         var c = mColors;
-        var text = formatTime(minutes, is24);
-        var tw = dc.getTextWidthInPixels(text, mFontXS);
-        var gw = Layout.SUN_ICON_W + 3 + tw;
-        var left = rising ? Layout.CX - Layout.SUN_GAP / 2 - gw : Layout.CX + Layout.SUN_GAP / 2;
-        var y = Layout.SUN_Y;
-        var ix = left + Layout.SUN_ICON_W / 2;
-        // icon: half sun on the horizon with an up/down arrow
+        var x = p(Layout.CX + (rising ? -Layout.SUN_DX : Layout.SUN_DX));
+        var y = p(Layout.SUN_ICON_Y);
         dc.setColor(c[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
-        dc.setPenWidth(2);
-        dc.drawArc(ix, y + 3, 4, Graphics.ARC_COUNTER_CLOCKWISE, 0, 180);
+        dc.setPenWidth(pen(2));
+        dc.drawArc(x, y + p(2), p(5), Graphics.ARC_COUNTER_CLOCKWISE, 0, 180);
+        dc.setPenWidth(pen(1));
+        dc.drawLine(x - p(8), y + p(2), x + p(8), y + p(2));
+        var rays = [30, 90, 150];
+        for (var i = 0; i < 3; i++) {
+            var a = Math.toRadians(rays[i]);
+            dc.drawLine(x + Math.round(p(7) * Math.cos(a)).toNumber(), y + p(2) - Math.round(p(7) * Math.sin(a)).toNumber(),
+                        x + Math.round(p(9) * Math.cos(a)).toNumber(), y + p(2) - Math.round(p(9) * Math.sin(a)).toNumber());
+        }
         dc.setPenWidth(1);
-        dc.drawLine(ix - 6, y + 3, ix + 7, y + 3);
         if (rising) {
-            dc.fillPolygon([[ix, y - 7], [ix - 3, y - 3], [ix + 3, y - 3]]);
+            dc.fillPolygon([[x, y + p(3)], [x - p(2), y + p(6)], [x + p(2), y + p(6)]]);
         } else {
-            dc.fillPolygon([[ix, y - 2], [ix - 3, y - 6], [ix + 3, y - 6]]);
+            dc.fillPolygon([[x, y + p(7)], [x - p(2), y + p(4)], [x + p(2), y + p(4)]]);
         }
         dc.setColor(c[Themes.TEXT], Graphics.COLOR_TRANSPARENT);
-        dc.drawText(left + Layout.SUN_ICON_W + 3, y, mFontXS, text,
-                    Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER);
+        dc.drawText(x, p(Layout.SUN_TIME_Y), mFontS, formatTime(minutes, is24),
+                    Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 
     hidden function formatTime(minutes as Number?, is24 as Boolean) as String {
@@ -525,80 +598,87 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         return (mins / 60).toString() + "h" + (mins % 60).format("%02d");
     }
 
+    // ------------------------------------------------------------------ Ayah
+    hidden function drawAyah(dc as Graphics.Dc, minute as Number) as Void {
+        var a = mSettings.ayah;
+        if (a == LuxeSettings.AYAH_NONE) {
+            return;
+        }
+        // glyphs "1".."7"; Al-Ikhlas shows one verse per minute: "6", "A", "B", "C"
+        var code = (a + 1).toString();
+        var ref = mAyahRefs[a];
+        if (a == 5) {
+            var v = minute % 4;
+            var codes = ["6", "A", "B", "C"];
+            code = codes[v];
+            ref = ref + (v + 1).toString();
+        }
+        var vc = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
+        dc.setColor(mColors[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
+        dc.drawText(p(140), p(Layout.AYAH_Y), mFontAyah, code, vc);
+        dc.setColor(mColors[Themes.DIM], Graphics.COLOR_TRANSPARENT);
+        dc.drawText(p(140), p(Layout.AYAH_REF_Y), mFontXS, ref, vc);
+    }
+
     // ------------------------------------------------------------------ hands
     hidden function drawHourMinuteHands(dc as Graphics.Dc, clock as System.ClockTime) as Void {
         var c = mColors;
         var hourA = ((clock.hour % 12) + clock.min / 60.0) * Math.PI / 6.0;
         var minA = clock.min * Math.PI / 30.0;
-        drawDauphine(dc, hourA, Layout.HOUR_LEN, Layout.HOUR_TAIL, Layout.HOUR_W);
-        drawDauphine(dc, minA, Layout.MIN_LEN, Layout.MIN_TAIL, Layout.MIN_W);
+        drawBaton(dc, hourA, Layout.HOUR_LEN, Layout.HOUR_W, Layout.HOUR_TAIL);
+        drawBaton(dc, minA, Layout.MIN_LEN, Layout.MIN_W, Layout.MIN_TAIL);
+        var cx = mSize / 2;
         dc.setColor(c[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
-        dc.fillCircle(Layout.CX, Layout.CY, Layout.CAP_R);
+        dc.fillCircle(cx, cx, p(Layout.CAP_R));
         dc.setColor(c[Themes.GOLD_DK], Graphics.COLOR_TRANSPARENT);
-        dc.fillCircle(Layout.CX, Layout.CY, Layout.CAP_INNER_R);
+        dc.fillCircle(cx, cx, p(Layout.CAP_INNER_R));
     }
 
-    // Faceted "dauphine" hand: gold left half, darker right half.
-    hidden function drawDauphine(dc as Graphics.Dc, a as Numeric, len as Number, tail as Number, w as Number) as Void {
+    // Gold baton hand with a pointed tip, dark outline and a light lume insert.
+    hidden function drawBaton(dc as Graphics.Dc, a as Numeric, len as Number, w as Number, tail as Number) as Void {
         var c = mColors;
+        dc.setColor(c[Themes.PLATE], Graphics.COLOR_TRANSPARENT);
+        dc.fillPolygon(rotatePoly([[-w - 1, tail + 1], [w + 1, tail + 1], [w, -len - 1], [0, -len - 5], [-w, -len - 1]], a));
         dc.setColor(c[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
-        dc.fillPolygon(rotatePoly([[0, -len], [-w, 0], [0, tail]], a));
-        dc.setColor(c[Themes.GOLD_DK], Graphics.COLOR_TRANSPARENT);
-        dc.fillPolygon(rotatePoly([[0, -len], [w, 0], [0, tail]], a));
+        dc.fillPolygon(rotatePoly([[-w, tail], [w, tail], [w - 0.5, -len], [0, -len - 4], [-w + 0.5, -len]], a));
+        dc.setColor(c[Themes.TEXT], Graphics.COLOR_TRANSPARENT);
+        dc.fillPolygon(rotatePoly([[-w + 1.5, -14], [w - 1.5, -14], [w - 1.5, -len + 3], [-w + 1.5, -len + 3]], a));
     }
 
     hidden function drawSecondsHand(dc as Graphics.Dc, sec as Number) as Void {
         var c = mColors;
         var a = sec * Math.PI / 30.0;
-        var tip = polar(Layout.SEC_LEN, a, 0);
-        var tail = polar(-Layout.SEC_TAIL, a, 0);
-        var weight = polar(-(Layout.SEC_TAIL - Layout.SEC_WEIGHT_R - 2), a, 0);
+        var tip = polar(Layout.SEC_LEN, a);
+        var tail = polar(-Layout.SEC_TAIL, a);
+        var weight = polar(-(Layout.SEC_TAIL - Layout.SEC_WEIGHT_R - 2), a);
         dc.setColor(c[Themes.SECONDS], Graphics.COLOR_TRANSPARENT);
-        dc.setPenWidth(Layout.SEC_PEN);
+        dc.setPenWidth(pen(Layout.SEC_PEN));
         dc.drawLine(tail[0], tail[1], tip[0], tip[1]);
+        dc.setPenWidth(pen(2));
+        dc.drawCircle(weight[0], weight[1], p(Layout.SEC_WEIGHT_R));
         dc.setPenWidth(1);
-        dc.fillCircle(weight[0], weight[1], Layout.SEC_WEIGHT_R);
-        dc.fillCircle(Layout.CX, Layout.CY, Layout.CAP_R - 1);
+        var cx = mSize / 2;
+        dc.setColor(c[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
+        dc.fillCircle(cx, cx, p(Layout.CAP_R));
+        dc.setColor(c[Themes.SECONDS], Graphics.COLOR_TRANSPARENT);
+        dc.fillCircle(cx, cx, p(Layout.CAP_INNER_R));
         dc.setColor(c[Themes.PLATE], Graphics.COLOR_TRANSPARENT);
-        dc.fillCircle(Layout.CX, Layout.CY, Layout.CAP_INNER_R);
+        dc.fillCircle(cx, cx, pen(1.5));
     }
 
     // Bounding box [x, y, w, h] of everything drawSecondsHand() touches.
     hidden function secondsBox(sec as Number) as Array<Number> {
         var a = sec * Math.PI / 30.0;
-        var tip = polar(Layout.SEC_LEN, a, 0);
-        var tail = polar(-Layout.SEC_TAIL, a, 0);
-        var m = Layout.SEC_WEIGHT_R + 3;
-        var x0 = min3(tip[0], tail[0], Layout.CX - Layout.CAP_R) - m;
-        var y0 = min3(tip[1], tail[1], Layout.CY - Layout.CAP_R) - m;
-        var x1 = max3(tip[0], tail[0], Layout.CX + Layout.CAP_R) + m;
-        var y1 = max3(tip[1], tail[1], Layout.CY + Layout.CAP_R) + m;
+        var tip = polar(Layout.SEC_LEN, a);
+        var tail = polar(-Layout.SEC_TAIL, a);
+        var cx = mSize / 2;
+        var cap = p(Layout.CAP_R);
+        var m = p(Layout.SEC_WEIGHT_R) + pen(2) + 3;
+        var x0 = min3(tip[0], tail[0], cx - cap) - m;
+        var y0 = min3(tip[1], tail[1], cx - cap) - m;
+        var x1 = max3(tip[0], tail[0], cx + cap) + m;
+        var y1 = max3(tip[1], tail[1], cx + cap) + m;
         return [x0, y0, x1 - x0, y1 - y0];
-    }
-
-    // ------------------------------------------------------------------ geometry helpers
-    // Point at distance r from the centre in direction a (radians clockwise from 12 o'clock),
-    // shifted sideways by `side` pixels.
-    hidden function polar(r as Numeric, a as Numeric, side as Numeric) as Array<Number> {
-        var sn = Math.sin(a);
-        var cs = Math.cos(a);
-        return [Math.round(Layout.CX + r * sn + side * cs).toNumber(),
-                Math.round(Layout.CY - r * cs + side * sn).toNumber()];
-    }
-
-    // Rotates points given in hand coordinates (x right, y towards 12 o'clock is negative).
-    hidden function rotatePoly(pts as Array, a as Numeric) as Array {
-        var sn = Math.sin(a);
-        var cs = Math.cos(a);
-        var out = [];
-        for (var i = 0; i < pts.size(); i++) {
-            var p = pts[i] as Array;
-            var x = p[0];
-            var y = p[1];
-            out.add([Math.round(Layout.CX + x * cs - y * sn).toNumber(),
-                     Math.round(Layout.CY + x * sn + y * cs).toNumber()]);
-        }
-        return out;
     }
 
     hidden function min3(a as Number, b as Number, c as Number) as Number {
@@ -609,5 +689,30 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     hidden function max3(a as Number, b as Number, c as Number) as Number {
         var m = (a > b) ? a : b;
         return (m > c) ? m : c;
+    }
+
+    // ------------------------------------------------------------------ AMOLED always-on
+    // Burn-in safe frame: black screen, thin hour/minute hands, four dots; everything shifts by
+    // up to 2 px each minute so that no pixel stays lit.
+    hidden function drawAlwaysOn(dc as Graphics.Dc, clock as System.ClockTime) as Void {
+        var c = mColors;
+        dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
+        dc.clear();
+        setAntiAlias(dc);
+        var shift = (clock.min % 5) - 2;
+        var cx = mSize / 2 + shift;
+        dc.setColor(c[Themes.DIM], Graphics.COLOR_TRANSPARENT);
+        for (var q = 0; q < 4; q++) {
+            var pt = polar(Layout.NUM_R + 6, q * Math.PI / 2.0);
+            dc.fillCircle(pt[0] + shift, pt[1] + shift, pen(2));
+        }
+        dc.setColor(c[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
+        dc.setPenWidth(pen(2));
+        var hourTip = polar(Layout.HOUR_LEN, ((clock.hour % 12) + clock.min / 60.0) * Math.PI / 6.0);
+        var minTip = polar(Layout.MIN_LEN, clock.min * Math.PI / 30.0);
+        dc.drawLine(cx, cx, hourTip[0] + shift, hourTip[1] + shift);
+        dc.drawLine(cx, cx, minTip[0] + shift, minTip[1] + shift);
+        dc.setPenWidth(1);
+        dc.drawCircle(cx, cx, p(4));
     }
 }

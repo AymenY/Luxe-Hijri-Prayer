@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Geometric validation of the 280 x 280 circular layout with worst-case content.
+"""Geometric validation of the round layout, for every supported screen size, with
+worst-case English and French content.
 
-For every text element the bounding box is computed from the real bitmap-font metrics
-(resources/fonts/*.fnt) using the widest strings that can occur in English and French, and
-checked against:
-  * the circular safe area (radius Layout.SAFE_R around the centre),
-  * the gauge discs and other elements it must not overlap,
-  * the inside of the gauge rings (values) and the open bottom of the rings (labels).
-Exit status is non-zero when a check fails.
+For each size the bounding boxes are computed from that size's bitmap fonts
+(resources[-round-WxH]/fonts) and the scaled layout, and checked against:
+  * the circular safe area (Layout.SAFE_R, scaled),
+  * the gauge discs, the prayer cartouches and every other text element,
+  * the inside of the gauge rings (icon, value, label) and of the cartouches.
+Exit status is non-zero when a check fails. Report: docs/layout-report.md.
 """
 import json
 import math
@@ -19,34 +19,48 @@ import face  # noqa: E402
 
 L = face.L
 ROOT = face.ROOT
-failures = []
-report = []
 
 
-def text_box(fontname, text, cx, cy, just="center"):
-    f = face.font(fontname)
-    w = f.width(text)
-    # ink extent: glyph boxes
-    x0 = cx - w // 2 if just == "center" else cx
-    top = cy - f.height // 2
-    ys = []
-    x = x0
-    xs = []
-    for ch in text:
-        g = f.chars.get(ord(ch), f.chars[32])
-        if g["width"]:
-            ys += [top + g["yoffset"], top + g["yoffset"] + g["height"]]
-            xs += [x + g["xoffset"], x + g["xoffset"] + g["width"]]
-        x += g["xadvance"]
-    return (min(xs), min(ys), max(xs), max(ys))
+class Check:
+    def __init__(self, size):
+        self.size = size
+        self.k = size / 280.0
+        self.c = size / 2.0
+        self.fail = []
+        self.boxes = {}
+
+    def p(self, v):
+        return int(math.floor(v * self.k + 0.5))
+
+    def text_box(self, fontname, text, cx, cy):
+        f = face.font(fontname, self.size)
+        w = f.width(text)
+        x = cx - w // 2
+        top = cy - f.height // 2
+        xs, ys = [], []
+        for ch in text:
+            g = f.chars.get(ord(ch), f.chars[32])
+            if g["width"]:
+                xs += [x + g["xoffset"], x + g["xoffset"] + g["width"]]
+                ys += [top + g["yoffset"], top + g["yoffset"] + g["height"]]
+            x += g["xadvance"]
+        return (min(xs), min(ys), max(xs), max(ys))
+
+    def inside(self, box, name, r=None):
+        r = (r or L.SAFE_R) * self.k
+        worst = max(math.hypot(x - self.c, y - self.c) for x in (box[0], box[2]) for y in (box[1], box[3]))
+        if worst > r:
+            self.fail.append("%s outside the safe circle (%.1f > %.1f px)" % (name, worst, r))
+
+    def add(self, name, box, check_circle=True):
+        self.boxes[name] = box
+        if check_circle:
+            self.inside(box, name)
 
 
-def corners_inside(box, r, name):
-    worst = max(math.hypot(x - L.CX, y - L.CY) for x in (box[0], box[2]) for y in (box[1], box[3]))
-    ok = worst <= r
-    report.append("| %s | (%d,%d)-(%d,%d) | %.1f | %s |" % (name, *box, worst, "ok" if ok else "OUTSIDE"))
-    if not ok:
-        failures.append("%s outside the safe circle (%.1f > %d)" % (name, worst, r))
+def widest(fontname, size, cands):
+    f = face.font(fontname, size)
+    return max(cands, key=f.width)
 
 
 def box_circle_gap(box, cx, cy, r):
@@ -55,118 +69,131 @@ def box_circle_gap(box, cx, cy, r):
     return math.hypot(nx - cx, ny - cy) - r
 
 
-def boxes_overlap(a, b):
+def overlap(a, b):
     return not (a[2] <= b[0] or b[2] <= a[0] or a[3] <= b[1] or b[3] <= a[1])
 
 
-def langs():
-    return {"eng": face.strings("eng"), "fre": face.strings("fre")}
-
-
-def widest(fontname, cands):
-    f = face.font(fontname)
-    return max(cands, key=f.width)
-
-
-def main():
-    S = langs()
-    disc_r = L.GAUGE_DISC_R
-    gauges = [(L.CX - L.GAUGE_DX, L.GAUGE_TOP_Y), (L.CX + L.GAUGE_DX, L.GAUGE_TOP_Y),
-              (L.CX - L.GAUGE_DX, L.GAUGE_BOT_Y), (L.CX + L.GAUGE_DX, L.GAUGE_BOT_Y)]
-    report.append("| Element (worst case) | Ink box | Max distance from centre | Safe area |")
-    report.append("|---|---|---|---|")
-    boxes = {}
-    for lang, s in S.items():
-        greg = widest("luxe_s", ["%s 28 %s 2026" % (s["Day%d" % d], s["Month%d" % m]) for d in range(7)
-                                 for m in range(1, 13)])
-        hijri = widest("luxe_s", ["30 %s 1448 %s" % (s["Hijri%d" % m], s["HijriSuffix"]) for m in range(1, 13)])
-        nxt = widest("luxe_m", ["%s %s" % (s["Prayer%d" % p], t) for p in (0, 2, 3, 5, 6)
-                                for t in ("23h59", "59m")] + [s["SetLocation"]])
-        boxes["greg-" + lang] = text_box("luxe_s", greg, L.CX, L.GREG_Y)
-        boxes["hijri-" + lang] = text_box("luxe_s", hijri, L.CX, L.HIJRI_Y)
-        boxes["next-" + lang] = text_box("luxe_m", nxt, L.CX, L.NEXT_Y)
-        report_names = {"greg-" + lang: greg, "hijri-" + lang: hijri, "next-" + lang: nxt}
-        for k, v in report_names.items():
-            corners_inside(boxes[k], L.SAFE_R, "%s: \"%s\"" % (k, v))
-        # gauge units must fit the open bottom of the ring (icons are drawn within 13 x 12 px)
-        for key in ["LabelCalories", "LabelBattery", "LabelKm", "LabelMi"]:
-            b = text_box("luxe_xxs", s[key], 0, L.GAUGE_ICON_DY)
-            end_x = L.GAUGE_R * math.sin(math.pi / 4) - L.GAUGE_PEN / 2.0 - 1
-            end_y = L.GAUGE_R * math.cos(math.pi / 4) + L.GAUGE_PEN / 2.0
-            if max(-b[0], b[2]) > end_x and b[1] < end_y:
-                failures.append("gauge unit %s/%s (%d px wide) touches the ring ends" % (lang, s[key], b[2] - b[0]))
-            if math.hypot(max(-b[0], b[2]), b[3]) > L.GAUGE_DISC_R + 1:
-                failures.append("gauge unit %s/%s leaves the gauge disc" % (lang, s[key]))
-
-    # schedule cells (24 h and 12 h worst cases), sun groups
-    cell = L.SCHED_W // 5
-    x0 = L.CX - L.SCHED_W // 2 + cell // 2
-    for k in range(5):
-        b = text_box("luxe_xs", "00:00", x0 + k * cell, L.SCHED_Y)
-        boxes["sched-%d" % k] = (b[0], b[1], b[2], b[3] + 4)  # + underline
-        corners_inside(boxes["sched-%d" % k], L.SAFE_R, "schedule cell %d \"00:00\"" % k)
-    tw = face.font("luxe_xs").width("00:00")
-    gw = L.SUN_ICON_W + 3 + tw
-    tb = text_box("luxe_xs", "00:00", 0, L.SUN_Y)
-    boxes["sunrise"] = (L.CX - L.SUN_GAP // 2 - gw, min(tb[1], L.SUN_Y - 7), L.CX - L.SUN_GAP // 2, max(tb[3], L.SUN_Y + 5))
-    boxes["sunset"] = (L.CX + L.SUN_GAP // 2, min(tb[1], L.SUN_Y - 7), L.CX + L.SUN_GAP // 2 + gw, max(tb[3], L.SUN_Y + 5))
-    corners_inside(boxes["sunrise"], L.SAFE_R, "sunrise group")
-    corners_inside(boxes["sunset"], L.SAFE_R, "sunset group")
-
-    # Ayah glyphs
-    ayah = json.load(open(os.path.join(ROOT, "tools", "assets-report.json")))["ayah"]
-    for ref, a in ayah.items():
-        b = (L.CX - a["w"] // 2, L.AYAH_Y - a["h"] // 2, L.CX + (a["w"] + 1) // 2, L.AYAH_Y + (a["h"] + 1) // 2)
-        boxes["ayah " + ref] = b
-        corners_inside(b, 124, "Ayah %s (%dx%d px, %d px font)" % (ref, a["w"], a["h"], a["px"]))
-        if b[1] <= L.CW_12_BOTTOM if hasattr(L, "CW_12_BOTTOM") else b[1] <= L.CY - L.IDX_R_OUT + (L.IDX_R_OUT - L.IDX_CARD_R_IN):
-            failures.append("Ayah %s reaches the 12 o'clock batons" % ref)
-
-    # gauges inside the safe circle
+def check_size(size, report):
+    ck = Check(size)
+    p = ck.p
+    S = {"eng": face.strings("eng"), "fre": face.strings("fre")}
+    gauges = [(p(140 - L.GAUGE_UP_DX), p(L.GAUGE_UP_Y)), (p(140 + L.GAUGE_UP_DX), p(L.GAUGE_UP_Y)),
+              (p(140 - L.GAUGE_SIDE_DX), p(L.GAUGE_SIDE_Y)), (p(140 + L.GAUGE_SIDE_DX), p(L.GAUGE_SIDE_Y))]
+    disc = p(L.GAUGE_DISC_R)
     for i, (gx, gy) in enumerate(gauges):
-        far = math.hypot(gx - L.CX, gy - L.CY) + disc_r
-        report.append("| gauge %d disc | centre (%d,%d) r=%d | %.1f | %s |" % (i + 1, gx, gy, disc_r, far,
-                                                                            "ok" if far <= L.SAFE_R else "OUTSIDE"))
-        if far > L.SAFE_R:
-            failures.append("gauge %d outside the safe circle" % (i + 1))
+        far = math.hypot(gx - ck.c, gy - ck.c) + disc
+        if far > L.SAFE_R * ck.k:
+            ck.fail.append("gauge %d disc outside the safe circle" % (i + 1))
 
-    # gauge values must fit inside the ring
-    inner = 2 * (L.GAUGE_R - L.GAUGE_PEN // 2) - 2
-    for v in ["9999", "99.9k", "999k", "--", "200", "100", "88.8", "100%"]:
-        w = min(face.font(f).width(v) for f in ("luxe_l", "luxe_m", "luxe_s"))
+    # numerals
+    for name, txt, a in (("num12", "12", 0), ("num3", "3", 90), ("num6", "6", 180), ("num9", "9", 270)):
+        x = int(math.floor(ck.c + L.NUM_R * ck.k * math.sin(math.radians(a)) + 0.5))
+        y = int(math.floor(ck.c - L.NUM_R * ck.k * math.cos(math.radians(a)) + 0.5))
+        ck.add(name, ck.text_box("luxe_num", txt, x, y), check_circle=False)
+        ck.inside(ck.boxes[name], name, L.TICK_R_IN)
+
+    for lang, s in S.items():
+        ck.add("dayname-" + lang, ck.text_box("luxe_xs", widest("luxe_xs", size, [s["Day%d" % d] for d in range(7)]),
+                                              p(140), p(L.DAY_NAME_Y)))
+        ck.add("daynum-" + lang, ck.text_box("luxe_l", "28", p(140), p(L.DAY_NUM_Y)))
+        ck.add("month-" + lang, ck.text_box("luxe_xs", widest("luxe_xs", size, ["%s 2026" % s["Month%d" % m]
+                                                                                for m in range(1, 13)]), p(140), p(L.MONTH_Y)))
+        ck.add("hijri-" + lang, ck.text_box("luxe_xs", widest("luxe_xs", size, ["30 %s 1448 %s" % (s["Hijri%d" % m],
+                                                                                                   s["HijriSuffix"])
+                                                                                for m in range(1, 13)]), p(140), p(L.HIJRI_Y)))
+        ref = widest("luxe_xs", size, [s["AyahRef%d" % i] + ("4" if i == 6 else "") for i in range(1, 8)])
+        ck.add("ayahref-" + lang, ck.text_box("luxe_xs", ref, p(140), p(L.AYAH_REF_Y)))
+        # gauge content must fit inside the ring
+        rin = p(L.GAUGE_R) - max(1, p(L.GAUGE_PEN)) // 2
+        for key in face.LABELS + ["LabelMi"]:
+            b = ck.text_box("luxe_xs", s[key], 0, p(L.GAUGE_LABEL_DY))
+            half = max(-b[0], b[2])
+            yb = max(abs(b[1]), abs(b[3]))
+            if math.hypot(half, yb) > rin:
+                ck.fail.append("gauge label %s/%s (%d px) crosses the ring" % (lang, s[key], b[2] - b[0]))
+        # cartouche text
+        names = [s["Prayer%d" % i] for i in (0, 2, 3, 5, 6)]
+        area = p(L.PANEL_W) - p(22)
+        for t, fn in [(widest("luxe_xs", size, names), "luxe_xs"), ("23h59", "luxe_s"), ("00:00", "luxe_s"),
+                      (s["SetLocation"], "luxe_xs"), (s["SetLocation2"], "luxe_xs")]:
+            w = face.font(fn, size).width(t)
+            limit = area if t not in (s["SetLocation"], s["SetLocation2"]) else p(L.PANEL_W) - 4
+            if w > limit:
+                ck.fail.append("cartouche text %s/'%s' (%d px) wider than its area (%d px)" % (lang, t, w, limit))
+
+    # values inside the ring
+    inner = 2 * (p(L.GAUGE_R) - max(1, p(L.GAUGE_PEN)) // 2) - 2
+    for v in ["9999", "99.9k", "999k", "--", "200", "100", "88.8"]:
+        w = min(face.font(f, size).width(v) for f in ("luxe_l", "luxe_m", "luxe_s"))
         if w > inner:
-            failures.append("gauge value '%s' (%d px) wider than the ring interior (%d px)" % (v, w, inner))
-        if face.font("luxe_m").width(v) > inner:
-            report.append("| gauge value \"%s\" | steps down to the smaller font | | |" % v)
+            ck.fail.append("gauge value '%s' (%d px) wider than the ring interior (%d px)" % (v, w, inner))
 
-    # no element may overlap a gauge disc or another element
-    for name, b in boxes.items():
+    # inside a gauge: icon, value and label must not touch each other
+    for fn, val, idy, ldy, lab in (("luxe_m", "9999", L.GAUGE_ICON_DY, L.GAUGE_LABEL_DY, "STRESS"),
+                                   ("luxe_l", "100", L.GAUGE_BATT_ICON_DY, L.GAUGE_BATT_LABEL_DY, "%")):
+        # real icon extents (dial units): generic icons 13 x 12, battery 13 x 7 (see drawGaugeIcon)
+        top, bot = (-6, 5) if lab != "%" else (-3, 4)
+        icon = (-p(7), p(idy) + p(top), p(7), p(idy) + p(bot))
+        if math.hypot(p(7), p(idy) + p(top)) > p(L.GAUGE_R) - max(1, p(L.GAUGE_PEN)) // 2:
+            ck.fail.append("gauge icon (%s) crosses the ring" % fn)
+        vb = ck.text_box(fn, val, 0, p(L.GAUGE_VALUE_DY))
+        lb = ck.text_box("luxe_xs", lab, 0, p(ldy))
+        if math.hypot(max(-lb[0], lb[2]), lb[3]) > p(L.GAUGE_R) - max(1, p(L.GAUGE_PEN)) // 2:
+            ck.fail.append("gauge label at %d crosses the ring (%s)" % (ldy, fn))
+        if overlap(vb, lb):
+            ck.fail.append("gauge value (%s) touches the label" % fn)
+        if overlap(vb, icon):
+            ck.fail.append("gauge value (%s) touches the icon" % fn)
+
+    # sunrise / sunset groups
+    for name, sgn in (("sunrise", -1), ("sunset", 1)):
+        x = p(140 + sgn * L.SUN_DX)
+        ck.add(name + "-time", ck.text_box("luxe_s", "00:00", x, p(L.SUN_TIME_Y)))
+        ck.add(name + "-icon", (x - p(9), p(L.SUN_ICON_Y) - p(8), x + p(9), p(L.SUN_ICON_Y) + p(7)))
+
+    # cartouches (prayer panels) and Ayah glyphs
+    for name, sgn in (("panel-left", -1), ("panel-right", 1)):
+        x0 = p(140 + sgn * L.PANEL_DX) - p(L.PANEL_W) // 2
+        ck.add(name, (x0, p(L.PANEL_Y0), x0 + p(L.PANEL_W), p(L.PANEL_Y0 + L.PANEL_H)))
+    rep = json.load(open(os.path.join(ROOT, "tools", "assets-report.json")))["fonts"][str(size)]["ayah"]
+    for ref, a in rep.items():
+        b = (p(140) - a["w"] // 2, p(L.AYAH_Y) - a["h"] // 2, p(140) + (a["w"] + 1) // 2, p(L.AYAH_Y) + (a["h"] + 1) // 2)
+        ck.add("ayah " + ref, b)
+
+    # overlaps
+    for name, b in ck.boxes.items():
         for i, (gx, gy) in enumerate(gauges):
-            gap = box_circle_gap(b, gx, gy, disc_r)
+            gap = box_circle_gap(b, gx, gy, disc)
             if gap < 1:
-                failures.append("%s overlaps gauge %d disc (gap %.1f px)" % (name, i + 1, gap))
-    names = list(boxes)
+                ck.fail.append("%s overlaps gauge %d (gap %.1f px)" % (name, i + 1, gap))
+    names = list(ck.boxes)
+    group = lambda n: n.split("-")[0].split(" ")[0]
     for i in range(len(names)):
         for j in range(i + 1, len(names)):
             a, b = names[i], names[j]
-            same_group = a.split("-")[0] == b.split("-")[0] or (a.startswith("ayah") and b.startswith("ayah"))
-            if not same_group and boxes_overlap(boxes[a], boxes[b]):
-                failures.append("%s overlaps %s" % (a, b))
+            if group(a) == group(b):
+                continue
+            if overlap(ck.boxes[a], ck.boxes[b]):
+                ck.fail.append("%s overlaps %s" % (a, b))
+    report.append("| %d x %d | %s |" % (size, size, "PASS" if not ck.fail else "FAIL: " + "; ".join(ck.fail[:6])))
+    return ck.fail
 
-    # seconds hand and indices
-    if L.SEC_LEN >= L.IDX_R_IN + 2:
-        failures.append("seconds hand runs into the hour indices")
-    report.append("")
-    report.append("Seconds hand: %d px from the centre (%.0f%% of the dial radius), tail %d px." %
-                  (L.SEC_LEN, 100.0 * L.SEC_LEN / L.CX, L.SEC_TAIL))
+
+def main():
+    report = ["| Screen | Result |", "|---|---|"]
+    failures = []
+    for size in face.RESOLUTIONS:
+        f = check_size(size, report)
+        failures += ["%d: %s" % (size, x) for x in f]
     out = os.path.join(ROOT, "docs", "layout-report.md")
     with open(out, "w") as fh:
-        fh.write("# Layout validation report\n\nGenerated by `tools/check_layout.py` (safe radius %d px).\n\n"
-                 % L.SAFE_R + "\n".join(report) + "\n\n## Result\n\n**%s**\n" %
-                 ("PASS" if not failures else "FAIL") + "".join("* %s\n" % f for f in failures))
+        fh.write("# Layout validation report\n\nGenerated by `tools/check_layout.py`: worst-case English and French "
+                 "content, every supported round screen size, safe radius %d px at 280 px (scaled).\n\n" % L.SAFE_R
+                 + "\n".join(report) + "\n\n## Result\n\n**%s**\n" % ("PASS" if not failures else "FAIL")
+                 + "".join("* %s\n" % f for f in failures))
     for f in failures:
         print("FAIL:", f)
-    print("layout check:", "PASS" if not failures else "FAIL", "-", out)
+    print("layout check:", "PASS" if not failures else "FAIL (%d)" % len(failures), "-", out)
     return 1 if failures else 0
 
 

@@ -8,57 +8,75 @@ module Layout {
     const CY = 140;
     const SAFE_R = 128;          // all text and gauges must stay inside this radius
 
-    // Chapter ring and indices
-    const TRACK_R_OUT = 137;     // minute track outer radius
-    const TRACK_R_IN = 133;      // minute track inner radius
-    const IDX_R_OUT = 134;       // hour index outer radius
-    const IDX_R_IN = 123;        // short (non-cardinal) hour index inner radius
-    const IDX_CARD_R_IN = 116;   // 3/9 o'clock index inner radius
-    const IDX_W = 3;             // half width of an hour index at the outer end
-    const IDX_12_GAP = 5;        // half distance between the two 12 o'clock batons
-    const STAR6_R = 7;           // 8-point star marker at 6 o'clock
-    const STAR6_Y = 264;
+    // Chapter ring
+    const TICK_R_IN = 131;       // minute ticks
+    const TICK_R_OUT = 137;
+    const IDX_R_IN = 121;        // gold hour indices (not at 12/3/6/9)
+    const IDX_R_OUT = 135;
+    const IDX_W_IN = 2;          // half widths of an index at its inner / outer end
+    const IDX_W_OUT = 4;
+    const NUM_R = 118;           // centre radius of the 12 / 3 / 6 / 9 numerals
 
-    // Ayah (pre-shaped glyph from the Ayah font), centred on AYAH_Y
-    const AYAH_Y = 49;
-    const AYAH_MAX_W = 160;
-    const AYAH_MAX_H = 44;
+    // Date block (between the two upper gauges) and Hijri line
+    const CRESCENT_Y = 45;
+    const DAY_NAME_Y = 57;
+    const DAY_NUM_Y = 75;
+    const MONTH_Y = 93;
+    const HIJRI_Y = 108;
 
-    // Dates (text vertical centres)
-    const GREG_Y = 80;
-    const HIJRI_Y = 95;
-
-    // Gauges (centres and ring)
-    const GAUGE_DX = 68;         // horizontal distance from CX
-    const GAUGE_TOP_Y = 133;
-    const GAUGE_BOT_Y = 186;
-    const GAUGE_R = 24;          // ring radius (pen centre)
+    // Gauges: upper pair (steps / heart rate) and side pair (calories / battery)
+    const GAUGE_UP_DX = 56;
+    const GAUGE_UP_Y = 72;
+    const GAUGE_SIDE_DX = 76;
+    const GAUGE_SIDE_Y = 146;
+    const GAUGE_R = 27;          // ring radius (pen centre)
     const GAUGE_PEN = 4;
-    const GAUGE_VALUE_DY = -3;   // value text centre relative to gauge centre
-    const GAUGE_DISC_R = 27;     // dark disc behind each gauge
-    const GAUGE_ICON_DY = 19;    // icon / unit centre (in the open bottom of the ring)
+    const GAUGE_DISC_R = 29;     // dark disc behind each gauge
+    const GAUGE_ICON_DY = -16;   // icon centre relative to the gauge centre
+    const GAUGE_VALUE_DY = -2;
+    const GAUGE_LABEL_DY = 11;
+    const GAUGE_BATT_ICON_DY = -17;  // battery: larger value, so icon and label move outwards
+    const GAUGE_BATT_LABEL_DY = 14;
 
-    // Prayer panel
-    const SCHED_Y = 220;
-    const SCHED_W = 166;         // total width used by the five schedule cells
-    const NEXT_Y = 237;
+    // Sunrise (left) and sunset (right): icon above the time
+    const SUN_DX = 93;
+    const SUN_ICON_Y = 97;
+    const SUN_TIME_Y = 109;
 
-    // Sunrise / sunset, in the band below the pivot between the four gauges
-    const SUN_Y = 160;
-    const SUN_GAP = 4;           // gap between the sunrise and sunset groups
-    const SUN_ICON_W = 11;
+    // Central arch window (scene behind the hands)
+    const ARCH_X0 = 99;
+    const ARCH_X1 = 181;
+    const ARCH_TOP = 118;
+    const ARCH_BOTTOM = 208;
+
+    // Prayer cartouches: next prayer + countdown (left), following prayer + time (right)
+    const PANEL_DX = 49;         // panel centre distance from CX
+    const PANEL_W = 66;
+    const PANEL_Y0 = 178;
+    const PANEL_H = 28;
+
+    // Ayah cartouche
+    const AYAH_Y = 223;
+    const AYAH_MAX_W = 132;
+    const AYAH_MAX_H = 26;
+    const AYAH_REF_Y = 243;
+    const CARTOUCHE_X0 = 70;
+    const CARTOUCHE_X1 = 210;
+    const CARTOUCHE_Y0 = 209;
+    const CARTOUCHE_Y1 = 251;
 
     // Hands (lengths from the centre; tails point the other way)
-    const HOUR_LEN = 66;
-    const HOUR_W = 7;
-    const HOUR_TAIL = 12;
-    const MIN_LEN = 104;
-    const MIN_W = 6;
-    const MIN_TAIL = 14;
-    const SEC_LEN = 122;
-    const SEC_TAIL = 26;
+    const HOUR_LEN = 54;
+    const HOUR_W = 4;
+    const HOUR_TAIL = 10;
+    const MIN_LEN = 96;
+    const MIN_W = 3;
+    const MIN_TAIL = 12;
+    const SEC_LEN = 120;
+    const SEC_TAIL = 24;
     const SEC_PEN = 2;
-    const SEC_WEIGHT_R = 4;      // counterweight radius on the tail
-    const CAP_R = 6;
-    const CAP_INNER_R = 2;
+    const SEC_WEIGHT_R = 4;      // hollow counterweight on the tail
+    const CAP_R = 7;
+    const CAP_INNER_R = 4;
+    const HUB_DIAMOND_Y = 152;   // small gold diamond under the pivot
 }

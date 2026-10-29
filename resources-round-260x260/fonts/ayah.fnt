@@ -1,0 +1,16 @@
+info face="Amiri-Bold (pre-shaped Ayat)" size=24 bold=0 italic=0 charset="" unicode=1 stretchH=100 smooth=1 aa=1 padding=0,0,0,0 spacing=1,1 outline=0
+common lineHeight=24 base=24 scaleW=256 scaleH=128 pages=1 packed=0 alphaChnl=0 redChnl=4 greenChnl=4 blueChnl=4
+page id=0 file="ayah.png"
+chars count=11
+char id=49    x=0    y=0    width=81   height=23   xoffset=0    yoffset=0    xadvance=81   page=0  chnl=15
+char id=50    x=82   y=0    width=75   height=23   xoffset=0    yoffset=0    xadvance=75   page=0  chnl=15
+char id=51    x=0    y=24   width=119  height=22   xoffset=0    yoffset=1    xadvance=119  page=0  chnl=15
+char id=52    x=120  y=24   width=75   height=24   xoffset=0    yoffset=0    xadvance=75   page=0  chnl=15
+char id=53    x=0    y=49   width=100  height=24   xoffset=0    yoffset=0    xadvance=100  page=0  chnl=15
+char id=54    x=101  y=49   width=72   height=24   xoffset=0    yoffset=0    xadvance=72   page=0  chnl=15
+char id=65    x=174  y=49   width=61   height=24   xoffset=0    yoffset=0    xadvance=61   page=0  chnl=15
+char id=66    x=0    y=74   width=67   height=24   xoffset=0    yoffset=0    xadvance=67   page=0  chnl=15
+char id=67    x=68   y=74   width=103  height=24   xoffset=0    yoffset=0    xadvance=103  page=0  chnl=15
+char id=55    x=172  y=74   width=78   height=24   xoffset=0    yoffset=0    xadvance=78   page=0  chnl=15
+char id=32    x=251  y=74   width=0    height=0    xoffset=0    yoffset=0    xadvance=4    page=0  chnl=15
+kernings count=0

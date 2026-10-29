@@ -236,16 +236,26 @@ class PrayerSchedule {
     // [prayer index, UTC moment as Long, day index] of the next prayer strictly after
     // `nowUtc`, or null when no prayer can be computed in the next three days.
     function next(nowUtc as Number) as Array? {
+        var list = upcoming(nowUtc, 1);
+        return (list.size() > 0) ? list[0] as Array : null;
+    }
+
+    // Up to `count` upcoming prayers, each [prayer index, UTC moment as Long, day index].
+    function upcoming(nowUtc as Number, count as Number) as Array {
+        var out = [];
         for (var dd = 0; dd < mDays.size(); dd++) {
             var times = mDays[dd] as Array;
             for (var k = 0; k < 5; k++) {
                 var p = PrayerTimes.PRAYERS[k] as Number;
                 var mo = PrayerTimes.moment(mDay + dd, times[p], mOffset);
                 if (mo != null && mo > nowUtc) {
-                    return [p, mo, dd];
+                    out.add([p, mo, dd]);
+                    if (out.size() >= count) {
+                        return out;
+                    }
                 }
             }
         }
-        return null;
+        return out;
     }
 }

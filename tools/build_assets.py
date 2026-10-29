@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Generate the bundled resources of Luxe Hijri Prayer (reproducible, no network needed).
 
-Outputs:
-  resources/fonts/*.fnt + *.png     BMFont (AngelCode text format) bitmap fonts
-  resources/fonts/ayah.fnt + png    one pre-shaped Arabic glyph per Ayah (HarfBuzz/raqm shaping)
-  resources/jsonData/bg_*.json      vector geometry of the four backgrounds (colour roles)
+Outputs (one font set per supported round screen size, selected by Connect IQ resource
+qualifiers; 280 x 280 is the base set in resources/):
+  resources[-round-WxH]/fonts/*.fnt + *.png + fonts.xml   BMFont bitmap fonts
+  resources[-round-WxH]/fonts/ayah.*                     one pre-shaped Arabic glyph per Ayah
+  resources/jsonData/*.json                              vector art in 280 x 280 coordinates
+                                                          (scaled at runtime to the screen)
   resources/drawables/launcher_icon.png
 
 Fonts: Barlow Semi Condensed and Amiri, both SIL Open Font License (tools/fonts-src).
@@ -16,24 +18,30 @@ import math
 import os
 import random
 import re
+import shutil
 import sys
 
-from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont, features
+from PIL import Image, ImageDraw, ImageFont, features
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FONT_SRC = os.path.join(ROOT, "tools", "fonts-src")
 RES = os.path.join(ROOT, "resources")
+BASE = 280
+# Round colour screens of current Connect IQ watches (pixels). 280 is the base resource set.
+RESOLUTIONS = [218, 240, 260, 280, 360, 390, 416, 454]
 
 LATIN = "".join(chr(c) for c in range(32, 127)) + "ÀÂÄÇÉÈÊËÎÏÔÖÙÛÜàâäçéèêëîïôöùûü·°’«»−"
 
-# id, ttf, pixel size, character set
+# id, ttf, pixel size at 280 px, character set
 FONTS = [
-    ("luxe_xxs", "BarlowSemiCondensed-Bold.ttf", 12, " KCALMI%"),
-    ("luxe_xs", "BarlowSemiCondensed-SemiBold.ttf", 14, LATIN),
-    ("luxe_s", "BarlowSemiCondensed-SemiBold.ttf", 17, LATIN),
-    ("luxe_m", "BarlowSemiCondensed-Bold.ttf", 21, LATIN),
-    ("luxe_l", "BarlowSemiCondensed-Bold.ttf", 28, "0123456789%-+.:kKh "),
+    ("luxe_num", "BarlowSemiCondensed-Bold.ttf", 25, " 0123456789"),
+    ("luxe_l", "BarlowSemiCondensed-Bold.ttf", 30, " 0123456789%-"),
+    ("luxe_m", "BarlowSemiCondensed-Bold.ttf", 20, LATIN),
+    ("luxe_s", "BarlowSemiCondensed-SemiBold.ttf", 15, LATIN),
+    ("luxe_xs", "BarlowSemiCondensed-SemiBold.ttf", 12, LATIN),
 ]
+FONT_IDS = {"luxe_num": "LuxeNum", "luxe_l": "LuxeL", "luxe_m": "LuxeM", "luxe_s": "LuxeS", "luxe_xs": "LuxeXS",
+            "ayah": "Ayah"}
 
 
 def layout_consts():
@@ -41,17 +49,20 @@ def layout_consts():
     return {k: int(v) for k, v in re.findall(r"const\s+(\w+)\s*=\s*(-?\d+)\s*;", src)}
 
 
+def res_dir(size):
+    return RES if size == BASE else os.path.join(ROOT, "resources-round-%dx%d" % (size, size))
+
+
 # ------------------------------------------------------------------ BMFont writer
-def pack_and_write(name, glyphs, line_height, base, size, face):
+def pack_and_write(folder, name, glyphs, line_height, base, size, face):
     """glyphs: list of (char id, L-mode coverage image or None, xoffset, yoffset, xadvance)."""
     width = 256
-    x = y = row_h = 0
     pad = 1
+    for _, img, _, _, _ in glyphs:
+        if img is not None and img.width + 2 * pad > width:
+            width = 1 << (img.width + 2 * pad - 1).bit_length()
+    x = y = row_h = 0
     placed = []
-    for cid, img, xo, yo, adv in glyphs:
-        w, h = (img.size if img is not None else (0, 0))
-        if w > width:
-            width = 1 << (w + 2 * pad - 1).bit_length()
     for cid, img, xo, yo, adv in glyphs:
         w, h = (img.size if img is not None else (0, 0))
         if x + w + pad > width:
@@ -79,13 +90,12 @@ def pack_and_write(name, glyphs, line_height, base, size, face):
         lines.append("char id=%-5d x=%-4d y=%-4d width=%-4d height=%-4d xoffset=%-4d yoffset=%-4d "
                      "xadvance=%-4d page=0  chnl=15" % (cid, px, py, w, h, xo, yo, adv))
     lines.append("kernings count=0")
-    atlas.save(os.path.join(RES, "fonts", name + ".png"), optimize=True)
-    with open(os.path.join(RES, "fonts", name + ".fnt"), "w") as fh:
+    atlas.save(os.path.join(folder, name + ".png"), optimize=True)
+    with open(os.path.join(folder, name + ".fnt"), "w") as fh:
         fh.write("\n".join(lines) + "\n")
-    return width, height
 
 
-def build_latin_font(name, ttf, size, chars):
+def build_latin_font(folder, name, ttf, size, chars):
     font = ImageFont.truetype(os.path.join(FONT_SRC, ttf), size)
     ascent, descent = font.getmetrics()
     glyphs = []
@@ -98,147 +108,242 @@ def build_latin_font(name, ttf, size, chars):
         img = Image.new("L", (bbox[2] - bbox[0], bbox[3] - bbox[1]), 0)
         ImageDraw.Draw(img).text((-bbox[0], -bbox[1]), ch, font=font, fill=255)
         glyphs.append((ord(ch), img, bbox[0], bbox[1], adv))
-    w, h = pack_and_write(name, glyphs, ascent + descent, ascent, size, os.path.splitext(ttf)[0])
-    return {"id": name, "size": size, "lineHeight": ascent + descent, "atlas": [w, h]}
+    pack_and_write(folder, name, glyphs, ascent + descent, ascent, size, os.path.splitext(ttf)[0])
+    return {"id": name, "size": size, "lineHeight": ascent + descent}
 
 
 # ------------------------------------------------------------------ Ayah glyph font
 def render_arabic_line(text, size):
-    font = ImageFont.truetype(os.path.join(FONT_SRC, "Amiri-Bold.ttf"), size,
-                              layout_engine=ImageFont.Layout.RAQM)
+    font = ImageFont.truetype(os.path.join(FONT_SRC, "Amiri-Bold.ttf"), size, layout_engine=ImageFont.Layout.RAQM)
     bbox = font.getbbox(text, direction="rtl", language="ar")
     w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
     img = Image.new("L", (w + 2, h + 2), 0)
-    ImageDraw.Draw(img).text((1 - bbox[0], 1 - bbox[1]), text, font=font, fill=255,
-                             direction="rtl", language="ar")
+    ImageDraw.Draw(img).text((1 - bbox[0], 1 - bbox[1]), text, font=font, fill=255, direction="rtl", language="ar")
     return img.crop(img.getbbox())
 
 
-def _stack(top, bottom, w):
-    """Places `bottom` under `top` as high as possible while keeping >= 2 px between inks."""
-    a = Image.new("L", (w, top.height), 0)
-    a.paste(top, ((w - top.width) // 2, 0))
-    grown = a.filter(ImageFilter.MaxFilter(3))   # 1 px clearance around every ink pixel
-    bx = (w - bottom.width) // 2
-    for y in range(0, top.height + 1):
-        canvas = Image.new("L", (w, y + bottom.height), 0)
-        canvas.paste(bottom, (bx, y))
-        overlap = ImageChops.multiply(canvas.crop((0, 0, w, min(top.height, y + bottom.height))).point(
-            lambda v: 255 if v > 40 else 0), grown.crop((0, 0, w, min(top.height, y + bottom.height))).point(
-            lambda v: 255 if v > 40 else 0))
-        if overlap.getbbox() is None:
-            out = Image.new("L", (w, max(top.height, y + bottom.height)), 0)
-            out.paste(a, (0, 0))
-            out = ImageChops.lighter(out, canvas.resize(out.size) if canvas.size != out.size else canvas)
-            return out
-    raise AssertionError("stacking failed")
-
-
-def _layouts(lines):
-    """Candidate line breaks: the given lines, plus every 2-line split of a single line."""
-    yield lines
-    if len(lines) == 1:
-        words = lines[0].split()
-        for k in range(1, len(words)):
-            yield [" ".join(words[:k]), " ".join(words[k:])]
-
-
-def ayah_fits(w, h, L):
-    """The Ayah box is centred on AYAH_Y; its top corners must stay inside a 124 px circle
-    (clear of the 11 and 1 o'clock indices) and its height inside AYAH_MAX_H."""
-    if h > L["AYAH_MAX_H"]:
+def ayah_fits(w, h, L, k):
+    """Single line centred on AYAH_Y inside the cartouche and a 124 px circle (scaled by k)."""
+    if h > L["AYAH_MAX_H"] * k or w > L["AYAH_MAX_W"] * k:
         return False
-    top = L["AYAH_Y"] - (h + 1) // 2
-    dy = L["CY"] - top
-    return w <= min(L["AYAH_MAX_W"], 2 * math.sqrt(max(0, 124 * 124 - dy * dy)))
+    bottom = (L["AYAH_Y"] - L["CY"]) * k + (h + 1) / 2.0
+    return w <= 2 * math.sqrt(max(0.0, (124 * k) ** 2 - bottom ** 2))
 
 
-def render_ayah(lines, L):
-    """Largest font size (then fewest lines) for which the Ayah fits the dial."""
-    for size in range(22, 11, -1):
-        best = None
-        for cand in _layouts(lines):
-            imgs = [render_arabic_line(t, size) for t in cand]
-            w = max(i.width for i in imgs)
-            out = imgs[0] if len(imgs) == 1 else _stack(imgs[0], imgs[1], w)
-            if ayah_fits(out.width, out.height, L):
-                if best is None or len(cand) < best[2] or (len(cand) == best[2] and out.width < best[0].width):
-                    best = (out, size, len(cand), cand)
-        if best is not None:
-            return best[0], best[1], best[3]
-    raise SystemExit("Ayah does not fit: %s" % lines)
-
-
-def build_ayah_font():
+def build_ayah_font(folder, k, L):
     if not features.check("raqm"):
         raise SystemExit("Pillow was built without raqm: Arabic shaping unavailable")
-    L = layout_consts()
     data = json.load(open(os.path.join(ROOT, "tools", "ayat.json")))
-    glyphs = []
-    sizes = {}
-    imgs = []
+    glyphs, sizes, imgs = [], {}, []
     for a in data["ayat"]:
-        img, size, used = render_ayah(a["lines"], L)
+        for size in range(int(26 * k), 7, -1):
+            img = render_arabic_line(a["lines"][0], size)
+            if ayah_fits(img.width, img.height, L, k):
+                break
+        else:
+            raise SystemExit("Ayah %s does not fit at %d px" % (a["ref"], BASE * k))
         imgs.append((a, img))
-        sizes[a["ref"]] = {"px": size, "w": img.width, "h": img.height, "lines": used}
+        sizes[a["ref"]] = {"px": size, "w": img.width, "h": img.height}
     line_h = max(i.height for _, i in imgs)
     for a, img in imgs:
         glyphs.append((ord(a["code"]), img, 0, (line_h - img.height) // 2, img.width))
     glyphs.append((32, None, 0, 0, 4))
-    pack_and_write("ayah", glyphs, line_h, line_h, line_h, "Amiri-Regular (pre-shaped Ayat)")
+    pack_and_write(folder, "ayah", glyphs, line_h, line_h, line_h, "Amiri-Bold (pre-shaped Ayat)")
     return sizes
 
 
-# ------------------------------------------------------------------ backgrounds
+def write_fonts_xml(folder):
+    lines = ["<fonts>", "    <!-- Generated by tools/build_assets.py (Barlow Semi Condensed / Amiri, SIL OFL) -->"]
+    for name in [f[0] for f in FONTS] + ["ayah"]:
+        lines.append('    <font id="%s" filename="%s.fnt" antialias="true" />' % (FONT_IDS[name], name))
+    lines.append("</fonts>")
+    with open(os.path.join(folder, "fonts.xml"), "w") as fh:
+        fh.write("\n".join(lines) + "\n")
+
+
+def build_font_sets():
+    L = layout_consts()
+    report = {}
+    for size in RESOLUTIONS:
+        k = size / float(BASE)
+        folder = os.path.join(res_dir(size), "fonts")
+        if size != BASE and os.path.isdir(folder):
+            shutil.rmtree(folder)
+        os.makedirs(folder, exist_ok=True)
+        for f in os.listdir(folder):
+            if f.endswith((".fnt", ".png")):
+                os.remove(os.path.join(folder, f))
+        fonts = [build_latin_font(folder, n, t, max(9, int(s * k)), c) for n, t, s, c in FONTS]
+        ayah = build_ayah_font(folder, k, L)
+        write_fonts_xml(folder)
+        report[size] = {"fonts": fonts, "ayah": ayah}
+    return report
+
+
+# ------------------------------------------------------------------ vector art
 # Colour roles (see source/Themes.mc)
-BG, PLATE, ORN, ORN2, GOLD, GOLD_DK, ACCENT, ACCENT2, TEXT, DIM, TRACK, SECONDS, SIL, STAR = range(14)
+(BG, PLATE, ORN, ORN2, GOLD, GOLD_DK, ACCENT, ACCENT2, TEXT, DIM, TRACK, SECONDS, SIL, STAR, WARN,
+ TICK) = range(16)
 # Op codes interpreted by source/Backgrounds.mc and tools/face.py
-OP_POLY, OP_CIRCLE, OP_LINE, OP_POLYLINE, OP_POINTS, OP_RING, OP_RECT, OP_STAR8, OP_FILL, OP_CRESCENT = range(10)
+(OP_POLY, OP_CIRCLE, OP_LINE, OP_POLYLINE, OP_POINTS, OP_RING, OP_RECT, OP_STAR8, OP_FILL, OP_CRESCENT,
+ OP_RRECT, OP_RRECT_LINE) = range(12)
 
 
 def inside(x, y, r=139):
     return (x - 140) ** 2 + (y - 140) ** 2 <= r * r
 
 
-def bg_mosque():
+def arch_points(L, inset=0):
+    """Pointed (two-centred) arch: vertical sides from ARCH_BOTTOM to the springing line,
+    then two circular arcs meeting at the apex."""
+    x0, x1, top, bottom = L["ARCH_X0"] + inset, L["ARCH_X1"] - inset, L["ARCH_TOP"] + inset, L["ARCH_BOTTOM"]
+    half = (x1 - x0) / 2.0
+    spring = top + 32
+    rad = (half * half + (spring - top) ** 2) / (2 * half)       # circle through (x0,spring) and apex
+    cx_l = x0 + rad
+    a_end = math.atan2(top - spring, (x0 + half) - cx_l)
+    left = []
+    for i in range(9):
+        a = math.pi + (a_end - math.pi) * i / 8.0
+        if a < -math.pi:
+            a += 2 * math.pi
+        left.append((cx_l + rad * math.cos(a), spring + rad * math.sin(a)))
+    pts = [(x0, bottom)] + left
+    right = [(2 * 140 - x, y) for (x, y) in reversed(left)]
+    pts += right[1:] + [(x1, bottom)]
+    return [(int(round(x)), int(round(y))) for x, y in pts]
+
+
+def flat(pts):
+    return [v for p in pts for v in p]
+
+
+def frame_ops(L):
+    """Elements common to every background: arch window frame, prayer and Ayah cartouches."""
     ops = []
-    # stars in the sky (kept away from the text bands)
-    rnd = random.Random(7)
-    pts = []
-    while len(pts) < 2 * 26:
-        x, y = rnd.randint(30, 250), rnd.randint(22, 150)
-        if inside(x, y, 128) and not (60 <= y <= 100 and 70 <= x <= 210) and not (36 <= y <= 60 and 76 <= x <= 204):
-            pts += [x, y]
-    ops.append([OP_POINTS, STAR, 2] + pts)
-    ops.append([OP_CRESCENT, GOLD, BG, 218, 78, 11, 5, -3, 9])
-    # mosque skyline rising from the bottom of the dial; it also darkens the prayer panel
-    s = SIL
-    ops.append([OP_CIRCLE, s, 140, 212, 27])                  # main dome
-    ops.append([OP_RECT, s, 112, 210, 57, 30])                # drum
-    ops.append([OP_POLY, s, 137, 186, 143, 186, 141, 176, 139, 176])  # finial base
-    ops.append([OP_LINE, s, 2, 140, 176, 140, 166])          # finial
-    ops.append([OP_CRESCENT, GOLD, BG, 140, 162, 4, 2, -1, 3])
-    ops.append([OP_CIRCLE, s, 102, 226, 15])                  # side domes
-    ops.append([OP_CIRCLE, s, 178, 226, 15])
-    for mx in (104, 176):                                     # minarets
-        ops.append([OP_RECT, s, mx - 4, 182, 9, 60])
-        ops.append([OP_RECT, s, mx - 6, 196, 13, 3])          # balcony
-        ops.append([OP_POLY, s, mx - 4, 182, mx + 4, 182, mx, 168])
-    ops.append([OP_RECT, s, 20, 232, 240, 50])               # ground
+    ops.append([OP_POLYLINE, GOLD_DK, 1] + flat(arch_points(L)))
+    ops.append([OP_POLYLINE, GOLD_DK, 1] + flat(arch_points(L, -3)))
+    w, h, y0 = L["PANEL_W"], L["PANEL_H"], L["PANEL_Y0"]
+    for sgn in (-1, 1):
+        x0 = 140 + sgn * L["PANEL_DX"] - w // 2
+        ops.append([OP_RRECT, PLATE, x0, y0, w, h, 7])
+        ops.append([OP_RRECT_LINE, GOLD_DK, 1, x0, y0, w, h, 7])
+    x0, x1, ya, yb = L["CARTOUCHE_X0"], L["CARTOUCHE_X1"], L["CARTOUCHE_Y0"], L["CARTOUCHE_Y1"]
+    cart = [(x0, yb), (x0, ya + 10), (x0 + 10, ya + 3), (124, ya + 3), (140, ya - 4), (156, ya + 3),
+            (x1 - 10, ya + 3), (x1, ya + 10), (x1, yb)]
+    ops.append([OP_POLY, PLATE] + flat(cart))
+    ops.append([OP_POLYLINE, GOLD_DK, 1] + flat(cart))
     return ops
 
 
-def bg_geometric():
+def lattice(role, step=34, r=11):
     ops = []
-    step = 46
     for gy in range(-step, 281 + step, step):
         for gx in range(-step, 281 + step, step):
-            ox = (step // 2) if ((gy // step) % 2) else 0
+            ox = step // 2 if (gy // step) % 2 else 0
             cx, cy = gx + ox, gy
             if inside(cx, cy, 150):
-                ops.append([OP_STAR8, ORN, 1, cx, cy, 15])
-                ops.append([OP_RING, ORN, 1, cx, cy, 6])
-    ops.append([OP_RING, ORN2, 1, 140, 140, 120])
+                ops.append([OP_STAR8, role, 1, cx, cy, r])
+    return ops
+
+
+def arch_fill(L, role):
+    return [OP_POLY, role] + flat(arch_points(L))
+
+
+def palm(x, base, top, lean):
+    ops = [[OP_POLYLINE, SIL, 2, x, base, x + lean // 2, (base + top) // 2, x + lean, top]]
+    tx, ty = x + lean, top
+    for ang, ln in [(-160, 11), (-130, 10), (-95, 7), (-50, 10), (-20, 11)]:
+        a = math.radians(ang)
+        mx, my = tx + ln * 0.55 * math.cos(a), ty + ln * 0.55 * math.sin(a) - 2
+        ex, ey = tx + ln * math.cos(a), ty + ln * math.sin(a) + 3
+        ops.append([OP_POLYLINE, SIL, 2, tx, ty, int(round(mx)), int(round(my)), int(round(ex)), int(round(ey))])
+    return ops
+
+
+def mosque_scene(L):
+    """Mosque, minarets, palms and water inside the arch window (centred under the pivot)."""
+    ops = []
+    s = SIL
+    base = 186
+    # water (dark) with golden reflections of the lit windows
+    ops.append([OP_RECT, PLATE, 99, base, 83, 22])
+    for x, ln, dy in [(124, 5, 4), (133, 4, 4), (143, 4, 4), (152, 5, 4), (128, 7, 9), (141, 6, 9), (137, 6, 14)]:
+        ops.append([OP_LINE, GOLD_DK, 1, x, base + dy, x + ln, base + dy])
+    # tall outer minarets with two balconies, lantern and cone
+    for mx in (110, 170):
+        ops.append([OP_RECT, s, mx - 3, 140, 7, base - 140])
+        ops.append([OP_RECT, s, mx - 5, 152, 11, 2])
+        ops.append([OP_RECT, s, mx - 5, 166, 11, 2])
+        ops.append([OP_POLY, s, mx - 3, 140, mx + 4, 140, mx, 130])
+        ops.append([OP_LINE, s, 1, mx, 130, mx, 126])
+        for wy in (145, 158, 172):
+            ops.append([OP_RECT, GOLD_DK, mx, wy, 1, 3])
+    # prayer hall, side domes, drum and main dome
+    ops.append([OP_RECT, s, 114, 174, 53, base - 174])
+    ops.append([OP_CIRCLE, s, 122, 175, 8])
+    ops.append([OP_CIRCLE, s, 158, 175, 8])
+    ops.append([OP_RECT, s, 126, 163, 29, base - 163])
+    ops.append([OP_CIRCLE, s, 140, 162, 14])
+    ops.append([OP_POLY, s, 138, 149, 143, 149, 141, 143, 140, 143])
+    ops.append([OP_LINE, s, 1, 140, 143, 140, 139])
+    ops.append([OP_CRESCENT, GOLD, BG, 140, 137, 2, 1, -1, 2])
+    # lit arched windows, arcade and gate
+    for x in (129, 134, 146, 151):
+        ops.append([OP_RECT, GOLD_DK, x, 167, 2, 4])
+    for x in range(117, 166, 6):
+        if abs(x - 140) > 5:
+            ops.append([OP_RECT, GOLD_DK, x, 179, 2, 4])
+    ops.append([OP_RECT, GOLD, 137, 177, 7, 9])
+    ops.append([OP_CIRCLE, GOLD, 140, 177, 3])
+    # palms at the sides of the window
+    ops += palm(101, base, 160, 3)
+    ops += palm(179, base, 160, -3)
+    return ops
+
+
+def stars_in_arch(L, rnd, n, role, size):
+    pts = []
+    tries = 0
+    poly = arch_points(L, 6)
+    while len(pts) < 2 * n and tries < 5000:
+        tries += 1
+        x, y = rnd.randint(L["ARCH_X0"] + 5, L["ARCH_X1"] - 5), rnd.randint(L["ARCH_TOP"] + 6, 150)
+        if point_in_poly(x, y, poly) and abs(x - 140) + abs(y - 140) > 10:
+            pts += [x, y]
+    return [OP_POINTS, role, size] + pts
+
+
+def point_in_poly(x, y, poly):
+    inside_ = False
+    j = len(poly) - 1
+    for i in range(len(poly)):
+        xi, yi = poly[i]
+        xj, yj = poly[j]
+        if (yi > y) != (yj > y) and x < (xj - xi) * (y - yi) / float(yj - yi) + xi:
+            inside_ = not inside_
+        j = i
+    return inside_
+
+
+def bg_mosque(L):
+    rnd = random.Random(7)
+    ops = lattice(PLATE)
+    ops.append(arch_fill(L, BG))
+    ops.append(stars_in_arch(L, rnd, 14, STAR, 1))
+    ops.append(stars_in_arch(L, rnd, 5, STAR, 2))
+    ops.append([OP_CRESCENT, GOLD, BG, 157, 131, 8, 4, -3, 7])
+    ops += mosque_scene(L)
+    return ops
+
+
+def bg_geometric(L):
+    ops = lattice(ORN, 28, 9)
+    ops.append(arch_fill(L, BG))
+    for r in (34, 25, 16, 7):
+        ops.append([OP_STAR8, ORN2, 1, 140, 160, r])
+    ops.append([OP_RING, ORN2, 1, 140, 160, 30])
     return ops
 
 
@@ -252,51 +357,72 @@ def _vein(rnd, x, y, ang, n, step):
     return pts
 
 
-def bg_marble():
+def bg_marble(L):
     rnd = random.Random(1448)
     ops = [[OP_FILL, PLATE]]
-    for _ in range(9):   # faint grey veins
+    cloud = []
+    for _ in range(260):
+        cx, cy = rnd.choice([(70, 90), (200, 70), (180, 200), (90, 210), (140, 140)])
+        x, y = int(rnd.gauss(cx, 26)), int(rnd.gauss(cy, 20))
+        if inside(x, y, 136):
+            cloud += [x, y]
+    ops.append([OP_POINTS, ORN, 1] + cloud)
+    for _ in range(14):
         ops.append([OP_POLYLINE, ORN, 1] + _vein(rnd, rnd.uniform(-20, 300), rnd.uniform(-20, 300),
                                                   rnd.uniform(0, 6.28), 22, 14))
-    for _ in range(4):   # gold veins with branches
+    for k in range(6):
         x, y = rnd.uniform(0, 80), rnd.uniform(20, 260)
         main = _vein(rnd, x, y, rnd.uniform(-0.6, 0.6), 26, 12)
-        ops.append([OP_POLYLINE, GOLD_DK, 1] + main)
-        for b in range(2):
+        ops.append([OP_POLYLINE, GOLD_DK, 2 if k < 2 else 1] + main)
+        for _ in range(3):
             i = rnd.randrange(4, 20) * 2
-            ops.append([OP_POLYLINE, GOLD_DK, 1] + _vein(rnd, main[i], main[i + 1], rnd.uniform(0, 6.28), 6, 9))
+            ops.append([OP_POLYLINE, GOLD_DK, 1] + _vein(rnd, main[i], main[i + 1], rnd.uniform(0, 6.28), 6, 8))
     return ops
 
 
-def bg_night():
+def bg_night(L):
     rnd = random.Random(29)
     ops = []
-    faint, bright = [], []
-    # milky way band (dense faint dots along a diagonal)
-    for _ in range(140):
+    faint, bright, small = [], [], []
+    for _ in range(320):
         t = rnd.uniform(0, 1)
-        x = 10 + 260 * t + rnd.gauss(0, 14)
-        y = 250 - 220 * t + rnd.gauss(0, 14)
-        if inside(x, y, 134):
+        x = 10 + 260 * t + rnd.gauss(0, 16)
+        y = 250 - 220 * t + rnd.gauss(0, 16)
+        if inside(x, y, 136):
             faint += [int(x), int(y)]
-    for _ in range(45):
-        x, y = rnd.randint(16, 264), rnd.randint(16, 264)
-        if inside(x, y, 130):
+    for _ in range(70):
+        x, y = rnd.randint(14, 266), rnd.randint(14, 266)
+        if inside(x, y, 132):
+            small += [x, y]
+    stars = []
+    for _ in range(26):
+        x, y = rnd.randint(18, 262), rnd.randint(18, 262)
+        if inside(x, y, 128):
             bright += [x, y]
+            stars.append((x, y))
     ops.append([OP_POINTS, ORN2, 1] + faint)
+    ops.append([OP_POINTS, STAR, 1] + small)
     ops.append([OP_POINTS, STAR, 2] + bright)
-    for (x, y) in [(40, 150), (236, 160), (172, 104), (110, 210)]:   # sparkles
-        ops.append([OP_LINE, STAR, 1, x - 3, y, x + 3, y])
-        ops.append([OP_LINE, STAR, 1, x, y - 3, x, y + 3])
-    ops.append([OP_CRESCENT, GOLD, BG, 60, 80, 15, 7, -4, 12])
+    # a constellation (faint lines between a few bright stars)
+    con = sorted(stars, key=lambda p: p[0])[:5]
+    ops.append([OP_POLYLINE, ORN2, 1] + flat(con))
+    for (x, y) in [(40, 150), (236, 160), (172, 104), (110, 210), (60, 60), (222, 228)]:
+        ops.append([OP_LINE, STAR, 1, x - 4, y, x + 4, y])
+        ops.append([OP_LINE, STAR, 1, x, y - 4, x, y + 4])
+        ops.append([OP_LINE, STAR, 1, x - 2, y - 2, x + 2, y + 2])
+        ops.append([OP_LINE, STAR, 1, x - 2, y + 2, x + 2, y - 2])
+    ops.append([OP_CRESCENT, GOLD, BG, 150, 168, 18, 8, -5, 15])
     return ops
 
 
-def build_backgrounds():
+def build_vector_art():
+    L = layout_consts()
     out = {}
-    for name, fn in [("bg_mosque", bg_mosque), ("bg_geometric", bg_geometric), ("bg_marble", bg_marble),
-                     ("bg_night", bg_night)]:
-        ops = fn()
+    jobs = [("bg_mosque", bg_mosque), ("bg_geometric", bg_geometric), ("bg_marble", bg_marble),
+            ("bg_night", bg_night), ("frame", frame_ops)]
+    os.makedirs(os.path.join(RES, "jsonData"), exist_ok=True)
+    for name, fn in jobs:
+        ops = fn(L)
         for op in ops:
             assert op[0] != OP_POLY or len(op) - 2 <= 128, "polygon too large"
         path = os.path.join(RES, "jsonData", name + ".json")
@@ -313,10 +439,8 @@ def build_icon():
     img = Image.new("RGB", (n, n), (0, 0, 0x55))
     d = ImageDraw.Draw(img)
     d.ellipse([2 * s, 2 * s, n - 2 * s, n - 2 * s], outline=(0xFF, 0xAA, 0), width=2 * s)
-    # crescent
     d.ellipse([9 * s, 8 * s, 31 * s, 30 * s], fill=(0xFF, 0xAA, 0))
     d.ellipse([14 * s, 5 * s, 34 * s, 27 * s], fill=(0, 0, 0x55))
-    # star
     cx, cy, r = 27 * s, 25 * s, 4 * s
     pts = []
     for i in range(10):
@@ -329,16 +453,12 @@ def build_icon():
 
 
 def main():
-    os.makedirs(os.path.join(RES, "fonts"), exist_ok=True)
-    os.makedirs(os.path.join(RES, "jsonData"), exist_ok=True)
-    report = {"fonts": [build_latin_font(*f) for f in FONTS]}
-    report["ayah"] = build_ayah_font()
-    report["backgrounds"] = build_backgrounds()
+    report = {"fonts": build_font_sets(), "vector": build_vector_art()}
     build_icon()
     with open(os.path.join(ROOT, "tools", "assets-report.json"), "w") as fh:
         json.dump(report, fh, indent=1, ensure_ascii=False)
-    json.dump(report, sys.stdout, indent=1, ensure_ascii=False)
-    print()
+    summary = {size: {k: v["px"] for k, v in r["ayah"].items()} for size, r in report["fonts"].items()}
+    print(json.dumps({"ayah_px": summary, "vector": report["vector"]}, indent=1, ensure_ascii=False))
 
 
 if __name__ == "__main__":

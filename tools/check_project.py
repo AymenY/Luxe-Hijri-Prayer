@@ -152,7 +152,7 @@ def main():
     n_presets = len(re.findall(r"//\s+[A-F]\s+\w", themes))
     expect = {
         "StylePreset": n_presets,
-        "Background": len(res["JsonData"]),
+        "Background": len([j for j in res["JsonData"] if j.startswith("Bg")]),
         "Gauge1": 8, "Gauge2": 8, "Gauge3": 8, "Gauge4": 8,
         "HijriCorrection": 5,
         "AyahSelection": 8,
@@ -167,44 +167,65 @@ def main():
 
     # ---- palette
     levels = {0x00, 0x55, 0xAA, 0xFF}
-    body = themes[themes.index("PRESETS"):]
+    body = themes[themes.index("const PRESETS"):themes.index("const MULTICOLOR")]
+    if len(re.findall(r"true|false", themes[themes.index("const MULTICOLOR"):themes.index("const SOURCE_COLORS")])) != n_presets:
+        errors.append("Themes.MULTICOLOR must have one entry per preset")
+    src_cols = re.findall(r"0x[0-9A-Fa-f]{6}", themes[themes.index("const SOURCE_COLORS"):])
+    if len(src_cols) != 8:
+        errors.append("Themes.SOURCE_COLORS must have one colour per gauge source")
+    for c in src_cols:
+        c = int(c, 16)
+        if any(((c >> sh) & 255) not in {0x00, 0x55, 0xAA, 0xFF} for sh in (16, 8, 0)):
+            errors.append("source colour %06X is not in the 64-colour MIP palette" % c)
     rows = re.findall(r"\[([^\[\]]+)\]", body)
     for i, r in enumerate(rows):
         cols = [int(x, 16) for x in re.findall(r"0x[0-9A-Fa-f]{6}", r)]
-        if len(cols) != 15:
-            errors.append("preset %d has %d colours (expected 15)" % (i, len(cols)))
+        if len(cols) != 16:
+            errors.append("preset %d has %d colours (expected 16)" % (i, len(cols)))
         for c in cols:
             if any(((c >> s) & 255) not in levels for s in (16, 8, 0)):
                 errors.append("preset %d colour %06X is not in the 64-colour MIP palette" % (i, c))
 
-    # ---- font coverage
-    def charset(name):
-        return {int(m) for m in re.findall(r"char id=(\d+)", open(os.path.join(ROOT, "resources", "fonts", name + ".fnt")).read())}
-    cs = {n: charset(n) for n in ("luxe_xxs", "luxe_xs", "luxe_s", "luxe_m", "luxe_l", "ayah")}
-    groups = {
-        "luxe_s": [k for k in res["Strings"] if re.match(r"(Day|Month|Hijri)\d+$|HijriSuffix$", k)],
-        "luxe_m": [k for k in res["Strings"] if re.match(r"Prayer\d|SetLocation$", k)],
-        "luxe_xxs": ["LabelCalories", "LabelBattery", "LabelKm", "LabelMi"],
-    }
-    for fontname, keys in groups.items():
+    # ---- font sets: one per screen size, same ids everywhere, full glyph coverage
+    font_dirs = [os.path.join(ROOT, "resources", "fonts")] + sorted(
+        glob.glob(os.path.join(ROOT, "resources-round-*", "fonts")))
+    base_ids = None
+    for fd in font_dirs:
+        root = parse(os.path.join(fd, "fonts.xml"))
+        if root is None:
+            continue
+        ids = {el.get("id"): el.get("filename") for el in root.iter("font")}
+        if base_ids is None:
+            base_ids = ids
+        elif ids != base_ids:
+            errors.append("%s: font ids differ from the base set" % rel(fd))
+        for fid, fn in ids.items():
+            for f in (fn, fn.replace(".fnt", ".png")):
+                if not os.path.exists(os.path.join(fd, f)):
+                    errors.append("%s: missing %s" % (rel(fd), f))
+
+        def charset(name):
+            return {int(m) for m in re.findall(r"char id=(\d+)", open(os.path.join(fd, name + ".fnt")).read())}
+        cs = {n: charset(n) for n in ("luxe_num", "luxe_l", "luxe_m", "luxe_s", "luxe_xs", "ayah")}
+        xs_keys = [k for k in res["Strings"] if re.match(
+            r"(Day|Month|Hijri)\d+$|HijriSuffix$|Prayer\d$|SetLocation$|Label\w+$|AyahRef\d$", k)]
         for table in (res["Strings"], fre):
-            for k in keys:
+            for k in xs_keys:
                 for ch in table.get(k, ""):
-                    if ord(ch) not in cs[fontname]:
-                        errors.append("font %s lacks %r used by string %s" % (fontname, ch, k))
-    for ch in "0123456789:-hmk. %":
-        for f in ("luxe_xs", "luxe_s", "luxe_m"):
-            if ord(ch) not in cs[f]:
-                errors.append("font %s lacks %r" % (f, ch))
-    for ch in "0123456789-":
-        if ord(ch) not in cs["luxe_l"]:
-            errors.append("font luxe_l lacks %r" % ch)
-    for ch in "12345678":
-        if ord(ch) not in cs["ayah"]:
-            errors.append("Ayah font lacks glyph %s" % ch)
+                    if ord(ch) not in cs["luxe_xs"]:
+                        errors.append("%s: luxe_xs lacks %r used by string %s" % (rel(fd), ch, k))
+        for ch in "0123456789:-hmk. %":
+            for f in ("luxe_xs", "luxe_s", "luxe_m"):
+                if ord(ch) not in cs[f]:
+                    errors.append("%s: %s lacks %r" % (rel(fd), f, ch))
+        for f, chars in (("luxe_l", "0123456789"), ("luxe_num", "12369"), ("ayah", "1234567ABC")):
+            for ch in chars:
+                if ord(ch) not in cs[f]:
+                    errors.append("%s: %s lacks %r" % (rel(fd), f, ch))
+    notes.append("font sets: %d (%s)" % (len(font_dirs), ", ".join(rel(d) for d in font_dirs)))
 
     # ---- backgrounds
-    arity = {0: None, 1: 5, 2: 7, 3: None, 4: None, 5: 6, 6: 6, 7: 6, 8: 2, 9: 9}
+    arity = {0: None, 1: 5, 2: 7, 3: None, 4: None, 5: 6, 6: 6, 7: 6, 8: 2, 9: 9, 10: 7, 11: 8}
     for path in glob.glob(os.path.join(ROOT, "resources", "jsonData", "*.json")):
         ops = json.load(open(path))
         for op in ops:
@@ -214,7 +235,7 @@ def main():
                 continue
             if arity[code] is not None and len(op) != arity[code]:
                 errors.append("%s: op %d has %d fields" % (rel(path), code, len(op)))
-            if not 0 <= op[1] <= 14 or (code == 9 and not 0 <= op[2] <= 14):
+            if not 0 <= op[1] <= 15 or (code == 9 and not 0 <= op[2] <= 15):
                 errors.append("%s: bad colour role in %s" % (rel(path), op[:3]))
             if code == 0 and (len(op) % 2 or len(op) - 2 > 128):
                 errors.append("%s: bad polygon" % rel(path))

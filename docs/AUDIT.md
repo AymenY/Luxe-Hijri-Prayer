@@ -65,3 +65,27 @@ What was done instead (all reproducible, see `README.md`):
 | Seconds hand | Full redraw into a buffered bitmap; `onPartialUpdate` restores only the hand area in low power; automatic fallback when the power budget is exceeded; user option to hide it in low power. | Documented watch-face power model (see `source/LuxeHijriPrayerView.mc`). |
 | Gauge labels | Icons (steps, heart, floors, Body Battery, stress) and short units (KCAL, %, KM/MI). | Text labels such as “FLOORS”/“ÉTAGES” do not fit the open bottom of a 24 px ring (found by `tools/check_layout.py`). |
 | Sunrise/sunset | Placed in the band under the pivot, between the gauges. | The bottom band is too narrow at the edge of the circle (≈108 px). |
+
+## 4. Revision 2 — approved concept and all round colour watches (2026-10-29)
+
+Requested by the owner after the first version:
+
+| Request | Implementation |
+|---|---|
+| Layout of the supplied concept image | New layout (`source/Layout.mc`): numerals 12/3/6/9, gauges at the upper corners and sides with icons, date block under 12, sunrise/sunset, arch window with a mosque night scene, next / following prayer cartouches, Ayah cartouche with reference. The previous layout was replaced (owner's choice). |
+| Compatible with all current Garmin models | Owner chose **round colour watches** (MIP and AMOLED). Geometry is scaled from 280 px at runtime; fonts and Ayah glyphs are generated per screen size (218–454 px); AMOLED always-on mode is burn-in safe; static art is cached in a buffered bitmap. Square and monochrome watches are not targeted. |
+
+Not taken from the concept, with reasons:
+
+* **Photographic effects** (glows, reflections, gradients): not reproducible on 64-colour MIP
+  screens and too costly to redraw; rendered as vector art.
+* **French translation under the verse**: about 6 px tall at watch size, illegible; kept in
+  `docs/AYAT.md`. The reference (e.g. “Hûd 11:88”) is shown.
+* **“GARMIN fēnix 7X” wordmark**: Garmin trademark, not allowed in a third-party watch face;
+  replaced by a crescent.
+* **Five-prayer schedule row**: the concept shows the next and the following prayer only;
+  the specification allowed the schedule “if space permits”.
+* Al-Ikhlas now shows one verse per minute (four glyphs) to fit the single-line cartouche.
+
+Device ids in `manifest.xml` are those known without the SDK; `tools/update_products.py`
+regenerates the list from the SDK device files (not run here: no SDK).

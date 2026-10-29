@@ -1,40 +1,49 @@
 # Luxe Hijri Prayer
 
-Luxury analog-digital Connect IQ **watch face** for the Garmin **fēnix 7X Pro / 7X Pro
-Sapphire Solar (51 mm, 280 × 280 round 64-colour MIP display)**, written in Monkey C.
+Luxury analog-digital Connect IQ **watch face** with Islamic prayer times, written in Monkey C,
+for **round colour Garmin watches** — fēnix 7 / 7 Pro / 8, epix 2 / Pro, Enduro 2 / 3,
+Forerunner 165 / 255 / 265 / 955 / 965, Venu 2 / 3, vívoactive 5, MARQ 2 — MIP and AMOLED,
+218 to 454 px.
 
-![Six styles (reference renders)](docs/previews/overview-styles.png)
+![Styles (reference renders)](docs/previews/overview-styles.png)
 
-> **Status.** The source is complete, but it **has not been compiled yet**: the Connect IQ SDK
-> could not be downloaded in the environment where it was written. The images in
-> `docs/previews/` are **reference renders** produced by a Python mirror of the drawing code
-> (same layout, fonts, colours and data), **not** simulator screenshots. See
-> [`docs/AUDIT.md`](docs/AUDIT.md) and [`docs/RELEASE_CHECKLIST.md`](docs/RELEASE_CHECKLIST.md).
+> **Status.** The source is complete but **has not been compiled yet**: the Connect IQ SDK
+> could not be downloaded where it was written. Images in `docs/previews/` are **reference
+> renders** from a Python mirror of the drawing code (same layout, fonts, colours, vector art),
+> **not** simulator screenshots. See [`docs/AUDIT.md`](docs/AUDIT.md) and
+> [`docs/RELEASE_CHECKLIST.md`](docs/RELEASE_CHECKLIST.md).
 
-## Features
+## Design
 
-* Analog clock: gold faceted hour and minute hands, long seconds hand (122 px, 87 % of the
-  radius) with counterweight; double baton at 12, batons at 3 and 9, 8-point star at 6
-* Next prayer name and countdown, schedule of the five prayers (next one highlighted, past ones
-  dimmed), sunrise and sunset
-* Gregorian date and Hijri date, Hijri correction −2…+2 days
-* Four gauges, each selectable: steps, heart rate, calories, battery, distance, floors,
-  Body Battery, stress (defaults: steps, heart rate, calories, battery); large battery value
-* Six style presets that recolour every element, four vector backgrounds, eight Ayah choices
-  (seven verses or hidden)
-* English and French
-* Excluded by design: weather, temperature, wind, altitude, compass
+Based on the approved concept image:
+
+* gold 12 / 3 / 6 / 9 numerals, two-tone gold indices, light minute track
+* gold baton hands with light lume inserts, long blue seconds hand with hollow counterweight
+* date block under 12 (day, large date, month and year) and the Hijri date
+* sunrise (left) and sunset (right)
+* four ring gauges — steps and heart rate at the top, calories and battery at the sides —
+  with icon, value and label; one colour per data type in Luxury Blue and Ice Silver
+* a pointed Islamic arch with a night scene (mosque, minarets, palms, water, crescent)
+* two cartouches: **next prayer + countdown** and **the following prayer + its time**
+* the selected Ayah in Arabic, in a cartouche at the bottom, with its reference
+
+Six style presets recolour everything; four backgrounds (mosque, geometric, black marble,
+night sky) change the art; the layout is identical on every screen size.
+
+Not reproduced from the concept: photographic glow and reflections (vector art instead), the
+French translation under the verse (≈6 px at watch size; kept in [`docs/AYAT.md`](docs/AYAT.md)),
+and the “GARMIN fēnix” wordmark (Garmin trademark; replaced by a crescent).
 
 ## Settings (Garmin Connect app → watch face → Settings)
 
 | Group | Setting | Default |
 |---|---|---|
-| Appearance | Style Preset | Luxury Blue |
-| Appearance | Background | Mosque and crescent moon |
-| Appearance | Seconds hand: always / only after wrist raise | Always |
-| Data Fields | Gauge 1–4 | Steps, Heart rate, Calories, Battery |
+| Appearance | Style Preset (6) | Luxury Blue |
+| Appearance | Background (4) | Mosque and crescent moon |
+| Appearance | Seconds hand: always / only after wrist raise (MIP) | Always |
+| Data Fields | Gauge 1–4: steps, heart rate, calories, battery, distance, floors, Body Battery, stress | Steps, Heart rate, Calories, Battery |
 | Faith & Calendar | Hijri Date Correction | 0 days |
-| Faith & Calendar | Ayah Selection | Taha 20:114 |
+| Faith & Calendar | Ayah Selection (7 + none) | Taha 20:114 |
 | Faith & Calendar | Prayer calculation method (14) | Tunisia 18°/18° |
 | Faith & Calendar | Asr convention | Standard |
 | Faith & Calendar | High-latitude rule | Middle of the night |
@@ -42,55 +51,67 @@ Sapphire Solar (51 mm, 280 × 280 round 64-colour MIP display)**, written in Mon
 | Faith & Calendar | Time zone: watch (auto, DST) / manual UTC offset | Watch |
 
 Coordinates are entered manually (decimal degrees, north and east positive). 0 / 0 is treated as
-“not set” and the dial shows **SET LOCATION**.
+“not set” and the dial asks to set the location.
+
+## Multiple watches
+
+* All geometry is defined for a 280 × 280 dial (`source/Layout.mc`) and scaled at runtime.
+* Bitmap fonts and the Arabic verse glyphs are generated for each screen size (218, 240, 260,
+  280, 360, 390, 416, 454 px) and selected by resource qualifiers (`resources-round-WxH/`).
+* MIP screens: 64-colour palette, seconds hand in low power through `onPartialUpdate`.
+* AMOLED screens (`requiresBurnInProtection`): in always-on mode only thin hands and four dots
+  are drawn on black and shifted every minute (about 0.7 % of the pixels lit).
+* `manifest.xml` lists the devices whose ids are known; **regenerate the list from your SDK**:
+  `python3 tools/update_products.py --write` (selects every round colour device with Connect IQ
+  4+ that supports watch faces).
 
 ## Project layout
 
 ```
-manifest.xml, monkey.jungle     project (target: fenix7xpro, min API 4.0.0)
+manifest.xml, monkey.jungle     project (min API 4.0.0)
 source/
   LuxeHijriPrayerApp.mc         app, settings-changed hook, power-budget delegate
-  LuxeHijriPrayerView.mc        drawing, buffered rendering, low-power seconds hand
+  LuxeHijriPrayerView.mc        drawing, static/frame buffers, low-power seconds, AMOLED always-on
   PrayerTimes.mc                prayer/sun algorithm + PrayerSchedule cache
   HijriCalendar.mc, CivilDate.mc
   DataFields.mc                 gauge data sources
   Settings.mc                   validated settings
-  Themes.mc, Layout.mc          six presets (MIP palette), dial geometry
-  Backgrounds.mc                vector background interpreter
+  Themes.mc, Layout.mc          presets (MIP palette), dial geometry (280-px units)
+  Backgrounds.mc                vector art interpreter (scaled)
 test/LuxeTests.mc               Monkey C unit tests (:test)
-resources/                      strings, settings, properties, fonts, background data, icon
+resources/                      strings, settings, properties, 280-px fonts, vector art, icon
+resources-round-WxH/            fonts for the other screen sizes
 resources-fre/                  French strings
-tools/                          asset build, validation, layout check, previews (Python)
+tools/                          asset build, validation, layout check, previews, device list
 docs/                           audit, calculations, Ayat, store texts, checklist, previews
 store/                          store artwork (reference renders)
 ```
 
 ## Build and run (needs the Connect IQ SDK)
 
-1. Install the [Connect IQ SDK Manager](https://developer.garmin.com/connect-iq/sdk/), download
-   the current SDK and the **fēnix 7X Pro** device, and install the *Monkey C* VS Code extension.
-2. Create a developer key once, **outside** this repository:
+1. Install the [Connect IQ SDK Manager](https://developer.garmin.com/connect-iq/sdk/), the
+   current SDK and the devices you target, and the *Monkey C* VS Code extension.
+2. `python3 tools/update_products.py --write` to align the device list with your SDK.
+3. Create a developer key once, **outside** this repository:
    ```sh
    openssl genrsa -out ~/garmin/developer_key.pem 4096
    openssl pkcs8 -topk8 -inform PEM -outform DER -in ~/garmin/developer_key.pem \
        -out ~/garmin/developer_key.der -nocrypt
    ```
-3. Compile and start the simulator:
+4. Compile and start the simulator (repeat `-d` for other devices, e.g. `epix2pro47mm`, `fr265`):
    ```sh
    monkeyc -f monkey.jungle -d fenix7xpro -o bin/LuxeHijriPrayer.prg -y ~/garmin/developer_key.der -w
    connectiq &
    monkeydo bin/LuxeHijriPrayer.prg fenix7xpro
    ```
-   (In VS Code: *Monkey C: Build for Device* / *Run*.)
-4. Unit tests:
+5. Unit tests:
    ```sh
    monkeyc -f monkey.jungle -d fenix7xpro -o bin/test.prg -y ~/garmin/developer_key.der --unit-test
    monkeydo bin/test.prg fenix7xpro -t
    ```
-5. Install on the watch: connect it by USB and copy `bin/LuxeHijriPrayer.prg` to
-   `GARMIN/APPS/` (macOS: use an MTP tool such as OpenMTP), then select the face on the watch.
-6. Store package: `monkeyc -f monkey.jungle -e -r -o bin/LuxeHijriPrayer.iq -y ~/garmin/developer_key.der`
-   and upload it at <https://apps.garmin.com/developer/> (beta first). Texts: `docs/STORE.md`.
+6. Install on a watch: copy the `.prg` built for that device to `GARMIN/APPS/` over USB.
+7. Store package (all devices): `monkeyc -f monkey.jungle -e -r -o bin/LuxeHijriPrayer.iq -y ~/garmin/developer_key.der`,
+   upload at <https://apps.garmin.com/developer/> (beta first). Texts: `docs/STORE.md`.
 
 Never commit the developer key: `*.der`, `*.pem`, `*.prg` and `*.iq` are git-ignored.
 
@@ -99,10 +120,10 @@ Never commit the developer key: `*.der`, `*.pem`, `*.prg` and `*.iq` are git-ign
 ```sh
 pip install -r tools/requirements.txt      # Pillow (with raqm), adhanpy, astral, convertdate, hijridate
 (cd tools && npm install)                   # optional: Monkey C parser for the syntax check
-python3 tools/build_assets.py               # fonts, Ayah glyphs, background geometry, icon
+python3 tools/build_assets.py               # fonts per screen size, Ayah glyphs, vector art, icon
 python3 tools/check_project.py              # resources, settings, palette, fonts, syntax
 python3 tools/validate_calculations.py      # -> docs/validation-report.md
-python3 tools/check_layout.py               # -> docs/layout-report.md
+python3 tools/check_layout.py               # -> docs/layout-report.md (8 screen sizes, EN + FR)
 python3 tools/make_previews.py              # -> docs/previews/, store/
 ```
 
@@ -120,6 +141,6 @@ keep them in sync when changing `source/`.
 ## Licences
 
 Code: © the author. Fonts: Barlow Semi Condensed and Amiri, SIL Open Font License 1.1
-(`tools/fonts-src/OFL-*.txt`); the bitmap fonts in `resources/fonts/` are derived from them.
+(`tools/fonts-src/OFL-*.txt`); the bitmap fonts in `resources*/fonts/` are derived from them.
 Arabic text: Tanzil (CC BY 3.0, unmodified text). French translation: M. Hamidullah via Tanzil
 (documentation only).

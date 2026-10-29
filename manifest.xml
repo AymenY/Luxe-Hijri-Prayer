@@ -3,8 +3,42 @@
     <iq:application id="cd78490637a1489791ea32d58c69ee94" type="watchface" name="@Strings.AppName"
         entry="LuxeHijriPrayerApp" launcherIcon="@Drawables.LauncherIcon" minApiLevel="4.0.0">
         <iq:products>
-            <!-- fenix 7X Pro / 7X Pro Sapphire Solar (51 mm, 280 x 280 MIP) -->
+            <!-- Round colour watches (Connect IQ 4+). Regenerate from the installed SDK device
+                 files with tools/update_products.py (see the README) -->
+            <iq:product id="fenix7" />
+            <iq:product id="fenix7s" />
+            <iq:product id="fenix7x" />
+            <iq:product id="fenix7pro" />
+            <iq:product id="fenix7spro" />
             <iq:product id="fenix7xpro" />
+            <iq:product id="epix2" />
+            <iq:product id="epix2pro42mm" />
+            <iq:product id="epix2pro47mm" />
+            <iq:product id="epix2pro51mm" />
+            <iq:product id="fenix843mm" />
+            <iq:product id="fenix847mm" />
+            <iq:product id="fenix8solar47mm" />
+            <iq:product id="fenix8solar51mm" />
+            <iq:product id="enduro2" />
+            <iq:product id="enduro3" />
+            <iq:product id="fr165" />
+            <iq:product id="fr165m" />
+            <iq:product id="fr255" />
+            <iq:product id="fr255m" />
+            <iq:product id="fr255s" />
+            <iq:product id="fr255sm" />
+            <iq:product id="fr265" />
+            <iq:product id="fr265s" />
+            <iq:product id="fr955" />
+            <iq:product id="fr965" />
+            <iq:product id="venu2" />
+            <iq:product id="venu2s" />
+            <iq:product id="venu2plus" />
+            <iq:product id="venu3" />
+            <iq:product id="venu3s" />
+            <iq:product id="vivoactive5" />
+            <iq:product id="marq2" />
+            <iq:product id="marq2aviator" />
         </iq:products>
         <iq:permissions>
             <!-- Body Battery and stress history (Toybox.SensorHistory) -->

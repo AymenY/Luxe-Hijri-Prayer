@@ -1,135 +1,674 @@
 {
- "fonts": [
-  {
-   "id": "luxe_xxs",
-   "size": 12,
-   "lineHeight": 15,
-   "atlas": [
-    256,
-    32
-   ]
+ "fonts": {
+  "218": {
+   "fonts": [
+    {
+     "id": "luxe_num",
+     "size": 19,
+     "lineHeight": 23
+    },
+    {
+     "id": "luxe_l",
+     "size": 23,
+     "lineHeight": 28
+    },
+    {
+     "id": "luxe_m",
+     "size": 15,
+     "lineHeight": 18
+    },
+    {
+     "id": "luxe_s",
+     "size": 11,
+     "lineHeight": 14
+    },
+    {
+     "id": "luxe_xs",
+     "size": 9,
+     "lineHeight": 11
+    }
+   ],
+   "ayah": {
+    "Taha 20:114": {
+     "px": 11,
+     "w": 68,
+     "h": 20
+    },
+    "Al-Inshirah 94:5": {
+     "px": 11,
+     "w": 64,
+     "h": 20
+    },
+    "Al-Baqarah 2:286": {
+     "px": 11,
+     "w": 102,
+     "h": 19
+    },
+    "Al-Imran 3:8": {
+     "px": 12,
+     "w": 65,
+     "h": 20
+    },
+    "Al-Fath 48:4": {
+     "px": 12,
+     "w": 86,
+     "h": 20
+    },
+    "Al-Ikhlas 112:1": {
+     "px": 12,
+     "w": 58,
+     "h": 19
+    },
+    "Al-Ikhlas 112:2": {
+     "px": 16,
+     "w": 51,
+     "h": 20
+    },
+    "Al-Ikhlas 112:3": {
+     "px": 12,
+     "w": 57,
+     "h": 20
+    },
+    "Al-Ikhlas 112:4": {
+     "px": 13,
+     "w": 89,
+     "h": 20
+    },
+    "Hud 11:88": {
+     "px": 11,
+     "w": 66,
+     "h": 20
+    }
+   }
   },
-  {
-   "id": "luxe_xs",
-   "size": 14,
-   "lineHeight": 17,
-   "atlas": [
-    256,
-    64
-   ]
+  "240": {
+   "fonts": [
+    {
+     "id": "luxe_num",
+     "size": 21,
+     "lineHeight": 26
+    },
+    {
+     "id": "luxe_l",
+     "size": 25,
+     "lineHeight": 30
+    },
+    {
+     "id": "luxe_m",
+     "size": 17,
+     "lineHeight": 21
+    },
+    {
+     "id": "luxe_s",
+     "size": 12,
+     "lineHeight": 15
+    },
+    {
+     "id": "luxe_xs",
+     "size": 10,
+     "lineHeight": 12
+    }
+   ],
+   "ayah": {
+    "Taha 20:114": {
+     "px": 12,
+     "w": 75,
+     "h": 21
+    },
+    "Al-Inshirah 94:5": {
+     "px": 12,
+     "w": 69,
+     "h": 21
+    },
+    "Al-Baqarah 2:286": {
+     "px": 12,
+     "w": 110,
+     "h": 20
+    },
+    "Al-Imran 3:8": {
+     "px": 13,
+     "w": 70,
+     "h": 22
+    },
+    "Al-Fath 48:4": {
+     "px": 13,
+     "w": 93,
+     "h": 22
+    },
+    "Al-Ikhlas 112:1": {
+     "px": 13,
+     "w": 63,
+     "h": 21
+    },
+    "Al-Ikhlas 112:2": {
+     "px": 17,
+     "w": 54,
+     "h": 21
+    },
+    "Al-Ikhlas 112:3": {
+     "px": 13,
+     "w": 61,
+     "h": 22
+    },
+    "Al-Ikhlas 112:4": {
+     "px": 13,
+     "w": 89,
+     "h": 20
+    },
+    "Hud 11:88": {
+     "px": 12,
+     "w": 72,
+     "h": 22
+    }
+   }
   },
-  {
-   "id": "luxe_s",
-   "size": 17,
-   "lineHeight": 21,
-   "atlas": [
-    256,
-    128
-   ]
+  "260": {
+   "fonts": [
+    {
+     "id": "luxe_num",
+     "size": 23,
+     "lineHeight": 28
+    },
+    {
+     "id": "luxe_l",
+     "size": 27,
+     "lineHeight": 33
+    },
+    {
+     "id": "luxe_m",
+     "size": 18,
+     "lineHeight": 22
+    },
+    {
+     "id": "luxe_s",
+     "size": 13,
+     "lineHeight": 16
+    },
+    {
+     "id": "luxe_xs",
+     "size": 11,
+     "lineHeight": 14
+    }
+   ],
+   "ayah": {
+    "Taha 20:114": {
+     "px": 13,
+     "w": 81,
+     "h": 23
+    },
+    "Al-Inshirah 94:5": {
+     "px": 13,
+     "w": 75,
+     "h": 23
+    },
+    "Al-Baqarah 2:286": {
+     "px": 13,
+     "w": 119,
+     "h": 22
+    },
+    "Al-Imran 3:8": {
+     "px": 14,
+     "w": 75,
+     "h": 24
+    },
+    "Al-Fath 48:4": {
+     "px": 14,
+     "w": 100,
+     "h": 24
+    },
+    "Al-Ikhlas 112:1": {
+     "px": 15,
+     "w": 72,
+     "h": 24
+    },
+    "Al-Ikhlas 112:2": {
+     "px": 19,
+     "w": 61,
+     "h": 24
+    },
+    "Al-Ikhlas 112:3": {
+     "px": 14,
+     "w": 67,
+     "h": 24
+    },
+    "Al-Ikhlas 112:4": {
+     "px": 15,
+     "w": 103,
+     "h": 24
+    },
+    "Hud 11:88": {
+     "px": 13,
+     "w": 78,
+     "h": 24
+    }
+   }
   },
-  {
-   "id": "luxe_m",
-   "size": 21,
-   "lineHeight": 26,
-   "atlas": [
-    256,
-    128
-   ]
+  "280": {
+   "fonts": [
+    {
+     "id": "luxe_num",
+     "size": 25,
+     "lineHeight": 30
+    },
+    {
+     "id": "luxe_l",
+     "size": 30,
+     "lineHeight": 36
+    },
+    {
+     "id": "luxe_m",
+     "size": 20,
+     "lineHeight": 24
+    },
+    {
+     "id": "luxe_s",
+     "size": 15,
+     "lineHeight": 18
+    },
+    {
+     "id": "luxe_xs",
+     "size": 12,
+     "lineHeight": 15
+    }
+   ],
+   "ayah": {
+    "Taha 20:114": {
+     "px": 14,
+     "w": 87,
+     "h": 25
+    },
+    "Al-Inshirah 94:5": {
+     "px": 14,
+     "w": 80,
+     "h": 25
+    },
+    "Al-Baqarah 2:286": {
+     "px": 14,
+     "w": 129,
+     "h": 24
+    },
+    "Al-Imran 3:8": {
+     "px": 15,
+     "w": 81,
+     "h": 26
+    },
+    "Al-Fath 48:4": {
+     "px": 15,
+     "w": 107,
+     "h": 26
+    },
+    "Al-Ikhlas 112:1": {
+     "px": 16,
+     "w": 76,
+     "h": 26
+    },
+    "Al-Ikhlas 112:2": {
+     "px": 20,
+     "w": 65,
+     "h": 26
+    },
+    "Al-Ikhlas 112:3": {
+     "px": 15,
+     "w": 71,
+     "h": 26
+    },
+    "Al-Ikhlas 112:4": {
+     "px": 16,
+     "w": 109,
+     "h": 26
+    },
+    "Hud 11:88": {
+     "px": 14,
+     "w": 83,
+     "h": 26
+    }
+   }
   },
-  {
-   "id": "luxe_l",
-   "size": 28,
-   "lineHeight": 34,
-   "atlas": [
-    256,
-    64
-   ]
-  }
- ],
- "ayah": {
-  "Taha 20:114": {
-   "px": 19,
-   "w": 117,
-   "h": 33,
-   "lines": [
-    "وَقُل رَّبِّ زِدْنِي عِلْمًا"
-   ]
+  "360": {
+   "fonts": [
+    {
+     "id": "luxe_num",
+     "size": 32,
+     "lineHeight": 39
+    },
+    {
+     "id": "luxe_l",
+     "size": 38,
+     "lineHeight": 46
+    },
+    {
+     "id": "luxe_m",
+     "size": 25,
+     "lineHeight": 30
+    },
+    {
+     "id": "luxe_s",
+     "size": 19,
+     "lineHeight": 23
+    },
+    {
+     "id": "luxe_xs",
+     "size": 15,
+     "lineHeight": 18
+    }
+   ],
+   "ayah": {
+    "Taha 20:114": {
+     "px": 19,
+     "w": 117,
+     "h": 33
+    },
+    "Al-Inshirah 94:5": {
+     "px": 19,
+     "w": 109,
+     "h": 33
+    },
+    "Al-Baqarah 2:286": {
+     "px": 18,
+     "w": 165,
+     "h": 30
+    },
+    "Al-Imran 3:8": {
+     "px": 19,
+     "w": 102,
+     "h": 32
+    },
+    "Al-Fath 48:4": {
+     "px": 19,
+     "w": 134,
+     "h": 32
+    },
+    "Al-Ikhlas 112:1": {
+     "px": 20,
+     "w": 97,
+     "h": 32
+    },
+    "Al-Ikhlas 112:2": {
+     "px": 26,
+     "w": 84,
+     "h": 32
+    },
+    "Al-Ikhlas 112:3": {
+     "px": 19,
+     "w": 89,
+     "h": 32
+    },
+    "Al-Ikhlas 112:4": {
+     "px": 21,
+     "w": 143,
+     "h": 33
+    },
+    "Hud 11:88": {
+     "px": 18,
+     "w": 107,
+     "h": 33
+    }
+   }
   },
-  "Al-Inshirah 94:5": {
-   "px": 20,
-   "w": 116,
-   "h": 36,
-   "lines": [
-    "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا"
-   ]
+  "390": {
+   "fonts": [
+    {
+     "id": "luxe_num",
+     "size": 34,
+     "lineHeight": 41
+    },
+    {
+     "id": "luxe_l",
+     "size": 41,
+     "lineHeight": 50
+    },
+    {
+     "id": "luxe_m",
+     "size": 27,
+     "lineHeight": 33
+    },
+    {
+     "id": "luxe_s",
+     "size": 20,
+     "lineHeight": 24
+    },
+    {
+     "id": "luxe_xs",
+     "size": 16,
+     "lineHeight": 20
+    }
+   ],
+   "ayah": {
+    "Taha 20:114": {
+     "px": 20,
+     "w": 122,
+     "h": 35
+    },
+    "Al-Inshirah 94:5": {
+     "px": 20,
+     "w": 116,
+     "h": 36
+    },
+    "Al-Baqarah 2:286": {
+     "px": 20,
+     "w": 182,
+     "h": 34
+    },
+    "Al-Imran 3:8": {
+     "px": 21,
+     "w": 112,
+     "h": 36
+    },
+    "Al-Fath 48:4": {
+     "px": 21,
+     "w": 149,
+     "h": 36
+    },
+    "Al-Ikhlas 112:1": {
+     "px": 22,
+     "w": 106,
+     "h": 35
+    },
+    "Al-Ikhlas 112:2": {
+     "px": 29,
+     "w": 93,
+     "h": 36
+    },
+    "Al-Ikhlas 112:3": {
+     "px": 21,
+     "w": 98,
+     "h": 36
+    },
+    "Al-Ikhlas 112:4": {
+     "px": 22,
+     "w": 150,
+     "h": 34
+    },
+    "Hud 11:88": {
+     "px": 20,
+     "w": 119,
+     "h": 36
+    }
+   }
   },
-  "Al-Baqarah 2:286": {
-   "px": 14,
-   "w": 129,
-   "h": 24,
-   "lines": [
-    "لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا"
-   ]
+  "416": {
+   "fonts": [
+    {
+     "id": "luxe_num",
+     "size": 37,
+     "lineHeight": 45
+    },
+    {
+     "id": "luxe_l",
+     "size": 44,
+     "lineHeight": 53
+    },
+    {
+     "id": "luxe_m",
+     "size": 29,
+     "lineHeight": 35
+    },
+    {
+     "id": "luxe_s",
+     "size": 22,
+     "lineHeight": 27
+    },
+    {
+     "id": "luxe_xs",
+     "size": 17,
+     "lineHeight": 21
+    }
+   ],
+   "ayah": {
+    "Taha 20:114": {
+     "px": 22,
+     "w": 135,
+     "h": 38
+    },
+    "Al-Inshirah 94:5": {
+     "px": 21,
+     "w": 121,
+     "h": 37
+    },
+    "Al-Baqarah 2:286": {
+     "px": 21,
+     "w": 191,
+     "h": 36
+    },
+    "Al-Imran 3:8": {
+     "px": 22,
+     "w": 117,
+     "h": 37
+    },
+    "Al-Fath 48:4": {
+     "px": 22,
+     "w": 156,
+     "h": 37
+    },
+    "Al-Ikhlas 112:1": {
+     "px": 23,
+     "w": 110,
+     "h": 38
+    },
+    "Al-Ikhlas 112:2": {
+     "px": 31,
+     "w": 98,
+     "h": 38
+    },
+    "Al-Ikhlas 112:3": {
+     "px": 22,
+     "w": 103,
+     "h": 37
+    },
+    "Al-Ikhlas 112:4": {
+     "px": 24,
+     "w": 164,
+     "h": 38
+    },
+    "Hud 11:88": {
+     "px": 21,
+     "w": 125,
+     "h": 37
+    }
+   }
   },
-  "Al-Imran 3:8": {
-   "px": 21,
-   "w": 112,
-   "h": 36,
-   "lines": [
-    "رَبَّنَا لَا تُزِغْ قُلُوبَنَا"
-   ]
-  },
-  "Al-Fath 48:4": {
-   "px": 18,
-   "w": 127,
-   "h": 30,
-   "lines": [
-    "هُوَ الَّذِي أَنْزَلَ السَّكِينَةَ"
-   ]
-  },
-  "Al-Ikhlas 112:1-4": {
-   "px": 17,
-   "w": 82,
-   "h": 43,
-   "lines": [
-    "قُلْ هُوَ اللَّهُ أَحَدٌ",
-    "اللَّهُ الصَّمَدُ"
-   ]
-  },
-  "Hud 11:88": {
-   "px": 19,
-   "w": 113,
-   "h": 34,
-   "lines": [
-    "وَمَا تَوْفِيقِي إِلَّا بِاللَّهِ"
-   ]
-  },
-  "Al-Ikhlas 112:3-4": {
-   "px": 14,
-   "w": 96,
-   "h": 44,
-   "lines": [
-    "لَمْ يَلِدْ وَلَمْ يُولَدْ",
-    "وَلَمْ يَكُنْ لَهُ كُفُوًا أَحَدٌ"
-   ]
+  "454": {
+   "fonts": [
+    {
+     "id": "luxe_num",
+     "size": 40,
+     "lineHeight": 48
+    },
+    {
+     "id": "luxe_l",
+     "size": 48,
+     "lineHeight": 58
+    },
+    {
+     "id": "luxe_m",
+     "size": 32,
+     "lineHeight": 39
+    },
+    {
+     "id": "luxe_s",
+     "size": 24,
+     "lineHeight": 29
+    },
+    {
+     "id": "luxe_xs",
+     "size": 19,
+     "lineHeight": 23
+    }
+   ],
+   "ayah": {
+    "Taha 20:114": {
+     "px": 24,
+     "w": 147,
+     "h": 42
+    },
+    "Al-Inshirah 94:5": {
+     "px": 24,
+     "w": 138,
+     "h": 42
+    },
+    "Al-Baqarah 2:286": {
+     "px": 23,
+     "w": 210,
+     "h": 39
+    },
+    "Al-Imran 3:8": {
+     "px": 25,
+     "w": 133,
+     "h": 42
+    },
+    "Al-Fath 48:4": {
+     "px": 25,
+     "w": 177,
+     "h": 42
+    },
+    "Al-Ikhlas 112:1": {
+     "px": 26,
+     "w": 124,
+     "h": 42
+    },
+    "Al-Ikhlas 112:2": {
+     "px": 33,
+     "w": 106,
+     "h": 41
+    },
+    "Al-Ikhlas 112:3": {
+     "px": 25,
+     "w": 117,
+     "h": 42
+    },
+    "Al-Ikhlas 112:4": {
+     "px": 27,
+     "w": 183,
+     "h": 42
+    },
+    "Hud 11:88": {
+     "px": 23,
+     "w": 136,
+     "h": 42
+    }
+   }
   }
  },
- "backgrounds": {
+ "vector": {
   "bg_mosque": {
-   "ops": 16,
-   "bytes": 550
+   "ops": 120,
+   "bytes": 2771
   },
   "bg_geometric": {
-   "ops": 75,
-   "bytes": 1324
+   "ops": 98,
+   "bytes": 1840
   },
   "bg_marble": {
-   "ops": 22,
-   "bytes": 2869
+   "ops": 40,
+   "bytes": 6475
   },
   "bg_night": {
-   "ops": 11,
-   "bytes": 1303
+   "ops": 29,
+   "bytes": 3123
+  },
+  "frame": {
+   "ops": 8,
+   "bytes": 563
   }
  }
 }
