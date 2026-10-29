@@ -202,11 +202,11 @@ def arch_points(L, inset=0):
     rad = (half * half + (spring - top) ** 2) / (2 * half)       # circle through (x0,spring) and apex
     cx_l = x0 + rad
     a_end = math.atan2(top - spring, (x0 + half) - cx_l)
+    if a_end < math.pi:          # go from the springing point upwards (screen y grows downwards)
+        a_end += 2 * math.pi
     left = []
     for i in range(9):
         a = math.pi + (a_end - math.pi) * i / 8.0
-        if a < -math.pi:
-            a += 2 * math.pi
         left.append((cx_l + rad * math.cos(a), spring + rad * math.sin(a)))
     pts = [(x0, bottom)] + left
     right = [(2 * 140 - x, y) for (x, y) in reversed(left)]
