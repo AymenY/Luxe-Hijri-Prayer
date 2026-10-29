@@ -21,6 +21,9 @@ Legend: ✅ done in this repository · ⬜ to do on a machine with the Connect I
 * ⬜ Fix every compiler error or warning (none could be checked here: types and API signatures
   were reviewed by hand only)
 * ⬜ Check memory in the simulator (*File → View Memory*); the watch-face limit is shown there
+* ⬜ The compiler accepts `packingFormat="jpg"` / `"png"` on the dial bitmaps (otherwise remove the attribute)
+* ⬜ `.prg` size per device is acceptable (HD dials: ~1.2 MB at 454 px, ~0.5 MB on MIP)
+* ⬜ The HD dial loads on every device (if not, the vector fallback is shown: compare with `docs/previews/`)
 
 ## Simulator tests
 

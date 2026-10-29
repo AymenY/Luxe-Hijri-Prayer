@@ -198,8 +198,8 @@ def arch_points(L, inset=0):
     then two circular arcs meeting at the apex."""
     x0, x1, top, bottom = L["ARCH_X0"] + inset, L["ARCH_X1"] - inset, L["ARCH_TOP"] + inset, L["ARCH_BOTTOM"]
     half = (x1 - x0) / 2.0
-    spring = top + 32
-    rad = (half * half + (spring - top) ** 2) / (2 * half)       # circle through (x0,spring) and apex
+    rad = 1.25 * half                       # two-centred (pointed) arch: radius > half width
+    spring = top + math.sqrt(rad * rad - (rad - half) ** 2)
     cx_l = x0 + rad
     a_end = math.atan2(top - spring, (x0 + half) - cx_l)
     if a_end < math.pi:          # go from the springing point upwards (screen y grows downwards)

@@ -30,6 +30,14 @@ Based on the approved concept image:
 Six style presets recolour everything; four backgrounds (mosque, geometric, black marble,
 night sky) change the art; the layout is identical on every screen size.
 
+**HD artwork.** The static part of the dial — background, arch scene, metallic chapter ring,
+faceted indices, bevelled numerals, recessed gauges, glass cartouches and fixed icons — is
+rendered offline with 3x supersampling, gradients, glows, inner shadows and textures
+(`tools/render_hd.py`), once per screen size, style and background: 24 images per size
+(`tools/build_hd.py`). AMOLED sizes use full-colour JPEG (`packingFormat="jpg"`), MIP sizes a
+64-colour PNG dithered offline. The watch draws only the live content (texts, gauge arcs,
+hands with drop shadows) on top. If an image cannot be loaded, the vector version is used.
+
 Not reproduced from the concept: photographic glow and reflections (vector art instead), the
 French translation under the verse (≈6 px at watch size; kept in [`docs/AYAT.md`](docs/AYAT.md)),
 and the “GARMIN fēnix” wordmark (Garmin trademark; replaced by a crescent).
@@ -80,7 +88,7 @@ source/
   Backgrounds.mc                vector art interpreter (scaled)
 test/LuxeTests.mc               Monkey C unit tests (:test)
 resources/                      strings, settings, properties, 280-px fonts, vector art, icon
-resources-round-WxH/            fonts for the other screen sizes
+resources-round-WxH/            fonts and HD dials for the other screen sizes
 resources-fre/                  French strings
 tools/                          asset build, validation, layout check, previews, device list
 docs/                           audit, calculations, Ayat, store texts, checklist, previews
@@ -121,6 +129,7 @@ Never commit the developer key: `*.der`, `*.pem`, `*.prg` and `*.iq` are git-ign
 pip install -r tools/requirements.txt      # Pillow (with raqm), adhanpy, astral, convertdate, hijridate
 (cd tools && npm install)                   # optional: Monkey C parser for the syntax check
 python3 tools/build_assets.py               # fonts per screen size, Ayah glyphs, vector art, icon
+python3 tools/build_hd.py                   # HD dial images: 8 sizes x 6 styles x 4 backgrounds (~10 min)
 python3 tools/check_project.py              # resources, settings, palette, fonts, syntax
 python3 tools/validate_calculations.py      # -> docs/validation-report.md
 python3 tools/check_layout.py               # -> docs/layout-report.md (8 screen sizes, EN + FR)

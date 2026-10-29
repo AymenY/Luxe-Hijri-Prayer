@@ -89,3 +89,22 @@ Not taken from the concept, with reasons:
 
 Device ids in `manifest.xml` are those known without the SDK; `tools/update_products.py`
 regenerates the list from the SDK device files (not run here: no SDK).
+
+## 5. Revision 3 — HD artwork (2026-10-29)
+
+Requested by the owner: “HD graphics and a contemporary, elaborate design”.
+
+* The static layer is now an offline-rendered HD image per screen size, style and background
+  (192 images, `tools/render_hd.py`, `tools/build_hd.py`): radial gradients, embossed lattice,
+  metallic brushed chapter ring, faceted indices with drop shadows, bevelled numerals, recessed
+  gauges with inner shadows, glass cartouches, a night scene with lit windows, bloom and a
+  rippled reflection, marble texture, Milky Way.
+* AMOLED sizes keep full colour (JPEG); MIP sizes are dithered to the 64-colour palette here so
+  the result is predictable on the display.
+* Live content is unchanged (positions from `source/Layout.mc`); hands gained a drop shadow.
+* The vector art remains as a fallback when an image cannot be loaded.
+
+Risks to verify with the SDK: the `packingFormat` attribute of bitmap resources (used to keep
+the package small; if the compiler rejects it, remove it and expect larger `.prg` files), the
+per-device application size (about 1.2 MB of images on 454 px devices, 0.4–0.5 MB on MIP
+devices) and graphics memory when the image is loaded.

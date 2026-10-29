@@ -224,6 +224,25 @@ def main():
                     errors.append("%s: %s lacks %r" % (rel(fd), f, ch))
     notes.append("font sets: %d (%s)" % (len(font_dirs), ", ".join(rel(d) for d in font_dirs)))
 
+    # ---- HD dials: 24 per screen size (style x background), same ids in every folder
+    dial_ids = {"Dial%d%d" % (st, bg) for st in range(n_presets) for bg in range(4)}
+    for dd in [os.path.join(ROOT, "resources", "drawables")] + sorted(glob.glob(os.path.join(ROOT, "resources-round-*", "drawables"))):
+        xml = os.path.join(dd, "drawables.xml")
+        if not os.path.exists(xml):
+            errors.append("%s: drawables.xml missing (run tools/build_hd.py)" % rel(dd))
+            continue
+        root = parse(xml)
+        if root is None:
+            continue
+        ids = {el.get("id"): el.get("filename") for el in root.iter("bitmap")}
+        if not dial_ids <= set(ids):
+            errors.append("%s: missing dial ids %s" % (rel(dd), sorted(dial_ids - set(ids))[:4]))
+        for rid, fn in ids.items():
+            if not os.path.exists(os.path.join(dd, fn)):
+                errors.append("%s: missing %s" % (rel(dd), fn))
+        notes.append("%s: %d dials, %d KB" % (rel(dd), len(dial_ids & set(ids)), sum(
+            os.path.getsize(os.path.join(dd, f)) for f in os.listdir(dd) if f.startswith("dial_")) // 1024))
+
     # ---- backgrounds
     arity = {0: None, 1: 5, 2: 7, 3: None, 4: None, 5: 6, 6: 6, 7: 6, 8: 2, 9: 9, 10: 7, 11: 8}
     for path in glob.glob(os.path.join(ROOT, "resources", "jsonData", "*.json")):

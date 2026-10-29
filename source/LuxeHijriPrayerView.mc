@@ -13,8 +13,10 @@ import Toybox.WatchUi;
 // p(); bitmap fonts come in one set per screen size (resource qualifiers).
 //
 // Update strategy
-//  * The static layer (background art, frame, chapter ring, numerals, gauge discs) is drawn
-//    once into a buffered bitmap and redrawn only after a settings change.
+//  * The static layer (background art, arch scene, chapter ring, numerals, gauge recesses,
+//    cartouches, fixed icons) is an HD bitmap rendered offline for each screen size, style and
+//    background (tools/render_hd.py). If it cannot be loaded, a vector version is drawn once
+//    into a buffered bitmap instead and redrawn only after a settings change.
 //  * onUpdate() copies the static layer, draws the live content (dates, gauges, prayers,
 //    Ayah, hour/minute hands) and then the seconds hand.
 //  * MIP screens: the frame without the seconds hand is also kept in a second buffer, so that
@@ -33,6 +35,7 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     hidden var mMulticolor as Boolean = false;
     hidden var mBgOps as Array? = null;
     hidden var mFrameOps as Array? = null;
+    hidden var mDial = null;        // HD static layer (BitmapResource) or null
 
     hidden var mFontNum;
     hidden var mFontL;
@@ -83,7 +86,9 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         mFontS = WatchUi.loadResource(Rez.Fonts.LuxeS);
         mFontXS = WatchUi.loadResource(Rez.Fonts.LuxeXS);
         mFontAyah = WatchUi.loadResource(Rez.Fonts.Ayah);
-        mStaticRef = createBuffer(dc.getWidth(), dc.getHeight());
+        if (mDial == null) {
+            mStaticRef = createBuffer(dc.getWidth(), dc.getHeight());
+        }
         if (!mBurnIn) {
             mFrameRef = createBuffer(dc.getWidth(), dc.getHeight());
         }
@@ -95,11 +100,34 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         mSettings.load();
         mColors = Themes.PRESETS[mSettings.preset] as Array<Number>;
         mMulticolor = Themes.MULTICOLOR[mSettings.preset] as Boolean;
-        mBgOps = Backgrounds.load(mSettings.background);
-        mFrameOps = Backgrounds.loadFrame();
+        mDial = null;
+        mDial = loadDial(mSettings.preset, mSettings.background);
+        if (mDial == null) {
+            mBgOps = Backgrounds.load(mSettings.background);
+            mFrameOps = Backgrounds.loadFrame();
+        } else {
+            mBgOps = null;
+            mFrameOps = null;
+            mStaticRef = null;
+        }
         mSchedule.configure(mSettings.latitude, mSettings.longitude, mSettings.method,
                             mSettings.asrFactor, mSettings.highLat);
         mStaticDirty = true;
+    }
+
+    // HD dial for style s and background b; null if it cannot be loaded (e.g. out of memory).
+    hidden function loadDial(st as Number, bg as Number) {
+        var ids = [Rez.Drawables.Dial00, Rez.Drawables.Dial01, Rez.Drawables.Dial02, Rez.Drawables.Dial03,
+                   Rez.Drawables.Dial10, Rez.Drawables.Dial11, Rez.Drawables.Dial12, Rez.Drawables.Dial13,
+                   Rez.Drawables.Dial20, Rez.Drawables.Dial21, Rez.Drawables.Dial22, Rez.Drawables.Dial23,
+                   Rez.Drawables.Dial30, Rez.Drawables.Dial31, Rez.Drawables.Dial32, Rez.Drawables.Dial33,
+                   Rez.Drawables.Dial40, Rez.Drawables.Dial41, Rez.Drawables.Dial42, Rez.Drawables.Dial43,
+                   Rez.Drawables.Dial50, Rez.Drawables.Dial51, Rez.Drawables.Dial52, Rez.Drawables.Dial53];
+        try {
+            return WatchUi.loadResource(ids[st * 4 + bg]);
+        } catch (e) {
+            return null;
+        }
     }
 
     function disablePartialUpdates() as Void {
@@ -178,8 +206,16 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         var target = (frame != null) ? frame.getDc() : dc;
         setAntiAlias(target);
 
+        var dial = mDial;
+        if (dial == null && mStaticRef == null) {
+            // HD dial unavailable (e.g. after a settings change): vector static layer instead
+            mStaticRef = createBuffer(dc.getWidth(), dc.getHeight());
+            mStaticDirty = true;
+        }
         var stat = bitmapOf(mStaticRef);
-        if (stat != null) {
+        if (dial != null) {
+            target.drawBitmap(0, 0, dial);
+        } else if (stat != null) {
             if (mStaticDirty) {
                 var sdc = stat.getDc();
                 setAntiAlias(sdc);
@@ -527,7 +563,9 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         var ix = x0 + p(11);
         var iy = p(Layout.PANEL_Y0 + Layout.PANEL_H / 2);
         dc.setColor(c[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
-        if (next) {
+        if (mDial != null) {
+            // icons are part of the HD dial
+        } else if (next) {
             dc.fillCircle(ix, iy, p(4));
             dc.fillRectangle(ix - p(5), iy, p(10) + 1, p(6));
             dc.fillRectangle(ix, iy - p(7), 1, p(3));
@@ -550,6 +588,13 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         var c = mColors;
         var x = p(Layout.CX + (rising ? -Layout.SUN_DX : Layout.SUN_DX));
         var y = p(Layout.SUN_ICON_Y);
+        if (mDial != null) {
+            // the sun icon is part of the HD dial: only the time is live
+            dc.setColor(c[Themes.TEXT], Graphics.COLOR_TRANSPARENT);
+            dc.drawText(x, p(Layout.SUN_TIME_Y), mFontS, formatTime(minutes, is24),
+                        Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+            return;
+        }
         dc.setColor(c[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
         dc.setPenWidth(pen(2));
         dc.drawArc(x, y + p(2), p(5), Graphics.ARC_COUNTER_CLOCKWISE, 0, 180);
@@ -634,9 +679,17 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         dc.fillCircle(cx, cx, p(Layout.CAP_INNER_R));
     }
 
-    // Gold baton hand with a pointed tip, dark outline and a light lume insert.
+    // Gold baton hand with a pointed tip, drop shadow, dark outline and a light lume insert.
     hidden function drawBaton(dc as Graphics.Dc, a as Numeric, len as Number, w as Number, tail as Number) as Void {
         var c = mColors;
+        var sh = rotatePoly([[-w - 1, tail + 1], [w + 1, tail + 1], [w, -len - 1], [0, -len - 5], [-w, -len - 1]], a);
+        var off = pen(2);
+        for (var i = 0; i < sh.size(); i++) {
+            var pt = sh[i] as Array<Number>;
+            sh[i] = [pt[0] + off, pt[1] + off];
+        }
+        dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_TRANSPARENT);
+        dc.fillPolygon(sh);
         dc.setColor(c[Themes.PLATE], Graphics.COLOR_TRANSPARENT);
         dc.fillPolygon(rotatePoly([[-w - 1, tail + 1], [w + 1, tail + 1], [w, -len - 1], [0, -len - 5], [-w, -len - 1]], a));
         dc.setColor(c[Themes.GOLD], Graphics.COLOR_TRANSPARENT);

@@ -274,9 +274,20 @@ class Face:
         load = lambda n: json.load(open(os.path.join(ROOT, "resources", "jsonData", n + ".json")))
         self.bg_ops = load(BACKGROUNDS[settings["background"]])
         self.frame_ops = load("frame")
+        self.hd = self.load_dial(settings["preset"], settings["background"], size)
         f = lambda n: font(n, size)
         self.f_num, self.f_l, self.f_m, self.f_s, self.f_xs, self.f_ayah = (
             f("luxe_num"), f("luxe_l"), f("luxe_m"), f("luxe_s"), f("luxe_xs"), f("ayah"))
+
+    @staticmethod
+    def load_dial(preset, bg, size):
+        """HD static dial (tools/build_hd.py) if it has been generated, else None (vector fallback)."""
+        base = "resources" if size == BASE else "resources-round-%dx%d" % (size, size)
+        for ext in ("png", "jpg"):
+            path = os.path.join(ROOT, base, "drawables", "dial_%d_%d.%s" % (preset, bg, ext))
+            if os.path.exists(path):
+                return Image.open(path).convert("RGB")
+        return None
 
     # ---- scaling (mirror of LuxeHijriPrayerView.p())
     def p(self, v):
@@ -350,6 +361,9 @@ class Face:
     # ---- static layer (mirror of drawStaticLayer)
     def draw_static(self, dc):
         c, p = self.c, self.p
+        if self.hd is not None:
+            dc.img.paste(self.hd.resize((self.size * S, self.size * S), Image.NEAREST), (0, 0))
+            return
         dc.setColor(c[T["BG"]], c[T["BG"]]); dc.clear()
         self.draw_ops(dc, self.bg_ops)
         self.draw_ops(dc, self.frame_ops)
@@ -472,6 +486,8 @@ class Face:
 
     def sun_icon(self, dc, x, y, rising):
         p = self.p
+        if self.hd is not None:
+            return
         dc.setColor(self.c[T["GOLD"]], -1)
         dc.setPenWidth(self.pen(2)); dc.drawArc(x, y + p(2), p(5), COUNTER_CLOCKWISE, 0, 180)
         dc.setPenWidth(self.pen(1))
@@ -488,6 +504,8 @@ class Face:
 
     def panel_icon(self, dc, x, y, kind):
         p = self.p
+        if self.hd is not None:
+            return
         dc.setColor(self.c[T["GOLD"]], -1)
         if kind == 0:   # small mosque: dome + base + finial
             dc.fillCircle(x, y, p(4)); dc.fillRectangle(x - p(5), y, p(10) + 1, p(6))
@@ -546,6 +564,10 @@ class Face:
 
     def hand(self, dc, a, ln, w, tail):
         c = self.c
+        off = self.pen(2)
+        sh = self.rotate_poly([(-w - 1, tail + 1), (w + 1, tail + 1), (w, -ln - 1), (0, -ln - 5), (-w, -ln - 1)], a)
+        dc.setColor(0, -1)
+        dc.fillPolygon([(x + off, y + off) for x, y in sh])
         dc.setColor(c[T["PLATE"]], -1)
         dc.fillPolygon(self.rotate_poly([(-w - 1, tail + 1), (w + 1, tail + 1), (w, -ln - 1), (0, -ln - 5), (-w, -ln - 1)], a))
         dc.setColor(c[T["GOLD"]], -1)
