@@ -1,0 +1,9 @@
+{
+  "name": "luxe-hijri-prayer-tools",
+  "private": true,
+  "description": "Offline Monkey C syntax check used by tools/check_project.py",
+  "devDependencies": {
+    "@markw65/prettier-plugin-monkeyc": "1.0.69",
+    "prettier": "3.9.10"
+  }
+}

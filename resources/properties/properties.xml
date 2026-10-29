@@ -1,0 +1,23 @@
+<properties>
+    <!-- Appearance -->
+    <property id="StylePreset" type="number">0</property>
+    <property id="Background" type="number">0</property>
+    <property id="SecondsMode" type="number">0</property>
+    <!-- Data fields: 0 steps, 1 heart rate, 2 calories, 3 battery, 4 distance,
+         5 floors, 6 Body Battery, 7 stress -->
+    <property id="Gauge1" type="number">0</property>
+    <property id="Gauge2" type="number">1</property>
+    <property id="Gauge3" type="number">2</property>
+    <property id="Gauge4" type="number">3</property>
+    <!-- Faith & Calendar -->
+    <property id="HijriCorrection" type="number">2</property>  <!-- index 0..4 = -2..+2 days -->
+    <property id="AyahSelection" type="number">0</property>   <!-- 0..6, 7 = hidden -->
+    <property id="CalcMethod" type="number">0</property>
+    <property id="AsrMethod" type="number">0</property>
+    <property id="HighLatRule" type="number">1</property>
+    <!-- Default location: Houmt Souk, Djerba, Tunisia (UTC+1, no DST) -->
+    <property id="Latitude" type="float">33.8754</property>
+    <property id="Longitude" type="float">10.8575</property>
+    <property id="TimeZoneMode" type="number">0</property>
+    <property id="UtcOffset" type="float">1.0</property>
+</properties>

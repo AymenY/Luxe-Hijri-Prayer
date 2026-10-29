@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<iq:manifest version="3" xmlns:iq="http://www.garmin.com/xml/connectiq">
+    <iq:application id="cd78490637a1489791ea32d58c69ee94" type="watchface" name="@Strings.AppName"
+        entry="LuxeHijriPrayerApp" launcherIcon="@Drawables.LauncherIcon" minApiLevel="4.0.0">
+        <iq:products>
+            <!-- fenix 7X Pro / 7X Pro Sapphire Solar (51 mm, 280 x 280 MIP) -->
+            <iq:product id="fenix7xpro" />
+        </iq:products>
+        <iq:permissions>
+            <!-- Body Battery and stress history (Toybox.SensorHistory) -->
+            <iq:uses-permission id="SensorHistory" />
+        </iq:permissions>
+        <iq:languages>
+            <iq:language>eng</iq:language>
+            <iq:language>fre</iq:language>
+        </iq:languages>
+        <iq:barrels />
+    </iq:application>
+</iq:manifest>

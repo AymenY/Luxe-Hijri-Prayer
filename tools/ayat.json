@@ -1,0 +1,91 @@
+{
+ "source_arabic": "Tanzil \"quran-simple\" text via github.com/fawazahmed0/quran-api (edition ara-quransimple), cross-checked letter-by-letter against Tanzil Uthmani 1.0.2 (md5 6aae945d556a1b28cfe682c0ea5ab518)",
+ "source_french": "Muhammad Hamidullah, via Tanzil (edition fra-muhammadhamidul); punctuation normalised",
+ "ayat": [
+  {
+   "code": "1",
+   "ref": "Taha 20:114",
+   "name_fr": "Ta-Ha 20:114 (extrait)",
+   "lines": [
+    "وَقُل رَّبِّ زِدْنِي عِلْمًا"
+   ],
+   "ortho": "Uthmani-style orthography as supplied in the specification (Tanzil Uthmani text, words 15-18)",
+   "fr": "« Ô mon Seigneur, accroît mes connaissances ! »",
+   "excerpt": true
+  },
+  {
+   "code": "2",
+   "ref": "Al-Inshirah 94:5",
+   "name_fr": "Ash-Sharh 94:5",
+   "lines": [
+    "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا"
+   ],
+   "fr": "« À côté de la difficulté est, certes, une facilité. »",
+   "excerpt": false
+  },
+  {
+   "code": "3",
+   "ref": "Al-Baqarah 2:286",
+   "name_fr": "Al-Baqarah 2:286 (extrait)",
+   "lines": [
+    "لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا"
+   ],
+   "fr": "« Allah n'impose à aucune âme une charge supérieure à sa capacité. »",
+   "excerpt": true
+  },
+  {
+   "code": "4",
+   "ref": "Al-Imran 3:8",
+   "name_fr": "Âl 'Imrân 3:8 (extrait)",
+   "lines": [
+    "رَبَّنَا لَا تُزِغْ قُلُوبَنَا"
+   ],
+   "fr": "« Seigneur ! Ne laisse pas dévier nos cœurs »",
+   "excerpt": true
+  },
+  {
+   "code": "5",
+   "ref": "Al-Fath 48:4",
+   "name_fr": "Al-Fath 48:4 (extrait)",
+   "lines": [
+    "هُوَ الَّذِي أَنْزَلَ السَّكِينَةَ"
+   ],
+   "fr": "« C'est Lui qui a fait descendre la quiétude »",
+   "excerpt": true
+  },
+  {
+   "code": "6",
+   "ref": "Al-Ikhlas 112:1-4",
+   "name_fr": "Al-Ikhlâs 112:1-4",
+   "lines": [
+    "قُلْ هُوَ اللَّهُ أَحَدٌ",
+    "اللَّهُ الصَّمَدُ"
+   ],
+   "fr": "« Dis : Il est Allah, Unique. Allah, Le Seul à être imploré pour ce que nous désirons. Il n'a jamais engendré, n'a pas été engendré non plus. Et nul n'est égal à Lui. »",
+   "excerpt": false,
+   "note": "Glyph 6 = verses 1-2, glyph 8 = verses 3-4; the watch face alternates them every minute so the whole surah is shown at a legible size."
+  },
+  {
+   "code": "7",
+   "ref": "Hud 11:88",
+   "name_fr": "Hûd 11:88 (extrait)",
+   "lines": [
+    "وَمَا تَوْفِيقِي إِلَّا بِاللَّهِ"
+   ],
+   "fr": "« Et ma réussite ne dépend que d'Allah. »",
+   "excerpt": true
+  },
+  {
+   "code": "8",
+   "ref": "Al-Ikhlas 112:3-4",
+   "name_fr": "Al-Ikhlâs 112:3-4",
+   "lines": [
+    "لَمْ يَلِدْ وَلَمْ يُولَدْ",
+    "وَلَمْ يَكُنْ لَهُ كُفُوًا أَحَدٌ"
+   ],
+   "fr": "« Dis : Il est Allah, Unique. Allah, Le Seul à être imploré pour ce que nous désirons. Il n'a jamais engendré, n'a pas été engendré non plus. Et nul n'est égal à Lui. »",
+   "excerpt": false,
+   "part_of": "6"
+  }
+ ]
+}

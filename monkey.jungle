@@ -1,0 +1,6 @@
+project.manifest = manifest.xml
+
+# test/ holds (:test) functions; they are only compiled into unit-test builds.
+# resources/ and the language folder resources-fre/ are picked up by the default
+# resource path rules.
+base.sourcePath = source;test

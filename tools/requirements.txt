@@ -1,0 +1,5 @@
+Pillow>=10.0  # must be built with raqm (HarfBuzz/FriBiDi) for Arabic shaping
+adhanpy>=1.0
+astral>=3.2
+convertdate>=2.4
+hijridate>=2.3

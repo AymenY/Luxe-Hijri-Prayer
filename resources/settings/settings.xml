@@ -1,0 +1,142 @@
+<settings>
+    <setting propertyKey="@Properties.StylePreset" title="@Strings.StylePresetTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.PresetA</listEntry>
+            <listEntry value="1">@Strings.PresetB</listEntry>
+            <listEntry value="2">@Strings.PresetC</listEntry>
+            <listEntry value="3">@Strings.PresetD</listEntry>
+            <listEntry value="4">@Strings.PresetE</listEntry>
+            <listEntry value="5">@Strings.PresetF</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.Background" title="@Strings.BackgroundTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.BgMosque</listEntry>
+            <listEntry value="1">@Strings.BgGeometric</listEntry>
+            <listEntry value="2">@Strings.BgMarble</listEntry>
+            <listEntry value="3">@Strings.BgNight</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.SecondsMode" title="@Strings.SecondsModeTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.SecondsAlways</listEntry>
+            <listEntry value="1">@Strings.SecondsAwake</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.Gauge1" title="@Strings.Gauge1Title">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.SrcSteps</listEntry>
+            <listEntry value="1">@Strings.SrcHeart</listEntry>
+            <listEntry value="2">@Strings.SrcCalories</listEntry>
+            <listEntry value="3">@Strings.SrcBattery</listEntry>
+            <listEntry value="4">@Strings.SrcDistance</listEntry>
+            <listEntry value="5">@Strings.SrcFloors</listEntry>
+            <listEntry value="6">@Strings.SrcBodyBattery</listEntry>
+            <listEntry value="7">@Strings.SrcStress</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.Gauge2" title="@Strings.Gauge2Title">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.SrcSteps</listEntry>
+            <listEntry value="1">@Strings.SrcHeart</listEntry>
+            <listEntry value="2">@Strings.SrcCalories</listEntry>
+            <listEntry value="3">@Strings.SrcBattery</listEntry>
+            <listEntry value="4">@Strings.SrcDistance</listEntry>
+            <listEntry value="5">@Strings.SrcFloors</listEntry>
+            <listEntry value="6">@Strings.SrcBodyBattery</listEntry>
+            <listEntry value="7">@Strings.SrcStress</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.Gauge3" title="@Strings.Gauge3Title">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.SrcSteps</listEntry>
+            <listEntry value="1">@Strings.SrcHeart</listEntry>
+            <listEntry value="2">@Strings.SrcCalories</listEntry>
+            <listEntry value="3">@Strings.SrcBattery</listEntry>
+            <listEntry value="4">@Strings.SrcDistance</listEntry>
+            <listEntry value="5">@Strings.SrcFloors</listEntry>
+            <listEntry value="6">@Strings.SrcBodyBattery</listEntry>
+            <listEntry value="7">@Strings.SrcStress</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.Gauge4" title="@Strings.Gauge4Title">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.SrcSteps</listEntry>
+            <listEntry value="1">@Strings.SrcHeart</listEntry>
+            <listEntry value="2">@Strings.SrcCalories</listEntry>
+            <listEntry value="3">@Strings.SrcBattery</listEntry>
+            <listEntry value="4">@Strings.SrcDistance</listEntry>
+            <listEntry value="5">@Strings.SrcFloors</listEntry>
+            <listEntry value="6">@Strings.SrcBodyBattery</listEntry>
+            <listEntry value="7">@Strings.SrcStress</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.HijriCorrection" title="@Strings.HijriCorrectionTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.CorrM2</listEntry>
+            <listEntry value="1">@Strings.CorrM1</listEntry>
+            <listEntry value="2">@Strings.Corr0</listEntry>
+            <listEntry value="3">@Strings.CorrP1</listEntry>
+            <listEntry value="4">@Strings.CorrP2</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.AyahSelection" title="@Strings.AyahTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.Ayah1</listEntry>
+            <listEntry value="1">@Strings.Ayah2</listEntry>
+            <listEntry value="2">@Strings.Ayah3</listEntry>
+            <listEntry value="3">@Strings.Ayah4</listEntry>
+            <listEntry value="4">@Strings.Ayah5</listEntry>
+            <listEntry value="5">@Strings.Ayah6</listEntry>
+            <listEntry value="6">@Strings.Ayah7</listEntry>
+            <listEntry value="7">@Strings.AyahNone</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.CalcMethod" title="@Strings.CalcMethodTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.MethodTunisia</listEntry>
+            <listEntry value="1">@Strings.MethodMWL</listEntry>
+            <listEntry value="2">@Strings.MethodISNA</listEntry>
+            <listEntry value="3">@Strings.MethodEgypt</listEntry>
+            <listEntry value="4">@Strings.MethodUmmAlQura</listEntry>
+            <listEntry value="5">@Strings.MethodKarachi</listEntry>
+            <listEntry value="6">@Strings.MethodGulf</listEntry>
+            <listEntry value="7">@Strings.MethodKuwait</listEntry>
+            <listEntry value="8">@Strings.MethodQatar</listEntry>
+            <listEntry value="9">@Strings.MethodSingapore</listEntry>
+            <listEntry value="10">@Strings.MethodTurkey</listEntry>
+            <listEntry value="11">@Strings.MethodFrance</listEntry>
+            <listEntry value="12">@Strings.MethodAlgeria</listEntry>
+            <listEntry value="13">@Strings.MethodMorocco</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.AsrMethod" title="@Strings.AsrTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.AsrStandard</listEntry>
+            <listEntry value="1">@Strings.AsrHanafi</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.HighLatRule" title="@Strings.HighLatTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.HighLatNone</listEntry>
+            <listEntry value="1">@Strings.HighLatMiddle</listEntry>
+            <listEntry value="2">@Strings.HighLatSeventh</listEntry>
+            <listEntry value="3">@Strings.HighLatAngle</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.Latitude" title="@Strings.LatitudeTitle">
+        <settingConfig type="numeric" min="-90" max="90" />
+    </setting>
+    <setting propertyKey="@Properties.Longitude" title="@Strings.LongitudeTitle">
+        <settingConfig type="numeric" min="-180" max="180" />
+    </setting>
+    <setting propertyKey="@Properties.TimeZoneMode" title="@Strings.TimeZoneModeTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.TzAuto</listEntry>
+            <listEntry value="1">@Strings.TzManual</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.UtcOffset" title="@Strings.UtcOffsetTitle">
+        <settingConfig type="numeric" min="-12" max="14" />
+    </setting>
+</settings>
