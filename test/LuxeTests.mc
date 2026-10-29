@@ -22,70 +22,87 @@ function testCivilDate(logger as Logger) as Boolean {
     return true;
 }
 
-(:test)
-function assertHijri(epochDay as Number, corr as Number, y as Number, m as Number, d as Number) as Void {
-    var h = HijriCalendar.forEpochDay(epochDay, corr);
-    Test.assertEqualMessage(h[0], y, "year " + epochDay);
-    Test.assertEqualMessage(h[1], m, "month " + epochDay);
-    Test.assertEqualMessage(h[2], d, "day " + epochDay);
+// Helpers return an error message (or null) and never call Toybox.Test themselves: only the
+// (:test) functions below use the Test module. The runner treats every (:test) function as a
+// test case, so helpers must not carry that annotation.
+function checkHijri(c as Array<Number>) as String? {
+    var h = HijriCalendar.forEpochDay(c[0], c[1]);
+    if (h[0] != c[2] || h[1] != c[3] || h[2] != c[4]) {
+        return "day " + c[0] + " corr " + c[1] + ": got " + h[0] + "-" + h[1] + "-" + h[2];
+    }
+    return null;
 }
 
-(:test)
-function testHijri(logger as Logger) as Boolean {
-    assertHijri(20755, 0, 1448, 5, 17);
-    assertHijri(20755, -2, 1448, 5, 15);
-    assertHijri(20755, 2, 1448, 5, 19);
-    // year boundary 1447 -> 1448
-    assertHijri(20620, 0, 1447, 12, 30);
-    assertHijri(20621, 0, 1448, 1, 1);
-    assertHijri(20620, 2, 1448, 1, 2);
-    assertHijri(20621, -2, 1447, 12, 29);
-    assertHijri(19782, 0, 1445, 8, 19);
-    assertHijri(10957, 0, 1420, 9, 24);
-    return true;
-}
-
-(:test)
-function assertMinutes(times as Array, expected as Array) as Void {
+// Compares computed times (minutes, +-1) with the expected ones; null entries must be undefined.
+function checkMinutes(times as Array, expected as Array) as String? {
     for (var i = 0; i < 7; i++) {
         var got = PrayerTimes.toMinutes(times[i]);
         var exp = expected[i];
         if (exp == null) {
-            Test.assertMessage(got == null, "index " + i + " should be undefined");
+            if (got != null) {
+                return "index " + i + " should be undefined, got " + got;
+            }
+        } else if (got == null) {
+            return "index " + i + " undefined, expected " + exp;
         } else {
-            Test.assertMessage(got != null, "index " + i + " undefined");
             var diff = (got as Number) - (exp as Number);
-            Test.assertMessage(diff >= -1 && diff <= 1, "index " + i + " got " + got + " expected " + exp);
+            if (diff < -1 || diff > 1) {
+                return "index " + i + " got " + got + " expected " + exp;
+            }
         }
     }
+    return null;
+}
+
+(:test)
+function testHijri(logger as Logger) as Boolean {
+    // [epoch day, correction, year, month, day]
+    var cases = [
+        [20755, 0, 1448, 5, 17], [20755, -2, 1448, 5, 15], [20755, 2, 1448, 5, 19],
+        // year boundary 1447 -> 1448
+        [20620, 0, 1447, 12, 30], [20621, 0, 1448, 1, 1], [20620, 2, 1448, 1, 2], [20621, -2, 1447, 12, 29],
+        [19782, 0, 1445, 8, 19], [10957, 0, 1420, 9, 24]
+    ];
+    for (var i = 0; i < cases.size(); i++) {
+        var err = checkHijri(cases[i] as Array<Number>);
+        Test.assertMessage(err == null, err == null ? "" : err as String);
+    }
+    return true;
 }
 
 (:test)
 function testPrayerTimesDjerba(logger as Logger) as Boolean {
     // Djerba 2026-10-29, Tunisia method, Asr standard, UTC+1
     var t = PrayerTimes.computeDay(20755, 33.8754d, 10.8575d, 1.0d, 0, 1, PrayerTimes.HL_MIDDLE);
-    assertMinutes(t, [309, 393, 720, 904, 1047, 1047, 1131]);
+    var err = checkMinutes(t, [309, 393, 720, 904, 1047, 1047, 1131]);
+    Test.assertMessage(err == null, err == null ? "" : err as String);
     return true;
 }
 
 (:test)
 function testPrayerTimesOtherLocations(logger as Logger) as Boolean {
+    var err;
     // Makkah 2026-03-01, Umm al-Qura (Isha = Maghrib + 90 min)
-    assertMinutes(PrayerTimes.computeDay(20513, 21.4225d, 39.8262d, 3.0d, 4, 1, PrayerTimes.HL_MIDDLE),
-                  [325, 401, 753, 954, 1105, 1105, 1195]);
+    err = checkMinutes(PrayerTimes.computeDay(20513, 21.4225d, 39.8262d, 3.0d, 4, 1, PrayerTimes.HL_MIDDLE),
+                       [325, 401, 753, 954, 1105, 1105, 1195]);
+    Test.assertMessage(err == null, err == null ? "" : err as String);
     // Karachi 2026-01-10, Karachi method, Hanafi Asr
-    assertMinutes(PrayerTimes.computeDay(20463, 24.8607d, 67.0011d, 5.0d, 5, 2, PrayerTimes.HL_MIDDLE),
-                  [358, 438, 759, 985, 1081, 1081, 1161]);
+    err = checkMinutes(PrayerTimes.computeDay(20463, 24.8607d, 67.0011d, 5.0d, 5, 2, PrayerTimes.HL_MIDDLE),
+                       [358, 438, 759, 985, 1081, 1081, 1161]);
+    Test.assertMessage(err == null, err == null ? "" : err as String);
     return true;
 }
 
 (:test)
 function testHighLatitude(logger as Logger) as Boolean {
+    var err;
     // Oslo 2026-06-21, MWL: Fajr/Isha undefined without a rule, middle-of-night with it
-    assertMinutes(PrayerTimes.computeDay(20625, 59.9139d, 10.7522d, 2.0d, 1, 1, PrayerTimes.HL_NONE),
-                  [null, 234, 799, 1080, 1364, 1364, null]);
-    assertMinutes(PrayerTimes.computeDay(20625, 59.9139d, 10.7522d, 2.0d, 1, 1, PrayerTimes.HL_MIDDLE),
-                  [79, 234, 799, 1080, 1364, 1364, 1519]);
+    err = checkMinutes(PrayerTimes.computeDay(20625, 59.9139d, 10.7522d, 2.0d, 1, 1, PrayerTimes.HL_NONE),
+                       [null, 234, 799, 1080, 1364, 1364, null]);
+    Test.assertMessage(err == null, err == null ? "" : err as String);
+    err = checkMinutes(PrayerTimes.computeDay(20625, 59.9139d, 10.7522d, 2.0d, 1, 1, PrayerTimes.HL_MIDDLE),
+                       [79, 234, 799, 1080, 1364, 1364, 1519]);
+    Test.assertMessage(err == null, err == null ? "" : err as String);
     return true;
 }
 
