@@ -106,6 +106,22 @@ docs/                           audit, calculations, Ayat, store texts, checklis
 store/                          store artwork (reference renders)
 ```
 
+## Compile a preview without installing anything (GitHub Actions)
+
+`.github/workflows/build.yml` compiles the watch face with the official SDK on GitHub's servers:
+
+1. Read the Connect IQ SDK license agreement. If you accept it, add the repository **variable**
+   `CIQ_ACCEPT_LICENSE` = `yes` (Settings → Secrets and variables → Actions → Variables).
+2. Add the **secrets** `GARMIN_USERNAME` and `GARMIN_PASSWORD` (your Garmin account: the SDK
+   device files require a login). They are encrypted and never appear in the code or the logs.
+3. Push, or run *Actions → Build → Run workflow* (mode `preview`, `all` or `iq`).
+4. Download the artifact *LuxeHijriPrayer-…*: one `.prg` per device
+   (`fr255s`, `fenix7s`, `fenix7`, `fenix7xpro`, `venu2s`, `fr165`, `epix2pro47mm`,
+   `epix2pro51mm` in preview mode), the unit-test build and the compiler logs.
+
+The `.prg` files are signed with a temporary key: they are for the simulator or sideloading
+(`GARMIN/APPS/`), not for the Store. The static checks (no SDK) run on every push as well.
+
 ## Build and run (needs the Connect IQ SDK)
 
 1. Install the [Connect IQ SDK Manager](https://developer.garmin.com/connect-iq/sdk/), the
@@ -147,6 +163,7 @@ python3 tools/check_project.py              # resources, settings, palette, font
 python3 tools/validate_calculations.py      # -> docs/validation-report.md
 python3 tools/check_layout.py               # -> docs/layout-report.md (8 screen sizes, EN + FR)
 python3 tools/make_previews.py              # -> docs/previews/, store/
+tools/ci_build.sh <key.der> preview         # compile with a local SDK (preview | all | iq | tests)
 ```
 
 `tools/face.py` and `tools/luxe_ref/calc.py` mirror the Monkey C drawing code and algorithms;

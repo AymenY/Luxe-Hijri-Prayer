@@ -3,3 +3,4 @@ adhanpy>=1.0
 astral>=3.2
 convertdate>=2.4
 hijridate>=2.3
+numpy>=1.26

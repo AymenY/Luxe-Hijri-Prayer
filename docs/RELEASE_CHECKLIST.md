@@ -9,11 +9,13 @@ Legend: ✅ done in this repository · ⬜ to do on a machine with the Connect I
 * ✅ Monkey C syntax of all sources parses (open-source parser, part of the check above)
 * ✅ Prayer/sun/Hijri algorithms validated against independent libraries — `python3 tools/validate_calculations.py`
 * ✅ Circular layout validated for all 8 screen sizes (218–454 px) — `python3 tools/check_layout.py`
-* ✅ Reference renders: 6 styles, 4 backgrounds, 8 screen sizes, AMOLED always-on, 11 Ayah states, 13 edge cases — `python3 tools/make_previews.py`
+* ✅ Circular layout validated for 3 font families, both Hijri scripts and all 39 verses
+* ✅ Reference renders: styles, backgrounds, 8 screen sizes, AMOLED always-on, verses, customisation, edge cases — `python3 tools/make_previews.py`
+* ✅ Build automation: `tools/ci_build.sh` and the GitHub Actions workflow `.github/workflows/build.yml`
 
 ## Compile (requires the SDK)
 
-* ⬜ Install the Connect IQ SDK Manager, the current SDK and the device files
+* ⬜ Either run the GitHub Actions build (README, “Compile a preview…”), or install the Connect IQ SDK Manager, the current SDK and the device files
 * ⬜ `python3 tools/update_products.py --write`, review the selected devices
 * ⬜ Generate a developer key (keep it **outside** the repository, never commit it)
 * ⬜ Build at least one device per screen size and type: fenix7s (240 MIP), fenix7 (260 MIP), fenix7xpro (280 MIP), fr255s (218 MIP), venu2s (360 AMOLED), fr165 (390 AMOLED), epix2pro47mm (416 AMOLED), epix2pro51mm / fr965 (454 AMOLED)
@@ -27,7 +29,7 @@ Legend: ✅ done in this repository · ⬜ to do on a machine with the Connect I
 
 ## Simulator tests
 
-* ⬜ Unit tests: `monkeyc ... --unit-test -o bin/test.prg` then `monkeydo bin/test.prg fenix7xpro -t` (5 tests in `test/LuxeTests.mc`)
+* ⬜ Unit tests: `monkeyc ... --unit-test -o bin/test.prg` then `monkeydo bin/test.prg fenix7xpro -t` (6 tests in `test/LuxeTests.mc`)
 * ⬜ Compare the simulator with `docs/previews/*` for each style and background
 * ⬜ *Settings → Trigger App Settings* (or the settings editor): change every setting, confirm the dial updates
 * ⬜ *Settings → Low Power Mode* on MIP: seconds hand keeps moving (option “Always”) or disappears (“Only after wrist raise”)

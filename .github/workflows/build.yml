@@ -1,0 +1,93 @@
+# Compiles Luxe Hijri Prayer with the official Connect IQ SDK on GitHub's runners.
+#
+# One-time setup (repository Settings -> Secrets and variables -> Actions):
+#   secrets   GARMIN_USERNAME, GARMIN_PASSWORD   your Garmin account (device files need a login)
+#   variable  CIQ_ACCEPT_LICENSE = yes           set it only after reading and accepting the
+#                                                Connect IQ SDK license agreement
+# The developer key is generated for each run: the .prg files are for testing (sideload or
+# simulator). Store uploads must be signed with your own permanent key on your machine.
+name: Build
+
+on:
+  push:
+    branches: ["**"]
+    paths-ignore: ["docs/**", "store/**", "**.md"]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "preview (one device per screen size), all (every product), iq (Store package)"
+        default: preview
+        type: choice
+        options: [preview, all, iq]
+      sdk:
+        description: "Connect IQ SDK version constraint"
+        default: ">=7.4.0"
+
+jobs:
+  checks:
+    name: Static checks (no SDK)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install tools
+        run: |
+          pip install -r tools/requirements.txt
+          (cd tools && npm install --silent)
+      - name: Project, calculations and layout checks
+        run: |
+          python3 tools/check_project.py
+          python3 tools/validate_calculations.py
+          python3 tools/check_layout.py
+
+  compile:
+    name: Compile (Connect IQ SDK)
+    runs-on: ubuntu-latest
+    if: ${{ vars.CIQ_ACCEPT_LICENSE == 'yes' }}
+    env:
+      MODE: ${{ github.event.inputs.mode || 'preview' }}
+      SDK: ${{ github.event.inputs.sdk || '>=7.4.0' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Install connect-iq-sdk-manager
+        run: |
+          curl -s https://raw.githubusercontent.com/lindell/connect-iq-sdk-manager-cli/master/install.sh | sh -s -- -b "$HOME/bin"
+          echo "$HOME/bin" >> "$GITHUB_PATH"
+      - name: Accept the SDK license (enabled by CIQ_ACCEPT_LICENSE=yes), log in, download SDK and devices
+        env:
+          GARMIN_USERNAME: ${{ secrets.GARMIN_USERNAME }}
+          GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
+        run: |
+          connect-iq-sdk-manager agreement accept
+          connect-iq-sdk-manager login
+          connect-iq-sdk-manager sdk set "$SDK"
+          echo "$(connect-iq-sdk-manager sdk current-path --bin)" >> "$GITHUB_PATH"
+          connect-iq-sdk-manager device download --manifest=manifest.xml
+      - name: Temporary developer key
+        run: |
+          openssl genrsa -out "$RUNNER_TEMP/key.pem" 4096
+          openssl pkcs8 -topk8 -inform PEM -outform DER -in "$RUNNER_TEMP/key.pem" -out "$RUNNER_TEMP/key.der" -nocrypt
+      - name: Compile watch face
+        run: tools/ci_build.sh "$RUNNER_TEMP/key.der" "$MODE"
+      - name: Compile unit tests
+        if: always()
+        run: tools/ci_build.sh "$RUNNER_TEMP/key.der" tests
+      - name: Upload builds and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: LuxeHijriPrayer-${{ env.MODE }}-${{ github.sha }}
+          path: |
+            bin/*.prg
+            bin/*.iq
+            bin/logs/
