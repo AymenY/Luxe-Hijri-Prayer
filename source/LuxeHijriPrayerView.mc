@@ -21,8 +21,8 @@ import Toybox.WatchUi;
 // tools/face.py mirrors this drawing code for the reference previews.
 class LuxeHijriPrayerView extends WatchUi.WatchFace {
 
-    hidden var mSettings as LuxeSettings = new LuxeSettings();
-    hidden var mSchedule as PrayerSchedule = new PrayerSchedule();
+    hidden var mSettings as LuxeSettings;
+    hidden var mSchedule as PrayerSchedule;
     hidden var mColors as Array<Number> = [] as Array<Number>;
     hidden var mBgOps as Array? = null;
 
@@ -52,6 +52,8 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
 
     function initialize() {
         WatchFace.initialize();
+        mSettings = new LuxeSettings();
+        mSchedule = new PrayerSchedule();
         mColors = Themes.PRESETS[0] as Array<Number>;
         loadStrings();
         buildDialGeometry();

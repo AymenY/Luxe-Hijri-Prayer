@@ -16,12 +16,6 @@ module CivilDate {
         return d.toNumber();
     }
 
-    // Seconds elapsed since local midnight.
-    function secondsOfDay(utcSeconds as Number, offsetSeconds as Number) as Number {
-        var t = utcSeconds.toLong() + offsetSeconds;
-        return (t - localEpochDay(utcSeconds, offsetSeconds).toLong() * 86400).toNumber();
-    }
-
     // Epoch day -> [year, month (1-12), day (1-31)] (Howard Hinnant's civil_from_days).
     function fromDays(days as Number) as Array<Number> {
         var z = days + 719468;

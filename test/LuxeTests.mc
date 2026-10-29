@@ -22,6 +22,7 @@ function testCivilDate(logger as Logger) as Boolean {
     return true;
 }
 
+(:test)
 function assertHijri(epochDay as Number, corr as Number, y as Number, m as Number, d as Number) as Void {
     var h = HijriCalendar.forEpochDay(epochDay, corr);
     Test.assertEqualMessage(h[0], y, "year " + epochDay);
@@ -44,6 +45,7 @@ function testHijri(logger as Logger) as Boolean {
     return true;
 }
 
+(:test)
 function assertMinutes(times as Array, expected as Array) as Void {
     for (var i = 0; i < 7; i++) {
         var got = PrayerTimes.toMinutes(times[i]);

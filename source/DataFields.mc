@@ -69,7 +69,7 @@ module DataFields {
                 return [null, null, 0];
             }
             var units = cm / ((System.getDeviceSettings().distanceUnits == System.UNIT_STATUTE) ? 160934.4 : 100000.0);
-            return [(units < 100.0) ? units.format("%.1f") : units.format("%d"), null, 0];
+            return [(units < 100.0) ? units.format("%.1f") : units.toNumber().toString(), null, 0];
         }
         if (source == FLOORS) {
             if (!(info has :floorsClimbed) || info.floorsClimbed == null) {
