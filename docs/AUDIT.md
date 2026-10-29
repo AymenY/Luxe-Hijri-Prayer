@@ -110,3 +110,20 @@ Risks to verify with the SDK: the `packingFormat` attribute of bitmap resources 
 the package small; if the compiler rejects it, remove it and expect larger `.prg` files), the
 per-device application size (about 1.2 MB of images on 454 px devices, 0.4–0.5 MB on MIP
 devices) and graphics memory when the image is loaded.
+
+## 6. Revision 4 — verses, Arabic dates, full customisation, illustration (2026-10-29)
+
+Requested by the owner:
+
+| Request | Implementation |
+|---|---|
+| Ayah hidden by the graphics | The Ayah cartouche was removed (“cleaner”); the verse sits on a soft shadow, inside a circle clear of the indices and above the 6. |
+| Hijri date and surah name in Arabic | Eastern Arabic digits, month names and هـ pre-shaped in a small Arabic font and assembled at runtime; the reference under the verse (e.g. «الشرح: ٥») is pre-shaped with each verse. A Latin option remains. |
+| Verse changes regularly, own verses | Hourly rotation over a library of verses with one check box per verse, or a fixed verse, or hidden. Free text typed in Garmin Connect cannot be shaped on the watch, so the library approach was chosen by the owner. |
+| Complete verses only | Library rebuilt with **39 complete short verses** (verified against two Tanzil texts); the five long verses of the original specification (20:114, 2:286, 3:8, 48:4, 11:88) were removed because they cannot be shown complete. |
+| Fully customisable | Font family (3), text / accent / seconds colours, hand style (3) and colour, seconds mode, gauge colour mode, “active minutes” and “none” gauge sources, Hijri script. 64 settings in total (`tools/gen_settings.py`). |
+| Richer background, then “use my image, it is the right format” | The owner's illustration is the Mosque background, colour-graded per style; gauges became smoked glass so the art shows through; the other backgrounds use a new lobed Moorish window. |
+
+Notes: the dial artwork (illustration, chapter ring, numerals) keeps the colours of the selected
+style; the colour settings apply to everything drawn live (texts, gauge arcs, hands, seconds).
+Store publication requires the rights to the illustration.

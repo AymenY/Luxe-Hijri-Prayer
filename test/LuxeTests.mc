@@ -128,3 +128,21 @@ function testNextPrayerRollover(logger as Logger) as Boolean {
     Test.assertEqual(n2[1], n[1]);
     return true;
 }
+
+(:test)
+function testAyahRotation(logger as Logger) as Boolean {
+    var all = [true, true, true, true];
+    // hourly rotation over every verse
+    Test.assertEqual(AyahPicker.pick(0, 2, all, 0), 0);
+    Test.assertEqual(AyahPicker.pick(0, 2, all, 5), 1);
+    // only verses 1 and 3 ticked: hours alternate between them
+    var some = [false, true, false, true];
+    Test.assertEqual(AyahPicker.pick(0, 0, some, 10), 1);
+    Test.assertEqual(AyahPicker.pick(0, 0, some, 11), 3);
+    // nothing ticked: the fixed verse
+    Test.assertEqual(AyahPicker.pick(0, 2, [false, false, false, false], 7), 2);
+    // fixed and hidden modes
+    Test.assertEqual(AyahPicker.pick(1, 2, all, 7), 2);
+    Test.assertEqual(AyahPicker.pick(2, 2, all, 7), -1);
+    return true;
+}

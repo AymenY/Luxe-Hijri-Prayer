@@ -22,7 +22,8 @@ ROOT = face.ROOT
 
 
 class Check:
-    def __init__(self, size):
+    def __init__(self, size, fam="luxe"):
+        self.fam = fam
         self.size = size
         self.k = size / 280.0
         self.c = size / 2.0
@@ -33,7 +34,8 @@ class Check:
         return int(math.floor(v * self.k + 0.5))
 
     def text_box(self, fontname, text, cx, cy):
-        f = face.font(fontname, self.size)
+        f = face.font(fontname.replace("luxe_", self.fam + "_") if fontname[5:] in ("l", "m", "s", "xs") else fontname,
+                      self.size)
         w = f.width(text)
         x = cx - w // 2
         top = cy - f.height // 2
@@ -58,8 +60,15 @@ class Check:
             self.inside(box, name)
 
 
+FAM = "luxe"
+
+
+def fontname_for(fontname):
+    return fontname.replace("luxe_", FAM + "_") if fontname[5:] in ("l", "m", "s", "xs") else fontname
+
+
 def widest(fontname, size, cands):
-    f = face.font(fontname, size)
+    f = face.font(fontname_for(fontname), size)
     return max(cands, key=f.width)
 
 
@@ -74,7 +83,7 @@ def overlap(a, b):
 
 
 def check_size(size, report):
-    ck = Check(size)
+    ck = Check(size, FAM)
     p = ck.p
     S = {"eng": face.strings("eng"), "fre": face.strings("fre")}
     gauges = [(p(140 - L.GAUGE_UP_DX), p(L.GAUGE_UP_Y)), (p(140 + L.GAUGE_UP_DX), p(L.GAUGE_UP_Y)),
@@ -98,11 +107,20 @@ def check_size(size, report):
         ck.add("daynum-" + lang, ck.text_box("luxe_l", "28", p(140), p(L.DAY_NUM_Y)))
         ck.add("month-" + lang, ck.text_box("luxe_xs", widest("luxe_xs", size, ["%s 2026" % s["Month%d" % m]
                                                                                 for m in range(1, 13)]), p(140), p(L.MONTH_Y)))
-        ck.add("hijri-" + lang, ck.text_box("luxe_xs", widest("luxe_xs", size, ["30 %s 1448 %s" % (s["Hijri%d" % m],
-                                                                                                   s["HijriSuffix"])
-                                                                                for m in range(1, 13)]), p(140), p(L.HIJRI_Y)))
-        ref = widest("luxe_xs", size, [s["AyahRef%d" % i] + ("4" if i == 6 else "") for i in range(1, 8)])
-        ck.add("ayahref-" + lang, ck.text_box("luxe_xs", ref, p(140), p(L.AYAH_REF_Y)))
+        # Arabic pieces (language independent): widest Hijri date and widest Ayah reference
+        ck.add("hijri", ck.text_box("ar_small", widest("ar_small", size, ["M 1448 %s 30" % chr(ord("A") + m)
+                                                                          for m in range(12)]), p(140), p(L.HIJRI_Y)))
+        ck.add("hijri_latin-" + lang, ck.text_box("luxe_xs", widest("luxe_xs", size, [
+            "30 %s 1448 %s" % (s["Hijri%d" % m], s["HijriSuffix"]) for m in range(1, 13)]), p(140), p(L.HIJRI_Y)))
+        refs = []
+        for g in range(5):
+            fa = face.font("ayah%d" % g, size)
+            for ch in "abcdefgh":
+                if ord(ch) in fa.chars:
+                    refs.append(ck.text_box("ayah%d" % g, ch, p(140), p(L.AYAH_REF_Y)))
+        rb = (min(b[0] for b in refs), min(b[1] for b in refs), max(b[2] for b in refs), max(b[3] for b in refs))
+        ck.add("ayahref", rb)
+        ck.inside(rb, "ayahref", L.AYAH_AREA_R)
         # gauge content must fit inside the ring
         rin = p(L.GAUGE_R) - max(1, p(L.GAUGE_PEN)) // 2
         for key in face.LABELS + ["LabelMi"]:
@@ -116,7 +134,7 @@ def check_size(size, report):
         area = p(L.PANEL_W) - p(22)
         for t, fn in [(widest("luxe_xs", size, names), "luxe_xs"), ("23h59", "luxe_s"), ("00:00", "luxe_s"),
                       (s["SetLocation"], "luxe_xs"), (s["SetLocation2"], "luxe_xs")]:
-            w = face.font(fn, size).width(t)
+            w = face.font(fontname_for(fn), size).width(t)
             limit = area if t not in (s["SetLocation"], s["SetLocation2"]) else p(L.PANEL_W) - 4
             if w > limit:
                 ck.fail.append("cartouche text %s/'%s' (%d px) wider than its area (%d px)" % (lang, t, w, limit))
@@ -124,7 +142,7 @@ def check_size(size, report):
     # values inside the ring
     inner = 2 * (p(L.GAUGE_R) - max(1, p(L.GAUGE_PEN)) // 2) - 2
     for v in ["9999", "99.9k", "999k", "--", "200", "100", "88.8"]:
-        w = min(face.font(f, size).width(v) for f in ("luxe_l", "luxe_m", "luxe_s"))
+        w = min(face.font(fontname_for(f), size).width(v) for f in ("luxe_l", "luxe_m", "luxe_s"))
         if w > inner:
             ck.fail.append("gauge value '%s' (%d px) wider than the ring interior (%d px)" % (v, w, inner))
 
@@ -159,6 +177,9 @@ def check_size(size, report):
     for ref, a in rep.items():
         b = (p(140) - a["w"] // 2, p(L.AYAH_Y) - a["h"] // 2, p(140) + (a["w"] + 1) // 2, p(L.AYAH_Y) + (a["h"] + 1) // 2)
         ck.add("ayah " + ref, b)
+        ck.inside(b, "ayah " + ref, L.AYAH_AREA_R)
+        if b[3] > p(L.AYAH_AREA_BOTTOM):
+            ck.fail.append("ayah %s below the Ayah area" % ref)
 
     # overlaps
     for name, b in ck.boxes.items():
@@ -167,7 +188,8 @@ def check_size(size, report):
             if gap < 1:
                 ck.fail.append("%s overlaps gauge %d (gap %.1f px)" % (name, i + 1, gap))
     names = list(ck.boxes)
-    group = lambda n: n.split("-")[0].split(" ")[0]
+    # variants of the same slot (e.g. Arabic and Latin Hijri date) are never shown together
+    group = lambda n: n.split("-")[0].split(" ")[0].split("_")[0]
     for i in range(len(names)):
         for j in range(i + 1, len(names)):
             a, b = names[i], names[j]
@@ -180,11 +202,16 @@ def check_size(size, report):
 
 
 def main():
-    report = ["| Screen | Result |", "|---|---|"]
+    global FAM
+    report = ["| Font | Screen | Result |", "|---|---|---|"]
     failures = []
-    for size in face.RESOLUTIONS:
-        f = check_size(size, report)
-        failures += ["%d: %s" % (size, x) for x in f]
+    for fam in face.FAMILIES:
+        FAM = fam
+        for size in face.RESOLUTIONS:
+            rows = []
+            f = check_size(size, rows)
+            report += ["| %s %s" % (fam, r) for r in rows]
+            failures += ["%s %d: %s" % (fam, size, x) for x in f]
     out = os.path.join(ROOT, "docs", "layout-report.md")
     with open(out, "w") as fh:
         fh.write("# Layout validation report\n\nGenerated by `tools/check_layout.py`: worst-case English and French "

@@ -1,0 +1,29 @@
+info face="Amiri-Bold (pre-shaped Arabic pieces)" size=17 bold=0 italic=0 charset="" unicode=1 stretchH=100 smooth=1 aa=1 padding=0,0,0,0 spacing=1,1 outline=0
+common lineHeight=31 base=20 scaleW=256 scaleH=128 pages=1 packed=0 alphaChnl=0 redChnl=4 greenChnl=4 blueChnl=4
+page id=0 file="ar_small.png"
+chars count=24
+char id=48    x=0    y=0    width=12   height=9    xoffset=-1   yoffset=12   xadvance=11   page=0  chnl=15
+char id=49    x=13   y=0    width=12   height=15   xoffset=-1   yoffset=8    xadvance=11   page=0  chnl=15
+char id=50    x=26   y=0    width=12   height=15   xoffset=-1   yoffset=9    xadvance=11   page=0  chnl=15
+char id=51    x=39   y=0    width=12   height=15   xoffset=-1   yoffset=9    xadvance=11   page=0  chnl=15
+char id=52    x=52   y=0    width=12   height=14   xoffset=-1   yoffset=9    xadvance=11   page=0  chnl=15
+char id=53    x=65   y=0    width=12   height=11   xoffset=-1   yoffset=10   xadvance=11   page=0  chnl=15
+char id=54    x=78   y=0    width=12   height=16   xoffset=-1   yoffset=8    xadvance=11   page=0  chnl=15
+char id=55    x=91   y=0    width=12   height=14   xoffset=-1   yoffset=9    xadvance=11   page=0  chnl=15
+char id=56    x=104  y=0    width=12   height=14   xoffset=-1   yoffset=9    xadvance=11   page=0  chnl=15
+char id=57    x=117  y=0    width=12   height=16   xoffset=-1   yoffset=8    xadvance=11   page=0  chnl=15
+char id=65    x=130  y=0    width=27   height=21   xoffset=-1   yoffset=9    xadvance=27   page=0  chnl=15
+char id=66    x=158  y=0    width=29   height=19   xoffset=-1   yoffset=7    xadvance=29   page=0  chnl=15
+char id=67    x=188  y=0    width=62   height=31   xoffset=-1   yoffset=0    xadvance=62   page=0  chnl=15
+char id=68    x=0    y=32   width=62   height=29   xoffset=-1   yoffset=2    xadvance=62   page=0  chnl=15
+char id=69    x=63   y=32   width=78   height=26   xoffset=-1   yoffset=0    xadvance=78   page=0  chnl=15
+char id=70    x=142  y=32   width=80   height=24   xoffset=-1   yoffset=2    xadvance=80   page=0  chnl=15
+char id=71    x=0    y=62   width=35   height=14   xoffset=-1   yoffset=13   xadvance=35   page=0  chnl=15
+char id=72    x=36   y=62   width=36   height=21   xoffset=-1   yoffset=5    xadvance=36   page=0  chnl=15
+char id=73    x=73   y=62   width=42   height=21   xoffset=-1   yoffset=5    xadvance=42   page=0  chnl=15
+char id=74    x=116  y=62   width=31   height=21   xoffset=-1   yoffset=5    xadvance=31   page=0  chnl=15
+char id=75    x=148  y=62   width=55   height=20   xoffset=-1   yoffset=6    xadvance=55   page=0  chnl=15
+char id=76    x=204  y=62   width=43   height=22   xoffset=-1   yoffset=4    xadvance=43   page=0  chnl=15
+char id=77    x=0    y=85   width=14   height=10   xoffset=-1   yoffset=11   xadvance=14   page=0  chnl=15
+char id=32    x=15   y=85   width=0    height=0    xoffset=0    yoffset=0    xadvance=5    page=0  chnl=15
+kernings count=0

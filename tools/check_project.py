@@ -74,9 +74,10 @@ def main():
                 if not os.path.exists(f):
                     errors.append("%s: missing file %s" % (rel(path), el.get("filename")))
     fre = {}
-    root = parse(os.path.join(ROOT, "resources-fre", "strings", "strings.xml"))
-    if root is not None:
-        fre = {el.get("id"): el.text or "" for el in root.iter("string")}
+    for path in glob.glob(os.path.join(ROOT, "resources-fre", "strings", "*.xml")):
+        root = parse(path)
+        if root is not None:
+            fre.update({el.get("id"): el.text or "" for el in root.iter("string")})
     missing_fr = set(res["Strings"]) - set(fre)
     extra_fr = set(fre) - set(res["Strings"])
     if missing_fr:
@@ -139,12 +140,18 @@ def main():
             if default not in vals:
                 errors.append("settings: default of %s (%d) is not a list value" % (key, default))
     for key in res["Properties"]:
-        if '"%s"' % key not in allsrc:
+        looped = re.match(r"(AyahInc)\d\d$", key)        # read in a loop: "AyahInc" + i.format("%02d")
+        if '"%s"' % key not in allsrc and not (looped and '"%s"' % looped.group(1) in allsrc):
             errors.append("property %s declared but never read" % key)
         if key not in lists and res["Properties"][key][0] == "number":
             errors.append("property %s has no setting" % key)
+    n_ayat = len(json.load(open(os.path.join(ROOT, "tools", "ayat.json")))["ayat"])
+    if len([k for k in res["Properties"] if k.startswith("AyahInc")]) != n_ayat:
+        errors.append("one AyahInc property per verse expected (%d)" % n_ayat)
+    if "const AYAH_COUNT = %d;" % n_ayat not in allsrc:
+        errors.append("LuxeSettings.AYAH_COUNT does not match tools/ayat.json (%d verses)" % n_ayat)
     for key in re.findall(r'read\w+\("(\w+)"', allsrc):
-        if key not in res["Properties"]:
+        if key not in res["Properties"] and key != "AyahInc":
             errors.append("source reads undeclared property %s" % key)
 
     # list sizes vs code tables
@@ -153,11 +160,16 @@ def main():
     expect = {
         "StylePreset": n_presets,
         "Background": len([j for j in res["JsonData"] if j.startswith("Bg")]),
-        "Gauge1": 8, "Gauge2": 8, "Gauge3": 8, "Gauge4": 8,
-        "HijriCorrection": 5,
-        "AyahSelection": 8,
+        "Gauge1": 10, "Gauge2": 10, "Gauge3": 10, "Gauge4": 10, "GaugeColors": 3,
+        "HijriCorrection": 5, "HijriScript": 2,
+        "AyahMode": 3, "AyahFixed": n_ayat,
+        "FontFamily": 3, "HandStyle": 3, "SecondsMode": 3,
+        "TextColor": 1 + len(re.findall(r"0x[0-9A-Fa-f]{6}", themes[themes.index("const TEXT_CHOICES"):themes.index("const HAND_CHOICES")])),
+        "AccentColor": 1 + len(re.findall(r"0x[0-9A-Fa-f]{6}", themes[themes.index("const COLOUR_CHOICES"):themes.index("const TEXT_CHOICES")])),
+        "SecondsColor": 1 + len(re.findall(r"0x[0-9A-Fa-f]{6}", themes[themes.index("const COLOUR_CHOICES"):themes.index("const TEXT_CHOICES")])),
+        "HandColor": 1 + len(re.findall(r"0x[0-9A-Fa-f]{6}", themes[themes.index("const HAND_CHOICES"):])) // 2,
         "CalcMethod": len(re.findall(r"^\s+\[\d+\.\dd, \d+\.\dd, \d+\]", open(os.path.join(ROOT, "source", "PrayerTimes.mc")).read(), re.M)),
-        "AsrMethod": 2, "HighLatRule": 4, "TimeZoneMode": 2, "SecondsMode": 2,
+        "AsrMethod": 2, "HighLatRule": 4, "TimeZoneMode": 2,
     }
     for k, n in expect.items():
         if len(lists.get(k, [])) != n:
@@ -170,8 +182,8 @@ def main():
     body = themes[themes.index("const PRESETS"):themes.index("const MULTICOLOR")]
     if len(re.findall(r"true|false", themes[themes.index("const MULTICOLOR"):themes.index("const SOURCE_COLORS")])) != n_presets:
         errors.append("Themes.MULTICOLOR must have one entry per preset")
-    src_cols = re.findall(r"0x[0-9A-Fa-f]{6}", themes[themes.index("const SOURCE_COLORS"):])
-    if len(src_cols) != 8:
+    src_cols = re.findall(r"0x[0-9A-Fa-f]{6}", themes[themes.index("const SOURCE_COLORS"):themes.index("const COLOUR_CHOICES")])
+    if len(src_cols) != 10:
         errors.append("Themes.SOURCE_COLORS must have one colour per gauge source")
     for c in src_cols:
         c = int(c, 16)
@@ -206,19 +218,33 @@ def main():
 
         def charset(name):
             return {int(m) for m in re.findall(r"char id=(\d+)", open(os.path.join(fd, name + ".fnt")).read())}
-        cs = {n: charset(n) for n in ("luxe_num", "luxe_l", "luxe_m", "luxe_s", "luxe_xs", "ayah")}
+        names = ["luxe_num", "ar_small"] + ["ayah%d" % g for g in range(5)] + [
+            "%s_%s" % (fam, r) for fam in ("luxe", "classic", "sport") for r in ("l", "m", "s", "xs")]
+        cs = {n: charset(n) for n in names}
         xs_keys = [k for k in res["Strings"] if re.match(
-            r"(Day|Month|Hijri)\d+$|HijriSuffix$|Prayer\d$|SetLocation$|Label\w+$|AyahRef\d$", k)]
-        for table in (res["Strings"], fre):
-            for k in xs_keys:
-                for ch in table.get(k, ""):
-                    if ord(ch) not in cs["luxe_xs"]:
-                        errors.append("%s: luxe_xs lacks %r used by string %s" % (rel(fd), ch, k))
-        for ch in "0123456789:-hmk. %":
-            for f in ("luxe_xs", "luxe_s", "luxe_m"):
-                if ord(ch) not in cs[f]:
-                    errors.append("%s: %s lacks %r" % (rel(fd), f, ch))
-        for f, chars in (("luxe_l", "0123456789"), ("luxe_num", "12369"), ("ayah", "1234567ABC")):
+            r"(Day|Month)\d+$|Prayer\d$|SetLocation\d?$|Label\w+$", k)]
+        xs_keys += [k for k in res["Strings"] if re.match(r"Hijri\d+$|HijriSuffix$", k)]
+        for fam in ("luxe", "classic", "sport"):
+            for table in (res["Strings"], fre):
+                for k in xs_keys:
+                    for ch in table.get(k, ""):
+                        if ord(ch) not in cs[fam + "_xs"]:
+                            errors.append("%s: %s_xs lacks %r used by string %s" % (rel(fd), fam, ch, k))
+            for ch in "0123456789:-hmk. %":
+                for f in ("xs", "s", "m"):
+                    if ord(ch) not in cs["%s_%s" % (fam, f)]:
+                        errors.append("%s: %s_%s lacks %r" % (rel(fd), fam, f, ch))
+            for ch in "0123456789":
+                if ord(ch) not in cs[fam + "_l"]:
+                    errors.append("%s: %s_l lacks %r" % (rel(fd), fam, ch))
+        n_groups = (n_ayat + 7) // 8
+        for g in range(n_groups):
+            count = min(8, n_ayat - g * 8)
+            for i in range(count):
+                for ch in (chr(ord("A") + i), chr(ord("a") + i)):
+                    if ord(ch) not in cs["ayah%d" % g]:
+                        errors.append("%s: ayah%d lacks %r" % (rel(fd), g, ch))
+        for f, chars in (("luxe_num", "12369"), ("ar_small", "0123456789ABCDEFGHIJKLM ")):
             for ch in chars:
                 if ord(ch) not in cs[f]:
                     errors.append("%s: %s lacks %r" % (rel(fd), f, ch))

@@ -51,5 +51,11 @@ module Themes {
     const MULTICOLOR = [true, false, false, false, true, false];
 
     // Gauge colour per data source (DataFields order), used by MULTICOLOR presets.
-    const SOURCE_COLORS = [0x00AAFF, 0xFF0055, 0xFFAA00, 0x00FF55, 0x55FFFF, 0xAAAAFF, 0x00FFAA, 0xFFFF55];
+    const SOURCE_COLORS = [0x00AAFF, 0xFF0055, 0xFFAA00, 0x00FF55, 0x55FFFF, 0xAAAAFF, 0x00FFAA, 0xFFFF55, 0xFF55FF, 0xAAAAAA];
+
+    // User colour choices (settings index - 1). Order must match tools/gen_settings.py.
+    const COLOUR_CHOICES = [0xFF0000, 0xFF5500, 0xFFAA00, 0x00FF55, 0x00FFFF, 0x00AAFF, 0xFFFFFF];
+    const TEXT_CHOICES = [0xFFFFFF, 0xFFFFAA, 0xFFAA00, 0xAAAAAA, 0xAAFFFF];
+    // hands: [light, dark]
+    const HAND_CHOICES = [[0xFFAA00, 0xAA5500], [0xFFAA55, 0xAA5555], [0xFFFFFF, 0xAAAAAA], [0xAA5500, 0x550000]];
 }

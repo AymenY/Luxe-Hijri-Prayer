@@ -1,7 +1,5 @@
 <strings>
     <string id="AppName">Luxe Hijri Prayer</string>
-
-    <!-- Dial texts (uppercase; the bundled fonts cover ASCII and French accents) -->
     <string id="Day0">SUN</string>
     <string id="Day1">MON</string>
     <string id="Day2">TUE</string>
@@ -21,19 +19,6 @@
     <string id="Month10">OCT</string>
     <string id="Month11">NOV</string>
     <string id="Month12">DEC</string>
-    <string id="Hijri1">Muharram</string>
-    <string id="Hijri2">Safar</string>
-    <string id="Hijri3">Rabi I</string>
-    <string id="Hijri4">Rabi II</string>
-    <string id="Hijri5">Jumada I</string>
-    <string id="Hijri6">Jumada II</string>
-    <string id="Hijri7">Rajab</string>
-    <string id="Hijri8">Sha'ban</string>
-    <string id="Hijri9">Ramadan</string>
-    <string id="Hijri10">Shawwal</string>
-    <string id="Hijri11">Dhu al-Qa'dah</string>
-    <string id="Hijri12">Dhu al-Hijjah</string>
-    <string id="HijriSuffix">AH</string>
     <string id="Prayer0">FAJR</string>
     <string id="Prayer2">DHUHR</string>
     <string id="Prayer3">ASR</string>
@@ -46,92 +31,22 @@
     <string id="LabelFloors">FLOORS</string>
     <string id="LabelBodyBattery">BODY</string>
     <string id="LabelStress">STRESS</string>
-    <string id="AyahRef1">Taha 20:114</string>
-    <string id="AyahRef2">Al-Inshirah 94:5</string>
-    <string id="AyahRef3">Al-Baqarah 2:286</string>
-    <string id="AyahRef4">Al-Imran 3:8</string>
-    <string id="AyahRef5">Al-Fath 48:4</string>
-    <string id="AyahRef6">Al-Ikhlas 112:</string>
-    <string id="AyahRef7">Hud 11:88</string>
     <string id="LabelCalories">KCAL</string>
     <string id="LabelBattery">%</string>
     <string id="LabelKm">KM</string>
     <string id="LabelMi">MI</string>
-
-    <!-- Settings: Appearance -->
-    <string id="StylePresetTitle">Appearance: Style Preset</string>
-    <string id="PresetA">Luxury Blue</string>
-    <string id="PresetB">Royal Gold</string>
-    <string id="PresetC">Emerald Night</string>
-    <string id="PresetD">Burgundy Royale</string>
-    <string id="PresetE">Ice Silver</string>
-    <string id="PresetF">Stealth</string>
-    <string id="BackgroundTitle">Appearance: Background</string>
-    <string id="BgMosque">Mosque and crescent moon</string>
-    <string id="BgGeometric">Islamic geometric pattern</string>
-    <string id="BgMarble">Black marble, gold veining</string>
-    <string id="BgNight">Night sky and crescent moon</string>
-    <string id="SecondsModeTitle">Appearance: Seconds hand</string>
-    <string id="SecondsAlways">Always (also in low power)</string>
-    <string id="SecondsAwake">Only after wrist raise</string>
-
-    <!-- Settings: Data fields -->
-    <string id="Gauge1Title">Data Fields: Gauge 1 (upper left)</string>
-    <string id="Gauge2Title">Data Fields: Gauge 2 (upper right)</string>
-    <string id="Gauge3Title">Data Fields: Gauge 3 (lower left)</string>
-    <string id="Gauge4Title">Data Fields: Gauge 4 (lower right)</string>
-    <string id="SrcSteps">Steps</string>
-    <string id="SrcHeart">Heart rate</string>
-    <string id="SrcCalories">Calories</string>
-    <string id="SrcBattery">Battery percentage</string>
-    <string id="SrcDistance">Distance</string>
-    <string id="SrcFloors">Floors climbed</string>
-    <string id="SrcBodyBattery">Body Battery</string>
-    <string id="SrcStress">Stress</string>
-
-    <!-- Settings: Faith & Calendar -->
-    <string id="HijriCorrectionTitle">Faith &amp; Calendar: Hijri Date Correction</string>
-    <string id="CorrM2">-2 days</string>
-    <string id="CorrM1">-1 day</string>
-    <string id="Corr0">0 days</string>
-    <string id="CorrP1">+1 day</string>
-    <string id="CorrP2">+2 days</string>
-    <string id="AyahTitle">Faith &amp; Calendar: Ayah Selection</string>
-    <string id="Ayah1">Taha 20:114 (Rabbi zidni ilma)</string>
-    <string id="Ayah2">Al-Inshirah 94:5</string>
-    <string id="Ayah3">Al-Baqarah 2:286 (excerpt)</string>
-    <string id="Ayah4">Al-Imran 3:8 (excerpt)</string>
-    <string id="Ayah5">Al-Fath 48:4 (excerpt)</string>
-    <string id="Ayah6">Al-Ikhlas 112:1-4</string>
-    <string id="Ayah7">Hud 11:88 (excerpt)</string>
-    <string id="AyahNone">None (hide)</string>
-    <string id="CalcMethodTitle">Faith &amp; Calendar: Prayer calculation method</string>
-    <string id="MethodTunisia">Tunisia (18° / 18°)</string>
-    <string id="MethodMWL">Muslim World League (18° / 17°)</string>
-    <string id="MethodISNA">ISNA North America (15° / 15°)</string>
-    <string id="MethodEgypt">Egypt (19.5° / 17.5°)</string>
-    <string id="MethodUmmAlQura">Umm al-Qura, Makkah (18.5° / 90 min)</string>
-    <string id="MethodKarachi">Karachi (18° / 18°)</string>
-    <string id="MethodGulf">Gulf region (19.5° / 90 min)</string>
-    <string id="MethodKuwait">Kuwait (18° / 17.5°)</string>
-    <string id="MethodQatar">Qatar (18° / 90 min)</string>
-    <string id="MethodSingapore">Singapore MUIS (20° / 18°)</string>
-    <string id="MethodTurkey">Turkey Diyanet (18° / 17°)</string>
-    <string id="MethodFrance">France UOIF (12° / 12°)</string>
-    <string id="MethodAlgeria">Algeria (18° / 17°)</string>
-    <string id="MethodMorocco">Morocco (19° / 17°)</string>
-    <string id="AsrTitle">Faith &amp; Calendar: Asr convention</string>
-    <string id="AsrStandard">Standard (Maliki, Shafi'i, Hanbali)</string>
-    <string id="AsrHanafi">Hanafi</string>
-    <string id="HighLatTitle">Faith &amp; Calendar: High-latitude rule</string>
-    <string id="HighLatNone">None</string>
-    <string id="HighLatMiddle">Middle of the night</string>
-    <string id="HighLatSeventh">One-seventh of the night</string>
-    <string id="HighLatAngle">Angle-based</string>
-    <string id="LatitudeTitle">Faith &amp; Calendar: Latitude (decimal degrees, north positive)</string>
-    <string id="LongitudeTitle">Faith &amp; Calendar: Longitude (decimal degrees, east positive)</string>
-    <string id="TimeZoneModeTitle">Faith &amp; Calendar: Time zone for prayer times</string>
-    <string id="TzAuto">Watch time zone (automatic, follows DST)</string>
-    <string id="TzManual">Manual UTC offset</string>
-    <string id="UtcOffsetTitle">Faith &amp; Calendar: Manual UTC offset (hours, e.g. 1 or 5.5)</string>
+    <string id="Hijri1">Muharram</string>
+    <string id="Hijri2">Safar</string>
+    <string id="Hijri3">Rabi I</string>
+    <string id="Hijri4">Rabi II</string>
+    <string id="Hijri5">Jumada I</string>
+    <string id="Hijri6">Jumada II</string>
+    <string id="Hijri7">Rajab</string>
+    <string id="Hijri8">Sha&apos;ban</string>
+    <string id="Hijri9">Ramadan</string>
+    <string id="Hijri10">Shawwal</string>
+    <string id="Hijri11">Dhu al-Qa&apos;dah</string>
+    <string id="Hijri12">Dhu al-Hijjah</string>
+    <string id="HijriSuffix">AH</string>
+    <string id="LabelActive">MIN</string>
 </strings>

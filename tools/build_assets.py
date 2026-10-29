@@ -23,6 +23,9 @@ import sys
 
 from PIL import Image, ImageDraw, ImageFont, features
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import shapes  # noqa: E402
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FONT_SRC = os.path.join(ROOT, "tools", "fonts-src")
 RES = os.path.join(ROOT, "resources")
@@ -32,16 +35,34 @@ RESOLUTIONS = [218, 240, 260, 280, 360, 390, 416, 454]
 
 LATIN = "".join(chr(c) for c in range(32, 127)) + "ÀÂÄÇÉÈÊËÎÏÔÖÙÛÜàâäçéèêëîïôöùûü·°’«»−"
 
-# id, ttf, pixel size at 280 px, character set
-FONTS = [
-    ("luxe_num", "BarlowSemiCondensed-Bold.ttf", 25, " 0123456789"),
-    ("luxe_l", "BarlowSemiCondensed-Bold.ttf", 30, " 0123456789%-"),
-    ("luxe_m", "BarlowSemiCondensed-Bold.ttf", 20, LATIN),
-    ("luxe_s", "BarlowSemiCondensed-SemiBold.ttf", 15, LATIN),
-    ("luxe_xs", "BarlowSemiCondensed-SemiBold.ttf", 12, LATIN),
+# Text font families (setting "Font"): prefix, bold ttf, semibold ttf, (bold, semibold) variable
+# weights or None, size factor (keeps every family inside the same layout; see check_layout.py)
+FAMILIES = [
+    ("luxe", "BarlowSemiCondensed-Bold.ttf", "BarlowSemiCondensed-SemiBold.ttf", None, 1.0),     # Modern
+    ("classic", "Cinzel-Variable.ttf", "Cinzel-Variable.ttf", (700, 600), 0.8),                    # Classic
+    ("sport", "Rajdhani-Bold.ttf", "Rajdhani-SemiBold.ttf", None, 0.95),                            # Sport
 ]
-FONT_IDS = {"luxe_num": "LuxeNum", "luxe_l": "LuxeL", "luxe_m": "LuxeM", "luxe_s": "LuxeS", "luxe_xs": "LuxeXS",
-            "ayah": "Ayah"}
+# role, bold?, pixel size at 280 px, character set
+ROLES = [
+    ("l", True, 30, " 0123456789%-"),
+    ("m", True, 20, LATIN),
+    ("s", False, 15, LATIN),
+    ("xs", False, 12, LATIN),
+]
+# id, ttf, pixel size at 280 px, character set, variable weight
+FONTS = [("luxe_num", "BarlowSemiCondensed-Bold.ttf", 25, " 0123456789", None)]
+for _pre, _bold, _semi, _w, _f in FAMILIES:
+    for _role, _isbold, _px, _chars in ROLES:
+        if _pre == "classic" and _role in ("s", "xs"):
+            # Cinzel is too wide for the small texts: the Classic family pairs the serif for the
+            # large figures with Barlow for labels and small text
+            FONTS.append(("%s_%s" % (_pre, _role), "BarlowSemiCondensed-SemiBold.ttf", _px, _chars, None))
+            continue
+        FONTS.append(("%s_%s" % (_pre, _role), _bold if _isbold else _semi, _px * _f, _chars,
+                      None if _w is None else (_w[0] if _isbold else _w[1])))
+FONT_IDS = {"luxe_num": "LuxeNum", "ar_small": "ArSmall"}
+FONT_IDS.update({"ayah%d" % g: "Ayah%d" % g for g in range(5)})
+FONT_IDS.update({"%s_%s" % (p, r): "%s%s" % (p.capitalize(), r.upper()) for p, *_ in FAMILIES for r, *_ in ROLES})
 
 
 def layout_consts():
@@ -95,8 +116,10 @@ def pack_and_write(folder, name, glyphs, line_height, base, size, face):
         fh.write("\n".join(lines) + "\n")
 
 
-def build_latin_font(folder, name, ttf, size, chars):
+def build_latin_font(folder, name, ttf, size, chars, weight=None):
     font = ImageFont.truetype(os.path.join(FONT_SRC, ttf), size)
+    if weight is not None:
+        font.set_variation_by_axes([weight])
     ascent, descent = font.getmetrics()
     glyphs = []
     for ch in chars:
@@ -123,38 +146,105 @@ def render_arabic_line(text, size):
 
 
 def ayah_fits(w, h, L, k):
-    """Single line centred on AYAH_Y inside the cartouche and a 124 px circle (scaled by k)."""
-    if h > L["AYAH_MAX_H"] * k or w > L["AYAH_MAX_W"] * k:
+    """Single line centred on AYAH_Y, inside the Ayah area circle with a 4 px margin (scaled by k)."""
+    # on the smallest screens the 8 px floor of the reference costs one pixel of verse height
+    max_h = L["AYAH_MAX_H"] * k - (1 if k < 0.9 else 0)
+    if h > max_h or w > L["AYAH_MAX_W"] * k:
         return False
     bottom = (L["AYAH_Y"] - L["CY"]) * k + (h + 1) / 2.0
-    return w <= 2 * math.sqrt(max(0.0, (124 * k) ** 2 - bottom ** 2))
+    return w <= 2 * math.sqrt(max(0.0, ((L["AYAH_AREA_R"] - 4) * k) ** 2 - bottom ** 2))
 
 
-def build_ayah_font(folder, k, L):
+def render_small_arabic(text, size):
+    """Arabic text on a common baseline: (image, yoffset, width) for the small Arabic pieces."""
+    font = ImageFont.truetype(os.path.join(FONT_SRC, "Amiri-Bold.ttf"), size, layout_engine=ImageFont.Layout.RAQM)
+    ascent, descent = font.getmetrics()
+    bbox = font.getbbox(text, direction="rtl", language="ar", anchor="ls")
+    w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
+    img = Image.new("L", (w + 2, h + 2), 0)
+    ImageDraw.Draw(img).text((1 - bbox[0], 1 - bbox[1]), text, font=font, fill=255, direction="rtl",
+                             language="ar", anchor="ls")
+    return img, ascent + bbox[1] - 1, w, ascent + descent
+
+
+AYAH_GROUP = 8
+AYAH_REF_PX = 10   # at 280 px: surah name and verse number under the verse
+AYAH_MIN_PX = 13   # at 280 px: complete verses below this size are not included
+
+
+def build_ayah_fonts(folder, k, L):
+    """One font per group of 8 verses (Ayah0..Ayah4): verse glyphs "A".."H" (as large as the Ayah
+    area allows) and their Arabic references "a".."h" (surah name and verse number)."""
     if not features.check("raqm"):
         raise SystemExit("Pillow was built without raqm: Arabic shaping unavailable")
     data = json.load(open(os.path.join(ROOT, "tools", "ayat.json")))
-    glyphs, sizes, imgs = [], {}, []
+    ref_px = max(8, int(AYAH_REF_PX * k))
+    sizes = {}
+    groups = {}
     for a in data["ayat"]:
-        for size in range(int(26 * k), 7, -1):
-            img = render_arabic_line(a["lines"][0], size)
-            if ayah_fits(img.width, img.height, L, k):
-                break
-        else:
-            raise SystemExit("Ayah %s does not fit at %d px" % (a["ref"], BASE * k))
-        imgs.append((a, img))
-        sizes[a["ref"]] = {"px": size, "w": img.width, "h": img.height}
-    line_h = max(i.height for _, i in imgs)
-    for a, img in imgs:
-        glyphs.append((ord(a["code"]), img, 0, (line_h - img.height) // 2, img.width))
-    glyphs.append((32, None, 0, 0, 4))
-    pack_and_write(folder, "ayah", glyphs, line_h, line_h, line_h, "Amiri-Bold (pre-shaped Ayat)")
+        groups.setdefault(a["font"], []).append(a)
+    for g, items in sorted(groups.items()):
+        glyphs = []
+        verse_imgs = []
+        for a in items:
+            for size in range(int(26 * k), 7, -1):
+                img = render_arabic_line(a["lines"][0], size)
+                if ayah_fits(img.width, img.height, L, k):
+                    break
+            else:
+                raise SystemExit("Ayah %s does not fit at %d px" % (a["ref"], BASE * k))
+            if k == 1.0 and size < AYAH_MIN_PX:
+                raise SystemExit("Ayah %s would be %d px at 280 px (< %d)" % (a["ref"], size, AYAH_MIN_PX))
+            verse_imgs.append((a, img))
+            sizes[a["ref"]] = {"px": size, "w": img.width, "h": img.height}
+        refs = [(a, render_small_arabic(a["ref_ar"], ref_px)) for a in items]
+        line_h = max([i.height for _, i in verse_imgs] + [r[3] for _, r in refs])
+        for a, img in verse_imgs:
+            glyphs.append((ord(a["code"]), img, 0, (line_h - img.height) // 2, img.width))
+        for a, (img, yoff, w, lh) in refs:
+            # each reference is shown alone: centre its ink rather than sharing a baseline
+            # (240 px: the 8 px floor leaves no room below, so the reference moves up 1 px)
+            nudge = 1 if 0.8 < k < 0.9 else 0
+            glyphs.append((ord(a["ref_code"]), img, -1, (line_h - img.height) // 2 - nudge, w + 2))
+            sizes[a["ref"]]["ref_w"] = w
+        glyphs.append((32, None, 0, 0, 4))
+        pack_and_write(folder, "ayah%d" % g, glyphs, line_h, line_h, line_h, "Amiri-Bold (pre-shaped Ayat %d)" % g)
     return sizes
+
+
+AR_DIGITS = "٠١٢٣٤٥٦٧٨٩"
+AR_SMALL_PX = 11  # at 280 px
+
+
+def build_arabic_small_font(folder, k):
+    """Small Arabic font assembled at runtime: glyph "0".."9" = Eastern Arabic digits, "A".."L" =
+    Hijri month names, "M" = the AH suffix. Every glyph is shaped with HarfBuzz and placed on a
+    common baseline."""
+    data = json.load(open(os.path.join(ROOT, "tools", "ayat.json")))
+    size = max(8, int(AR_SMALL_PX * k))
+    font = ImageFont.truetype(os.path.join(FONT_SRC, "Amiri-Bold.ttf"), size, layout_engine=ImageFont.Layout.RAQM)
+    ascent, descent = font.getmetrics()
+    items = [(str(i), AR_DIGITS[i]) for i in range(10)]
+    items += [(chr(ord("A") + i), m) for i, m in enumerate(data["hijri_months_ar"])]
+    items += [("M", data["hijri_suffix_ar"])]
+    glyphs = []
+    widths = {}
+    for code, text in items:
+        bbox = font.getbbox(text, direction="rtl", language="ar", anchor="ls")
+        w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
+        img = Image.new("L", (w + 2, h + 2), 0)
+        ImageDraw.Draw(img).text((1 - bbox[0], 1 - bbox[1]), text, font=font, fill=255, direction="rtl",
+                                 language="ar", anchor="ls")
+        glyphs.append((ord(code), img, -1, ascent + bbox[1] - 1, w + (1 if code.isdigit() else 2)))
+        widths[code] = w
+    glyphs.append((32, None, 0, 0, max(3, int(round(size * 0.3)))))
+    pack_and_write(folder, "ar_small", glyphs, ascent + descent, ascent, size, "Amiri-Bold (pre-shaped Arabic pieces)")
+    return {"px": size, "widths": widths}
 
 
 def write_fonts_xml(folder):
     lines = ["<fonts>", "    <!-- Generated by tools/build_assets.py (Barlow Semi Condensed / Amiri, SIL OFL) -->"]
-    for name in [f[0] for f in FONTS] + ["ayah"]:
+    for name in [f[0] for f in FONTS] + ["ar_small"] + ["ayah%d" % g for g in range(5)]:
         lines.append('    <font id="%s" filename="%s.fnt" antialias="true" />' % (FONT_IDS[name], name))
     lines.append("</fonts>")
     with open(os.path.join(folder, "fonts.xml"), "w") as fh:
@@ -173,10 +263,11 @@ def build_font_sets():
         for f in os.listdir(folder):
             if f.endswith((".fnt", ".png")):
                 os.remove(os.path.join(folder, f))
-        fonts = [build_latin_font(folder, n, t, max(9, int(s * k)), c) for n, t, s, c in FONTS]
-        ayah = build_ayah_font(folder, k, L)
+        fonts = [build_latin_font(folder, n, t, max(9, int(s * k)), c, w) for n, t, s, c, w in FONTS]
+        ayah = build_ayah_fonts(folder, k, L)
+        arabic = build_arabic_small_font(folder, k)
         write_fonts_xml(folder)
-        report[size] = {"fonts": fonts, "ayah": ayah}
+        report[size] = {"fonts": fonts, "ayah": ayah, "ar_small": arabic}
     return report
 
 
@@ -194,24 +285,8 @@ def inside(x, y, r=139):
 
 
 def arch_points(L, inset=0):
-    """Pointed (two-centred) arch: vertical sides from ARCH_BOTTOM to the springing line,
-    then two circular arcs meeting at the apex."""
-    x0, x1, top, bottom = L["ARCH_X0"] + inset, L["ARCH_X1"] - inset, L["ARCH_TOP"] + inset, L["ARCH_BOTTOM"]
-    half = (x1 - x0) / 2.0
-    rad = 1.25 * half                       # two-centred (pointed) arch: radius > half width
-    spring = top + math.sqrt(rad * rad - (rad - half) ** 2)
-    cx_l = x0 + rad
-    a_end = math.atan2(top - spring, (x0 + half) - cx_l)
-    if a_end < math.pi:          # go from the springing point upwards (screen y grows downwards)
-        a_end += 2 * math.pi
-    left = []
-    for i in range(9):
-        a = math.pi + (a_end - math.pi) * i / 8.0
-        left.append((cx_l + rad * math.cos(a), spring + rad * math.sin(a)))
-    pts = [(x0, bottom)] + left
-    right = [(2 * 140 - x, y) for (x, y) in reversed(left)]
-    pts += right[1:] + [(x1, bottom)]
-    return [(int(round(x)), int(round(y))) for x, y in pts]
+    """Outline of the Moorish window (tools/shapes.py), rounded to whole dial units."""
+    return [(int(round(x)), int(round(y))) for x, y in shapes.window_points(L, inset)]
 
 
 def flat(pts):
@@ -219,7 +294,7 @@ def flat(pts):
 
 
 def frame_ops(L):
-    """Elements common to every background: arch window frame, prayer and Ayah cartouches."""
+    """Elements common to every background: arch window frame and prayer cartouches."""
     ops = []
     ops.append([OP_POLYLINE, GOLD_DK, 1] + flat(arch_points(L)))
     ops.append([OP_POLYLINE, GOLD_DK, 1] + flat(arch_points(L, -3)))
@@ -228,11 +303,6 @@ def frame_ops(L):
         x0 = 140 + sgn * L["PANEL_DX"] - w // 2
         ops.append([OP_RRECT, PLATE, x0, y0, w, h, 7])
         ops.append([OP_RRECT_LINE, GOLD_DK, 1, x0, y0, w, h, 7])
-    x0, x1, ya, yb = L["CARTOUCHE_X0"], L["CARTOUCHE_X1"], L["CARTOUCHE_Y0"], L["CARTOUCHE_Y1"]
-    cart = [(x0, yb), (x0, ya + 10), (x0 + 10, ya + 3), (124, ya + 3), (140, ya - 4), (156, ya + 3),
-            (x1 - 10, ya + 3), (x1, ya + 10), (x1, yb)]
-    ops.append([OP_POLY, PLATE] + flat(cart))
-    ops.append([OP_POLYLINE, GOLD_DK, 1] + flat(cart))
     return ops
 
 
@@ -248,7 +318,9 @@ def lattice(role, step=34, r=11):
 
 
 def arch_fill(L, role):
-    return [OP_POLY, role] + flat(arch_points(L))
+    """Window area as convex polygons (fillPolygon is only guaranteed for convex shapes)."""
+    return [[OP_POLY, role] + flat([(int(round(x)), int(round(y))) for x, y in part])
+            for part in shapes.window_fill_parts(L)]
 
 
 def palm(x, base, top, lean):
@@ -309,7 +381,7 @@ def stars_in_arch(L, rnd, n, role, size):
     poly = arch_points(L, 6)
     while len(pts) < 2 * n and tries < 5000:
         tries += 1
-        x, y = rnd.randint(L["ARCH_X0"] + 5, L["ARCH_X1"] - 5), rnd.randint(L["ARCH_TOP"] + 6, 150)
+        x, y = rnd.randint(L["WINDOW_X0"] + 5, L["WINDOW_X1"] - 5), rnd.randint(L["WINDOW_TOP"] + 6, 150)
         if point_in_poly(x, y, poly) and abs(x - 140) + abs(y - 140) > 10:
             pts += [x, y]
     return [OP_POINTS, role, size] + pts
@@ -330,7 +402,7 @@ def point_in_poly(x, y, poly):
 def bg_mosque(L):
     rnd = random.Random(7)
     ops = lattice(PLATE)
-    ops.append(arch_fill(L, BG))
+    ops += arch_fill(L, BG)
     ops.append(stars_in_arch(L, rnd, 14, STAR, 1))
     ops.append(stars_in_arch(L, rnd, 5, STAR, 2))
     ops.append([OP_CRESCENT, GOLD, BG, 157, 131, 8, 4, -3, 7])
@@ -340,7 +412,7 @@ def bg_mosque(L):
 
 def bg_geometric(L):
     ops = lattice(ORN, 28, 9)
-    ops.append(arch_fill(L, BG))
+    ops += arch_fill(L, BG)
     for r in (34, 25, 16, 7):
         ops.append([OP_STAR8, ORN2, 1, 140, 160, r])
     ops.append([OP_RING, ORN2, 1, 140, 160, 30])

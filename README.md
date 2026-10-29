@@ -21,11 +21,15 @@ Based on the approved concept image:
 * gold baton hands with light lume inserts, long blue seconds hand with hollow counterweight
 * date block under 12 (day, large date, month and year) and the Hijri date
 * sunrise (left) and sunset (right)
-* four ring gauges — steps and heart rate at the top, calories and battery at the sides —
+* the default background is the owner's night illustration of a mosque (`tools/art-src/`),
+  colour-graded for each style; the other backgrounds are rendered procedurally
+* four ring gauges in smoked glass — steps and heart rate at the top, calories and battery at the sides —
   with icon, value and label; one colour per data type in Luxury Blue and Ice Silver
 * a pointed Islamic arch with a night scene (mosque, minarets, palms, water, crescent)
 * two cartouches: **next prayer + countdown** and **the following prayer + its time**
-* the selected Ayah in Arabic, in a cartouche at the bottom, with its reference
+* a complete Quranic verse in Arabic at the bottom, with its Arabic reference, changing every
+  hour (39 short verses; see [`docs/AYAT.md`](docs/AYAT.md))
+* the Hijri date in Arabic (Eastern Arabic digits, month names, هـ) or in Latin script
 
 Six style presets recolour everything; four backgrounds (mosque, geometric, black marble,
 night sky) change the art; the layout is identical on every screen size.
@@ -46,19 +50,24 @@ and the “GARMIN fēnix” wordmark (Garmin trademark; replaced by a crescent).
 
 ## Settings (Garmin Connect app → watch face → Settings)
 
-| Group | Setting | Default |
+Everything is customisable; the settings are generated from `tools/gen_settings.py` (English and French).
+
+| Group | Setting | Choices (default first) |
 |---|---|---|
-| Appearance | Style Preset (6) | Luxury Blue |
-| Appearance | Background (4) | Mosque and crescent moon |
-| Appearance | Seconds hand: always / only after wrist raise (MIP) | Always |
-| Data Fields | Gauge 1–4: steps, heart rate, calories, battery, distance, floors, Body Battery, stress | Steps, Heart rate, Calories, Battery |
-| Faith & Calendar | Hijri Date Correction | 0 days |
-| Faith & Calendar | Ayah Selection (7 + none) | Taha 20:114 |
-| Faith & Calendar | Prayer calculation method (14) | Tunisia 18°/18° |
-| Faith & Calendar | Asr convention | Standard |
-| Faith & Calendar | High-latitude rule | Middle of the night |
-| Faith & Calendar | Latitude / Longitude | 33.8754 / 10.8575 (Houmt Souk, Djerba) |
-| Faith & Calendar | Time zone: watch (auto, DST) / manual UTC offset | Watch |
+| Appearance | Style | Luxury Blue, Royal Gold, Emerald Night, Burgundy Royale, Ice Silver, Stealth |
+| Appearance | Background | Mosque at night (illustration), Islamic geometric pattern, Black marble, Night sky |
+| Appearance | Font | Modern (Barlow), Classic (Cinzel + Barlow), Sport (Rajdhani) |
+| Appearance | Text colour | Preset, white, cream, gold, silver, ice blue |
+| Appearance | Accent colour (countdown, gauges) | Preset, red, orange, gold, green, cyan, blue, white |
+| Appearance | Hands / hands colour | Baton with lume, Dauphine, Sword / preset, gold, rose gold, silver, bronze |
+| Appearance | Seconds hand / colour | Always, only after wrist raise, hidden / preset + 7 colours |
+| Data fields | Gauges 1–4 | Steps, heart rate, calories, battery, distance, floors, Body Battery, stress, active minutes (week), none |
+| Data fields | Gauge colours | One colour per data type, accent colour, text colour |
+| Faith & calendar | Hijri date script / correction | Arabic, Latin / −2…+2 days (0) |
+| Faith & calendar | Ayah | Hourly rotation (ticked verses), fixed verse, hidden |
+| Faith & calendar | Fixed verse + 39 “Rotation” check boxes | Ash-Sharh 94:5; all ticked |
+| Faith & calendar | Prayer method, Asr, high-latitude rule | Tunisia 18°/18°, standard, middle of the night |
+| Faith & calendar | Latitude / longitude / time zone | 33.8754 / 10.8575 (Houmt Souk, Djerba) / watch time zone |
 
 Coordinates are entered manually (decimal degrees, north and east positive). 0 / 0 is treated as
 “not set” and the dial asks to set the location.
@@ -130,7 +139,9 @@ Never commit the developer key: `*.der`, `*.pem`, `*.prg` and `*.iq` are git-ign
 ```sh
 pip install -r tools/requirements.txt      # Pillow (with raqm), adhanpy, astral, convertdate, hijridate
 (cd tools && npm install)                   # optional: Monkey C parser for the syntax check
-python3 tools/build_assets.py               # fonts per screen size, Ayah glyphs, vector art, icon
+python3 tools/gen_settings.py               # settings, properties and their EN/FR strings
+python3 tools/build_assets.py               # fonts per screen size and family, Ayah fonts, vector art, icon
+python3 tools/gen_ayat_doc.py               # -> docs/AYAT.md
 python3 tools/build_hd.py                   # HD dial images: 8 sizes x 6 styles x 4 backgrounds (~10 min)
 python3 tools/check_project.py              # resources, settings, palette, fonts, syntax
 python3 tools/validate_calculations.py      # -> docs/validation-report.md
@@ -151,7 +162,8 @@ keep them in sync when changing `source/`.
 
 ## Licences
 
-Code: © the author. Fonts: Barlow Semi Condensed and Amiri, SIL Open Font License 1.1
+Code: © the author. Background illustration `tools/art-src/mosque-night.png`: supplied by the
+owner. Fonts: Barlow Semi Condensed, Cinzel, Rajdhani and Amiri, SIL Open Font License 1.1
 (`tools/fonts-src/OFL-*.txt`); the bitmap fonts in `resources*/fonts/` are derived from them.
 Arabic text: Tanzil (CC BY 3.0, unmodified text). French translation: M. Hamidullah via Tanzil
 (documentation only).

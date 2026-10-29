@@ -42,15 +42,24 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     hidden var mFontM;
     hidden var mFontS;
     hidden var mFontXS;
-    hidden var mFontAyah;
+    hidden var mFontAyah;           // Ayah font of the group holding the current verse
+    hidden var mAyahGroup as Number = -1;
+    hidden var mFontAr;             // small Arabic pieces: digits, Hijri months, AH
+    hidden var mFontFamily as Number = -1;
+
+    // effective colours after the user's overrides
+    hidden var mText as Number = 0xFFFFFF;
+    hidden var mAccent as Number = 0x00AAFF;
+    hidden var mSecColor as Number = 0x00AAFF;
+    hidden var mHandLight as Number = 0xFFAA00;
+    hidden var mHandDark as Number = 0xAA5500;
 
     hidden var mDays as Array<String> = [];
     hidden var mMonths as Array<String> = [];
-    hidden var mHijriMonths as Array<String> = [];
     hidden var mPrayerNames as Array = [];
     hidden var mLabels as Array<String> = [];
     hidden var mLabelMi as String = "MI";
-    hidden var mAyahRefs as Array<String> = [];
+    hidden var mHijriMonths as Array<String> = [];
     hidden var mHijriSuffix as String = "";
     hidden var mSetLocation as String = "";
     hidden var mSetLocation2 as String = "";
@@ -81,11 +90,8 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         mSize = dc.getWidth();
         mK = mSize / 280.0;
         mFontNum = WatchUi.loadResource(Rez.Fonts.LuxeNum);
-        mFontL = WatchUi.loadResource(Rez.Fonts.LuxeL);
-        mFontM = WatchUi.loadResource(Rez.Fonts.LuxeM);
-        mFontS = WatchUi.loadResource(Rez.Fonts.LuxeS);
-        mFontXS = WatchUi.loadResource(Rez.Fonts.LuxeXS);
-        mFontAyah = WatchUi.loadResource(Rez.Fonts.Ayah);
+        mFontAr = WatchUi.loadResource(Rez.Fonts.ArSmall);
+        loadFonts();
         if (mDial == null) {
             mStaticRef = createBuffer(dc.getWidth(), dc.getHeight());
         }
@@ -99,7 +105,29 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     function applySettings() as Void {
         mSettings.load();
         mColors = Themes.PRESETS[mSettings.preset] as Array<Number>;
-        mMulticolor = Themes.MULTICOLOR[mSettings.preset] as Boolean;
+        var st = mSettings;
+        mMulticolor = (st.gaugeColors == 0) && (Themes.MULTICOLOR[st.preset] as Boolean);
+        mText = mColors[Themes.TEXT];
+        if (st.textColor > 0) {
+            mText = Themes.TEXT_CHOICES[st.textColor - 1] as Number;
+        }
+        mAccent = mColors[Themes.ACCENT];
+        if (st.accentColor > 0) {
+            mAccent = Themes.COLOUR_CHOICES[st.accentColor - 1] as Number;
+        }
+        mSecColor = mColors[Themes.SECONDS];
+        if (st.secondsColor > 0) {
+            mSecColor = Themes.COLOUR_CHOICES[st.secondsColor - 1] as Number;
+        }
+        if (st.handColor == 0) {
+            mHandLight = mColors[Themes.GOLD];
+            mHandDark = mColors[Themes.GOLD_DK];
+        } else {
+            var hc = Themes.HAND_CHOICES[st.handColor - 1] as Array<Number>;
+            mHandLight = hc[0];
+            mHandDark = hc[1];
+        }
+        loadFonts();
         mDial = null;
         mDial = loadDial(mSettings.preset, mSettings.background);
         if (mDial == null) {
@@ -130,6 +158,38 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         }
     }
 
+    // Text fonts of the selected family (Modern, Classic, Sport); reloaded only when it changes.
+    hidden function loadFonts() as Void {
+        var f = mSettings.fontFamily;
+        if (f == mFontFamily && mFontM != null) {
+            return;
+        }
+        var ids = [[Rez.Fonts.LuxeL, Rez.Fonts.LuxeM, Rez.Fonts.LuxeS, Rez.Fonts.LuxeXS],
+                   [Rez.Fonts.ClassicL, Rez.Fonts.ClassicM, Rez.Fonts.ClassicS, Rez.Fonts.ClassicXS],
+                   [Rez.Fonts.SportL, Rez.Fonts.SportM, Rez.Fonts.SportS, Rez.Fonts.SportXS]];
+        var set = ids[f] as Array;
+        mFontL = null;
+        mFontM = null;
+        mFontS = null;
+        mFontXS = null;
+        mFontL = WatchUi.loadResource(set[0]);
+        mFontM = WatchUi.loadResource(set[1]);
+        mFontS = WatchUi.loadResource(set[2]);
+        mFontXS = WatchUi.loadResource(set[3]);
+        mFontFamily = f;
+    }
+
+    // Ayah fonts hold 8 verses each; only the one with the current verse is kept in memory.
+    hidden function ayahFont(group as Number) {
+        if (group != mAyahGroup || mFontAyah == null) {
+            var ids = [Rez.Fonts.Ayah0, Rez.Fonts.Ayah1, Rez.Fonts.Ayah2, Rez.Fonts.Ayah3, Rez.Fonts.Ayah4];
+            mFontAyah = null;
+            mFontAyah = WatchUi.loadResource(ids[group]);
+            mAyahGroup = group;
+        }
+        return mFontAyah;
+    }
+
     function disablePartialUpdates() as Void {
         mPartialAllowed = false;
     }
@@ -140,18 +200,16 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         mMonths = [s(Rez.Strings.Month1), s(Rez.Strings.Month2), s(Rez.Strings.Month3), s(Rez.Strings.Month4),
                    s(Rez.Strings.Month5), s(Rez.Strings.Month6), s(Rez.Strings.Month7), s(Rez.Strings.Month8),
                    s(Rez.Strings.Month9), s(Rez.Strings.Month10), s(Rez.Strings.Month11), s(Rez.Strings.Month12)];
-        mHijriMonths = [s(Rez.Strings.Hijri1), s(Rez.Strings.Hijri2), s(Rez.Strings.Hijri3), s(Rez.Strings.Hijri4),
-                        s(Rez.Strings.Hijri5), s(Rez.Strings.Hijri6), s(Rez.Strings.Hijri7), s(Rez.Strings.Hijri8),
-                        s(Rez.Strings.Hijri9), s(Rez.Strings.Hijri10), s(Rez.Strings.Hijri11), s(Rez.Strings.Hijri12)];
         mPrayerNames = [s(Rez.Strings.Prayer0), null, s(Rez.Strings.Prayer2), s(Rez.Strings.Prayer3), null,
                         s(Rez.Strings.Prayer5), s(Rez.Strings.Prayer6)];
         mLabels = [s(Rez.Strings.LabelSteps), s(Rez.Strings.LabelHeart), s(Rez.Strings.LabelCalories),
                    s(Rez.Strings.LabelBattery), s(Rez.Strings.LabelKm), s(Rez.Strings.LabelFloors),
-                   s(Rez.Strings.LabelBodyBattery), s(Rez.Strings.LabelStress)];
-        mLabelMi = s(Rez.Strings.LabelMi);
-        mAyahRefs = [s(Rez.Strings.AyahRef1), s(Rez.Strings.AyahRef2), s(Rez.Strings.AyahRef3), s(Rez.Strings.AyahRef4),
-                     s(Rez.Strings.AyahRef5), s(Rez.Strings.AyahRef6), s(Rez.Strings.AyahRef7)];
+                   s(Rez.Strings.LabelBodyBattery), s(Rez.Strings.LabelStress), s(Rez.Strings.LabelActive), ""];
+        mHijriMonths = [s(Rez.Strings.Hijri1), s(Rez.Strings.Hijri2), s(Rez.Strings.Hijri3), s(Rez.Strings.Hijri4),
+                        s(Rez.Strings.Hijri5), s(Rez.Strings.Hijri6), s(Rez.Strings.Hijri7), s(Rez.Strings.Hijri8),
+                        s(Rez.Strings.Hijri9), s(Rez.Strings.Hijri10), s(Rez.Strings.Hijri11), s(Rez.Strings.Hijri12)];
         mHijriSuffix = s(Rez.Strings.HijriSuffix);
+        mLabelMi = s(Rez.Strings.LabelMi);
         mSetLocation = s(Rez.Strings.SetLocation);
         mSetLocation2 = s(Rez.Strings.SetLocation2);
     }
@@ -172,7 +230,11 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     }
 
     hidden function showSeconds() as Boolean {
-        return !mSleeping || (!mBurnIn && mSettings.secondsAlways && mPartialAllowed);
+        var mode = mSettings.secondsMode;
+        if (mode == 2) {
+            return false;
+        }
+        return !mSleeping || (!mBurnIn && mode == 0 && mPartialAllowed);
     }
 
     // ------------------------------------------------------------------ buffers
@@ -240,7 +302,7 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     }
 
     function onPartialUpdate(dc as Graphics.Dc) as Void {
-        if (mBurnIn || !mPartialAllowed || !mSettings.secondsAlways) {
+        if (mBurnIn || !mPartialAllowed || mSettings.secondsMode != 0) {
             return;
         }
         var frame = bitmapOf(mFrameRef);
@@ -397,14 +459,24 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
 
         // date block
         var ymd = CivilDate.fromDays(day);
-        dc.setColor(c[Themes.TEXT], Graphics.COLOR_TRANSPARENT);
+        dc.setColor(mText, Graphics.COLOR_TRANSPARENT);
         dc.drawText(p(140), p(Layout.DAY_NAME_Y), mFontXS, mDays[CivilDate.dayOfWeek(day)], vc);
         dc.drawText(p(140), p(Layout.DAY_NUM_Y), mFontL, ymd[2].toString(), vc);
         dc.drawText(p(140), p(Layout.MONTH_Y), mFontXS, mMonths[ymd[1] - 1] + " " + ymd[0].toString(), vc);
+        // Hijri date in Arabic. The ArSmall font maps "0".."9" to Eastern Arabic digits, "A".."L"
+        // to the month names and "M" to the AH suffix; written left to right on screen this
+        // reads, right to left, "day month year AH" (numbers keep their left-to-right order).
+        // (or in Latin script when the user prefers it)
         var h = HijriCalendar.forEpochDay(day, mSettings.hijriCorrection);
         dc.setColor(c[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
-        dc.drawText(p(140), p(Layout.HIJRI_Y), mFontXS,
-                    h[2].toString() + " " + mHijriMonths[h[1] - 1] + " " + h[0].toString() + " " + mHijriSuffix, vc);
+        if (mSettings.hijriArabic) {
+            var month = (('A' as Char).toNumber() + h[1] - 1).toChar().toString();
+            dc.drawText(p(140), p(Layout.HIJRI_Y), mFontAr,
+                        "M " + h[0].toString() + " " + month + " " + h[2].toString(), vc);
+        } else {
+            dc.drawText(p(140), p(Layout.HIJRI_Y), mFontXS,
+                        h[2].toString() + " " + mHijriMonths[h[1] - 1] + " " + h[0].toString() + " " + mHijriSuffix, vc);
+        }
 
         // gauges
         var info = ActivityMonitor.getInfo();
@@ -414,15 +486,18 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         }
 
         drawPrayers(dc, now, clock);
-        drawAyah(dc, clock.min);
+        drawAyah(dc, now, clock);
         drawHourMinuteHands(dc, clock);
     }
 
     // ------------------------------------------------------------------ gauges
     hidden function drawGauge(dc as Graphics.Dc, x as Number, y as Number, source as Number,
                               info as ActivityMonitor.Info?) as Void {
+        if (source == DataFields.NONE) {
+            return;      // empty gauge: only the recess of the dial remains
+        }
         var c = mColors;
-        var color = c[Themes.ACCENT];
+        var color = (mSettings.gaugeColors == 2) ? mText : mAccent;
         if (mMulticolor) {
             color = Themes.SOURCE_COLORS[source] as Number;
         }
@@ -452,7 +527,7 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         dc.setColor(color, Graphics.COLOR_TRANSPARENT);
         drawGaugeIcon(dc, x, y + p(isBatt ? Layout.GAUGE_BATT_ICON_DY : Layout.GAUGE_ICON_DY), source);
 
-        var tcol = c[Themes.TEXT];
+        var tcol = mText;
         if (value == null) {
             value = "--";
             tcol = c[Themes.DIM];
@@ -513,6 +588,13 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         } else if (source == DataFields.BODY_BATTERY) {
             dc.fillPolygon([[x + p(2), y - p(6)], [x - p(3), y + p(1)], [x + p(1), y + p(1)]]);
             dc.fillPolygon([[x - p(1), y - p(1)], [x + p(3), y - p(1)], [x - p(2), y + p(6)]]);
+        } else if (source == DataFields.ACTIVE_MINUTES) {
+            // stopwatch
+            dc.setPenWidth(pen(2));
+            dc.drawCircle(x, y + p(1), p(5));
+            dc.drawLine(x, y + p(1), x + p(2), y - p(2));
+            dc.setPenWidth(1);
+            dc.fillRectangle(x - p(1), y - p(7), p(3), p(2));
         } else if (source == DataFields.STRESS) {
             dc.setPenWidth(pen(2));
             var zz = [[-6, 1], [-3, -3], [0, 3], [3, -3], [6, 1]];
@@ -543,12 +625,12 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
             var n = list[0] as Array;
             var secs = ((n[1] as Long) - now).toNumber();
             drawPanel(dc, p(Layout.CX - Layout.PANEL_DX), true, mPrayerNames[n[0] as Number] as String,
-                      countdown(secs), c[Themes.GOLD]);
+                      countdown(secs), mAccent);
         }
         if (list.size() > 1) {
             var f = list[1] as Array;
             drawPanel(dc, p(Layout.CX + Layout.PANEL_DX), false, mPrayerNames[f[0] as Number] as String,
-                      formatTime(mSchedule.minutes(f[2] as Number, f[0] as Number), is24), c[Themes.TEXT]);
+                      formatTime(mSchedule.minutes(f[2] as Number, f[0] as Number), is24), mText);
         }
         drawSun(dc, true, mSchedule.minutes(0, PrayerTimes.SUNRISE), is24);
         drawSun(dc, false, mSchedule.minutes(0, PrayerTimes.SUNSET), is24);
@@ -577,7 +659,7 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
             dc.fillCircle(ix + p(4), iy + p(2), 1);
         }
         var tx = x0 + p(20) + (p(Layout.PANEL_W) - p(22)) / 2;
-        dc.setColor(c[Themes.TEXT], Graphics.COLOR_TRANSPARENT);
+        dc.setColor(mText, Graphics.COLOR_TRANSPARENT);
         dc.drawText(tx, p(Layout.PANEL_Y0 + 8), mFontXS, name, vc);
         dc.setColor(valueColor, Graphics.COLOR_TRANSPARENT);
         dc.drawText(tx, p(Layout.PANEL_Y0 + 20), mFontS, value, vc);
@@ -590,7 +672,7 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         var y = p(Layout.SUN_ICON_Y);
         if (mDial != null) {
             // the sun icon is part of the HD dial: only the time is live
-            dc.setColor(c[Themes.TEXT], Graphics.COLOR_TRANSPARENT);
+            dc.setColor(mText, Graphics.COLOR_TRANSPARENT);
             dc.drawText(x, p(Layout.SUN_TIME_Y), mFontS, formatTime(minutes, is24),
                         Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
             return;
@@ -612,7 +694,7 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         } else {
             dc.fillPolygon([[x, y + p(7)], [x - p(2), y + p(4)], [x + p(2), y + p(4)]]);
         }
-        dc.setColor(c[Themes.TEXT], Graphics.COLOR_TRANSPARENT);
+        dc.setColor(mText, Graphics.COLOR_TRANSPARENT);
         dc.drawText(x, p(Layout.SUN_TIME_Y), mFontS, formatTime(minutes, is24),
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
@@ -644,45 +726,59 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     }
 
     // ------------------------------------------------------------------ Ayah
-    hidden function drawAyah(dc as Graphics.Dc, minute as Number) as Void {
-        var a = mSettings.ayah;
-        if (a == LuxeSettings.AYAH_NONE) {
+    // 39 complete verses in 5 fonts of up to 8 (tools/ayat.json): verse glyphs "A".."H" and their
+    // Arabic references "a".."h". The verse changes every hour (rotation over the verses ticked in
+    // the settings) unless a fixed verse is chosen.
+    hidden function drawAyah(dc as Graphics.Dc, now as Number, clock as System.ClockTime) as Void {
+        var st = mSettings;
+        var hour = ((now.toLong() + clock.timeZoneOffset) / 3600).toNumber();
+        var idx = AyahPicker.pick(st.ayahMode, st.ayahFixed, st.ayahIncluded, hour);
+        if (idx < 0) {
             return;
         }
-        // glyphs "1".."7"; Al-Ikhlas shows one verse per minute: "6", "A", "B", "C"
-        var code = (a + 1).toString();
-        var ref = mAyahRefs[a];
-        if (a == 5) {
-            var v = minute % 4;
-            var codes = ["6", "A", "B", "C"];
-            code = codes[v];
-            ref = ref + (v + 1).toString();
-        }
+        var font = ayahFont(idx / 8);
+        var slot = idx % 8;
+        var code = (('A' as Char).toNumber() + slot).toChar().toString();
+        var ref = (('a' as Char).toNumber() + slot).toChar().toString();
         var vc = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
         dc.setColor(mColors[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
-        dc.drawText(p(140), p(Layout.AYAH_Y), mFontAyah, code, vc);
+        dc.drawText(p(140), p(Layout.AYAH_Y), font, code, vc);
         dc.setColor(mColors[Themes.DIM], Graphics.COLOR_TRANSPARENT);
-        dc.drawText(p(140), p(Layout.AYAH_REF_Y), mFontXS, ref, vc);
+        dc.drawText(p(140), p(Layout.AYAH_REF_Y), font, ref, vc);
     }
 
     // ------------------------------------------------------------------ hands
     hidden function drawHourMinuteHands(dc as Graphics.Dc, clock as System.ClockTime) as Void {
-        var c = mColors;
         var hourA = ((clock.hour % 12) + clock.min / 60.0) * Math.PI / 6.0;
         var minA = clock.min * Math.PI / 30.0;
-        drawBaton(dc, hourA, Layout.HOUR_LEN, Layout.HOUR_W, Layout.HOUR_TAIL);
-        drawBaton(dc, minA, Layout.MIN_LEN, Layout.MIN_W, Layout.MIN_TAIL);
+        drawHand(dc, hourA, Layout.HOUR_LEN, Layout.HOUR_W, Layout.HOUR_TAIL);
+        drawHand(dc, minA, Layout.MIN_LEN, Layout.MIN_W, Layout.MIN_TAIL);
         var cx = mSize / 2;
-        dc.setColor(c[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
+        dc.setColor(mHandLight, Graphics.COLOR_TRANSPARENT);
         dc.fillCircle(cx, cx, p(Layout.CAP_R));
-        dc.setColor(c[Themes.GOLD_DK], Graphics.COLOR_TRANSPARENT);
+        dc.setColor(mHandDark, Graphics.COLOR_TRANSPARENT);
         dc.fillCircle(cx, cx, p(Layout.CAP_INNER_R));
     }
 
-    // Gold baton hand with a pointed tip, drop shadow, dark outline and a light lume insert.
-    hidden function drawBaton(dc as Graphics.Dc, a as Numeric, len as Number, w as Number, tail as Number) as Void {
+    // Outline polygon of a hand in dial units (pointing to 12), for the selected style.
+    hidden function handOutline(len as Number, w as Number, tail as Number, grow as Numeric) as Array {
+        var g = grow;
+        var style = mSettings.handStyle;
+        if (style == 1) {            // dauphine: long diamond
+            return [[0, tail + g], [-w - 1.5 - g, -len * 0.18], [0, -len - g], [w + 1.5 + g, -len * 0.18]];
+        }
+        if (style == 2) {            // sword: straight blade, widest at two thirds, sharp tip
+            return [[-w * 0.6 - g, tail + g], [w * 0.6 + g, tail + g], [w + 0.8 + g, -len * 0.62],
+                    [0, -len - 2 - g], [-w - 0.8 - g, -len * 0.62]];
+        }
+        return [[-w - g, tail + g], [w + g, tail + g], [w - 0.5 + g, -len - g], [0, -len - 4 - g],
+                [-w + 0.5 - g, -len - g]];   // baton
+    }
+
+    // Hand with drop shadow, dark outline, metal body and a style-specific light insert.
+    hidden function drawHand(dc as Graphics.Dc, a as Numeric, len as Number, w as Number, tail as Number) as Void {
         var c = mColors;
-        var sh = rotatePoly([[-w - 1, tail + 1], [w + 1, tail + 1], [w, -len - 1], [0, -len - 5], [-w, -len - 1]], a);
+        var sh = rotatePoly(handOutline(len, w, tail, 1), a);
         var off = pen(2);
         for (var i = 0; i < sh.size(); i++) {
             var pt = sh[i] as Array<Number>;
@@ -691,11 +787,23 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_TRANSPARENT);
         dc.fillPolygon(sh);
         dc.setColor(c[Themes.PLATE], Graphics.COLOR_TRANSPARENT);
-        dc.fillPolygon(rotatePoly([[-w - 1, tail + 1], [w + 1, tail + 1], [w, -len - 1], [0, -len - 5], [-w, -len - 1]], a));
-        dc.setColor(c[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
-        dc.fillPolygon(rotatePoly([[-w, tail], [w, tail], [w - 0.5, -len], [0, -len - 4], [-w + 0.5, -len]], a));
-        dc.setColor(c[Themes.TEXT], Graphics.COLOR_TRANSPARENT);
-        dc.fillPolygon(rotatePoly([[-w + 1.5, -14], [w - 1.5, -14], [w - 1.5, -len + 3], [-w + 1.5, -len + 3]], a));
+        dc.fillPolygon(rotatePoly(handOutline(len, w, tail, 1), a));
+        dc.setColor(mHandLight, Graphics.COLOR_TRANSPARENT);
+        dc.fillPolygon(rotatePoly(handOutline(len, w, tail, 0), a));
+        var style = mSettings.handStyle;
+        if (style == 1) {
+            // faceted: darker right half
+            dc.setColor(mHandDark, Graphics.COLOR_TRANSPARENT);
+            dc.fillPolygon(rotatePoly([[0, tail], [0, -len], [w + 1.5, -len * 0.18]], a));
+        } else if (style == 2) {
+            dc.setColor(mHandDark, Graphics.COLOR_TRANSPARENT);
+            dc.fillPolygon(rotatePoly([[0, tail], [w * 0.6, tail], [w + 0.8, -len * 0.62], [0, -len - 2]], a));
+            dc.setColor(mText, Graphics.COLOR_TRANSPARENT);
+            dc.fillPolygon(rotatePoly([[-0.8, -12], [0.8, -12], [0.8, -len * 0.6], [-0.8, -len * 0.6]], a));
+        } else {
+            dc.setColor(mText, Graphics.COLOR_TRANSPARENT);
+            dc.fillPolygon(rotatePoly([[-w + 1.5, -14], [w - 1.5, -14], [w - 1.5, -len + 3], [-w + 1.5, -len + 3]], a));
+        }
     }
 
     hidden function drawSecondsHand(dc as Graphics.Dc, sec as Number) as Void {
@@ -704,16 +812,16 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         var tip = polar(Layout.SEC_LEN, a);
         var tail = polar(-Layout.SEC_TAIL, a);
         var weight = polar(-(Layout.SEC_TAIL - Layout.SEC_WEIGHT_R - 2), a);
-        dc.setColor(c[Themes.SECONDS], Graphics.COLOR_TRANSPARENT);
+        dc.setColor(mSecColor, Graphics.COLOR_TRANSPARENT);
         dc.setPenWidth(pen(Layout.SEC_PEN));
         dc.drawLine(tail[0], tail[1], tip[0], tip[1]);
         dc.setPenWidth(pen(2));
         dc.drawCircle(weight[0], weight[1], p(Layout.SEC_WEIGHT_R));
         dc.setPenWidth(1);
         var cx = mSize / 2;
-        dc.setColor(c[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
+        dc.setColor(mHandLight, Graphics.COLOR_TRANSPARENT);
         dc.fillCircle(cx, cx, p(Layout.CAP_R));
-        dc.setColor(c[Themes.SECONDS], Graphics.COLOR_TRANSPARENT);
+        dc.setColor(mSecColor, Graphics.COLOR_TRANSPARENT);
         dc.fillCircle(cx, cx, p(Layout.CAP_INNER_R));
         dc.setColor(c[Themes.PLATE], Graphics.COLOR_TRANSPARENT);
         dc.fillCircle(cx, cx, pen(1.5));
@@ -759,7 +867,7 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
             var pt = polar(Layout.NUM_R + 6, q * Math.PI / 2.0);
             dc.fillCircle(pt[0] + shift, pt[1] + shift, pen(2));
         }
-        dc.setColor(c[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
+        dc.setColor(mHandLight, Graphics.COLOR_TRANSPARENT);
         dc.setPenWidth(pen(2));
         var hourTip = polar(Layout.HOUR_LEN, ((clock.hour % 12) + clock.min / 60.0) * Math.PI / 6.0);
         var minTip = polar(Layout.MIN_LEN, clock.min * Math.PI / 30.0);

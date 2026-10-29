@@ -5,5 +5,18 @@
     <font id="LuxeM" filename="luxe_m.fnt" antialias="true" />
     <font id="LuxeS" filename="luxe_s.fnt" antialias="true" />
     <font id="LuxeXS" filename="luxe_xs.fnt" antialias="true" />
-    <font id="Ayah" filename="ayah.fnt" antialias="true" />
+    <font id="ClassicL" filename="classic_l.fnt" antialias="true" />
+    <font id="ClassicM" filename="classic_m.fnt" antialias="true" />
+    <font id="ClassicS" filename="classic_s.fnt" antialias="true" />
+    <font id="ClassicXS" filename="classic_xs.fnt" antialias="true" />
+    <font id="SportL" filename="sport_l.fnt" antialias="true" />
+    <font id="SportM" filename="sport_m.fnt" antialias="true" />
+    <font id="SportS" filename="sport_s.fnt" antialias="true" />
+    <font id="SportXS" filename="sport_xs.fnt" antialias="true" />
+    <font id="ArSmall" filename="ar_small.fnt" antialias="true" />
+    <font id="Ayah0" filename="ayah0.fnt" antialias="true" />
+    <font id="Ayah1" filename="ayah1.fnt" antialias="true" />
+    <font id="Ayah2" filename="ayah2.fnt" antialias="true" />
+    <font id="Ayah3" filename="ayah3.fnt" antialias="true" />
+    <font id="Ayah4" filename="ayah4.fnt" antialias="true" />
 </fonts>

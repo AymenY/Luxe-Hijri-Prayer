@@ -218,88 +218,80 @@
   "lit_pixels": "0.6 %"
  },
  {
-  "file": "previews/ayah-1.png",
-  "title": "Ayah selection 1",
+  "file": "previews/ayah-01.png",
+  "title": "Verse Al-Fatiha 1:2",
   "size": 280,
   "local_time": "2026-09-16T10:25:37+01:00",
   "hijri": "1448-04-03",
   "next_prayer": "Dhuhr"
  },
  {
-  "file": "previews/ayah-2.png",
-  "title": "Ayah selection 2",
+  "file": "previews/ayah-05.png",
+  "title": "Verse Taha 20:25",
   "size": 280,
   "local_time": "2026-09-16T10:25:37+01:00",
   "hijri": "1448-04-03",
   "next_prayer": "Dhuhr"
  },
  {
-  "file": "previews/ayah-3.png",
-  "title": "Ayah selection 3",
+  "file": "previews/ayah-09.png",
+  "title": "Verse Al-Anbiya 21:107",
   "size": 280,
   "local_time": "2026-09-16T10:25:37+01:00",
   "hijri": "1448-04-03",
   "next_prayer": "Dhuhr"
  },
  {
-  "file": "previews/ayah-4.png",
-  "title": "Ayah selection 4",
+  "file": "previews/ayah-13.png",
+  "title": "Verse Al-Fajr 89:27",
   "size": 280,
   "local_time": "2026-09-16T10:25:37+01:00",
   "hijri": "1448-04-03",
   "next_prayer": "Dhuhr"
  },
  {
-  "file": "previews/ayah-5.png",
-  "title": "Ayah selection 5",
+  "file": "previews/ayah-17.png",
+  "title": "Verse Ad-Duha 93:5",
   "size": 280,
   "local_time": "2026-09-16T10:25:37+01:00",
   "hijri": "1448-04-03",
   "next_prayer": "Dhuhr"
  },
  {
-  "file": "previews/ayah-6-verse-1.png",
-  "title": "Ayah selection 6",
-  "size": 280,
-  "local_time": "2026-09-16T10:24:37+01:00",
-  "hijri": "1448-04-03",
-  "next_prayer": "Dhuhr"
- },
- {
-  "file": "previews/ayah-6-verse-2.png",
-  "title": "Ayah selection 6",
+  "file": "previews/ayah-21.png",
+  "title": "Verse Ash-Sharh 94:7",
   "size": 280,
   "local_time": "2026-09-16T10:25:37+01:00",
   "hijri": "1448-04-03",
   "next_prayer": "Dhuhr"
  },
  {
-  "file": "previews/ayah-6-verse-3.png",
-  "title": "Ayah selection 6",
-  "size": 280,
-  "local_time": "2026-09-16T10:26:37+01:00",
-  "hijri": "1448-04-03",
-  "next_prayer": "Dhuhr"
- },
- {
-  "file": "previews/ayah-6-verse-4.png",
-  "title": "Ayah selection 6",
-  "size": 280,
-  "local_time": "2026-09-16T10:27:37+01:00",
-  "hijri": "1448-04-03",
-  "next_prayer": "Dhuhr"
- },
- {
-  "file": "previews/ayah-7.png",
-  "title": "Ayah selection 7",
+  "file": "previews/ayah-25.png",
+  "title": "Verse Al-Qadr 97:3",
   "size": 280,
   "local_time": "2026-09-16T10:25:37+01:00",
   "hijri": "1448-04-03",
   "next_prayer": "Dhuhr"
  },
  {
-  "file": "previews/ayah-8.png",
-  "title": "Ayah selection 8",
+  "file": "previews/ayah-29.png",
+  "title": "Verse Al-Kawthar 108:1",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/ayah-33.png",
+  "title": "Verse Al-Ikhlas 112:2",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/ayah-37.png",
+  "title": "Verse An-Nas 114:1",
   "size": 280,
   "local_time": "2026-09-16T10:25:37+01:00",
   "hijri": "1448-04-03",
@@ -402,9 +394,73 @@
   "next_prayer": "Dhuhr"
  },
  {
+  "file": "previews/state-hijri-latin.png",
+  "title": "Hijri date in Latin script",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/state-empty-gauges.png",
+  "title": "Gauges 3 and 4 set to None, active minutes in gauge 2",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
   "file": "previews/state-low-power-no-seconds.png",
   "title": "MIP low power, 'Only after wrist raise': no seconds hand",
   "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/custom-font-modern.png",
+  "title": "Font: Modern",
+  "size": 454,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/custom-font-classic.png",
+  "title": "Font: Classic",
+  "size": 454,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/custom-font-sport.png",
+  "title": "Font: Sport",
+  "size": 454,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/custom-hands-dauphine-rose.png",
+  "title": "Dauphine hands, rose gold, red seconds",
+  "size": 454,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/custom-hands-sword-silver.png",
+  "title": "Sword hands, silver, cyan accent",
+  "size": 454,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/custom-gold-text.png",
+  "title": "Gold text, gauges in accent colour",
+  "size": 454,
   "local_time": "2026-09-16T10:25:37+01:00",
   "hijri": "1448-04-03",
   "next_prayer": "Dhuhr"

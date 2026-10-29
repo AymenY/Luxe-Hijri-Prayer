@@ -22,13 +22,13 @@ module Layout {
     const DAY_NAME_Y = 57;
     const DAY_NUM_Y = 75;
     const MONTH_Y = 93;
-    const HIJRI_Y = 108;
+    const HIJRI_Y = 113;
 
     // Gauges: upper pair (steps / heart rate) and side pair (calories / battery)
     const GAUGE_UP_DX = 56;
     const GAUGE_UP_Y = 72;
     const GAUGE_SIDE_DX = 76;
-    const GAUGE_SIDE_Y = 146;
+    const GAUGE_SIDE_Y = 148;
     const GAUGE_R = 27;          // ring radius (pen centre)
     const GAUGE_PEN = 4;
     const GAUGE_DISC_R = 29;     // dark disc behind each gauge
@@ -43,11 +43,16 @@ module Layout {
     const SUN_ICON_Y = 97;
     const SUN_TIME_Y = 109;
 
-    // Central arch window (scene behind the hands)
-    const ARCH_X0 = 99;
-    const ARCH_X1 = 181;
-    const ARCH_TOP = 118;
-    const ARCH_BOTTOM = 208;
+    // Moorish window (night scene behind the date block and the hands): straight sides between
+    // the side gauges, shoulders under the upper gauges, neck between them, lobed pointed top
+    const WINDOW_X0 = 97;
+    const WINDOW_X1 = 183;
+    const WINDOW_SHOULDER_Y = 116;
+    const WINDOW_NECK_X0 = 114;
+    const WINDOW_NECK_X1 = 166;
+    const WINDOW_NECK_Y = 98;
+    const WINDOW_TOP = 34;
+    const WINDOW_BOTTOM = 214;
 
     // Prayer cartouches: next prayer + countdown (left), following prayer + time (right)
     const PANEL_DX = 49;         // panel centre distance from CX
@@ -55,15 +60,14 @@ module Layout {
     const PANEL_Y0 = 178;
     const PANEL_H = 28;
 
-    // Ayah cartouche
-    const AYAH_Y = 223;
-    const AYAH_MAX_W = 132;
+    // Ayah: no cartouche; the verse and its Arabic reference sit on the dial, inside a circle
+    // clear of the hour indices and above the 6 numeral
+    const AYAH_Y = 219;
+    const AYAH_MAX_W = 136;
     const AYAH_MAX_H = 26;
-    const AYAH_REF_Y = 243;
-    const CARTOUCHE_X0 = 70;
-    const CARTOUCHE_X1 = 210;
-    const CARTOUCHE_Y0 = 209;
-    const CARTOUCHE_Y1 = 251;
+    const AYAH_REF_Y = 241;
+    const AYAH_AREA_R = 117;
+    const AYAH_AREA_BOTTOM = 248;
 
     // Hands (lengths from the centre; tails point the other way)
     const HOUR_LEN = 54;

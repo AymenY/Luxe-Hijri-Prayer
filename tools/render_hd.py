@@ -13,9 +13,13 @@ palette of each device. to_mip() simulates the 64-colour case for the previews.
 import math
 import os
 import re
+import sys
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import shapes  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FONT_SRC = os.path.join(ROOT, "tools", "fonts-src")
@@ -142,20 +146,8 @@ class Art:
 
 # ------------------------------------------------------------------ shapes
 def arch_points(inset=0.0):
-    x0, x1, top, bottom = L["ARCH_X0"] + inset, L["ARCH_X1"] - inset, L["ARCH_TOP"] + inset, L["ARCH_BOTTOM"]
-    half = (x1 - x0) / 2.0
-    rad = 1.25 * half                       # two-centred (pointed) arch: radius > half width
-    spring = top + math.sqrt(rad * rad - (rad - half) ** 2)
-    cx_l = x0 + rad
-    a_end = math.atan2(top - spring, (x0 + half) - cx_l)
-    if a_end < math.pi:
-        a_end += 2 * math.pi
-    left = []
-    for i in range(25):
-        a = math.pi + (a_end - math.pi) * i / 24.0
-        left.append((cx_l + rad * math.cos(a), spring + rad * math.sin(a)))
-    right = [(280 - x, y) for (x, y) in reversed(left)]
-    return [(x0, bottom)] + left + right[1:] + [(x1, bottom)]
+    """The Moorish window of the dial (see tools/shapes.py)."""
+    return shapes.window_points(L, inset)
 
 
 def poly(draw, u, pts, **kw):
@@ -261,26 +253,26 @@ def stars(art, count, seed, st, big=6, region=None):
 
 def arch_window(art, st, bg):
     win = art.mask(lambda d, u: poly(d, u, arch_points(), fill=255))
-    inside = lambda x, y: L["ARCH_X0"] < x < L["ARCH_X1"] and L["ARCH_TOP"] < y < L["ARCH_BOTTOM"]
+    inside = lambda x, y: L["WINDOW_X0"] < x < L["WINDOW_X1"] and L["WINDOW_TOP"] < y < L["WINDOW_BOTTOM"]
     sky0, sky1 = hexc(st["sky"][0]), hexc(st["sky"][1])
     save = art.rgb.copy()
     # sky
-    art.rgb = art.vertical(L["ARCH_TOP"], 190, sky0, sky1)
+    art.rgb = art.vertical(L["WINDOW_TOP"], 200, sky0, sky1)
     art.add(hexc(st["glow"]) * 0.25, np.exp(-((art.y - 186) / 14.0) ** 2), 1.0)
     if bg == "mosque":
         stars(art, 220, 5, st, big=4, region=lambda x, y: inside(x, y) and y < 160)
         crescent(art, st, 158, 132, 9)
         mosque(art, st)
     elif bg == "geometric":
-        stars(art, 90, 9, st, big=2, region=lambda x, y: inside(x, y) and y < 165)
-        rosette(art, st, 140, 162)
+        stars(art, 140, 9, st, big=3, region=lambda x, y: inside(x, y) and y < 175)
+        rosette(art, st, 140, 165)
     elif bg == "marble":
         layer_pattern(art, st, "marble")
         art.rgb *= 0.8
         rosette(art, st, 140, 162, simple=True)
     else:
-        stars(art, 200, 13, st, big=6, region=inside)
-        crescent(art, st, 150, 158, 20)
+        stars(art, 320, 13, st, big=8, region=inside)
+        crescent(art, st, 152, 160, 20)
     scene = art.rgb
     art.rgb = save
     art.paint(scene, win)
@@ -288,8 +280,8 @@ def arch_window(art, st, bg):
     outer = art.mask(lambda d, u: d.line([(u(x), u(y)) for x, y in arch_points(-2.5)], fill=255, width=max(1, int(u(1.6)))))
     inner = art.mask(lambda d, u: d.line([(u(x), u(y)) for x, y in arch_points(0.5)], fill=255, width=max(1, int(u(0.8)))))
     art.add(hexc(st["glow"]) * 0.5, art.blur(outer, 2.4), 0.9)
-    art.paint(art.metal(L["ARCH_TOP"], L["ARCH_BOTTOM"], st["metal"]), outer)
-    art.paint(art.metal(L["ARCH_TOP"], L["ARCH_BOTTOM"], st["metal"]), inner, 0.8)
+    art.paint(art.metal(L["WINDOW_TOP"], L["WINDOW_BOTTOM"], st["metal"]), outer)
+    art.paint(art.metal(L["WINDOW_TOP"], L["WINDOW_BOTTOM"], st["metal"]), inner, 0.8)
 
 
 def crescent(art, st, cx, cy, r):
@@ -445,11 +437,12 @@ def gauge_recesses(art, st):
         r = L["GAUGE_DISC_R"]
         outer = art.mask(lambda d, u, cx=cx, cy=cy: circle(d, u, cx, cy, r + 1.6, fill=255))
         disc = art.mask(lambda d, u, cx=cx, cy=cy: circle(d, u, cx, cy, r, fill=255))
-        art.paint(np.zeros(3), art.blur(outer, 2.5), 0.55)                       # drop shadow
-        art.paint(art.metal(cy - r - 2, cy + r + 2, st["metal"]), outer)         # metal bezel
-        art.paint(art.radial(cx, cy - 6, r * 1.3, rc0, rc1), disc)                # recess
+        bezel = np.clip(outer - disc, 0, 1)
+        art.paint(np.zeros(3), np.clip(art.blur(outer, 2.5) - disc, 0, 1), 0.55)  # drop shadow outside
+        art.paint(art.metal(cy - r - 2, cy + r + 2, st["metal"]), bezel)         # metal bezel ring
+        art.paint(art.radial(cx, cy - 6, r * 1.3, rc0, rc1), disc, 0.72)          # smoked-glass recess
         top = np.clip(disc - np.roll(disc, SS * 3, 0), 0, 1)
-        art.paint(np.zeros(3), art.blur(top, 2.0), 0.7)                          # inner shadow
+        art.paint(np.zeros(3), art.blur(top, 2.0) * disc, 0.5)                   # inner shadow
         tr = art.mask(lambda d, u, cx=cx, cy=cy: circle(d, u, cx, cy, L["GAUGE_R"] + L["GAUGE_PEN"] / 2.0,
                                                          outline=255, width=max(1, int(u(L["GAUGE_PEN"])))))
         art.paint(track, tr, 0.9)
@@ -478,13 +471,12 @@ def cartouches(art, st):
     for sgn in (-1, 1):
         x0 = 140 + sgn * L["PANEL_DX"] - w / 2.0
         glass_panel(art, st, None, y0, y0 + h, radius=7, rect=(x0, y0, x0 + w, y0 + h))
-    x0, x1, ya, yb = L["CARTOUCHE_X0"], L["CARTOUCHE_X1"], L["CARTOUCHE_Y0"], L["CARTOUCHE_Y1"]
-    pts = [(x0, yb), (x0, ya + 10), (x0 + 10, ya + 3), (124, ya + 3), (140, ya - 4), (156, ya + 3),
-           (x1 - 10, ya + 3), (x1, ya + 10), (x1, yb)]
-    glass_panel(art, st, pts, ya - 4, yb)
+    # no Ayah cartouche: a soft, shapeless shadow keeps the verse readable over the pattern
+    shade = art.mask(lambda d, u: d.ellipse([u(72), u(L["AYAH_Y"] - 16), u(208), u(L["AYAH_REF_Y"] + 9)], fill=255))
+    art.paint(np.zeros(3), art.blur(shade, 9), 0.55)
 
 
-def fixed_icons(art, st):
+def fixed_icons(art, st, hub_diamond=True):
     """Crescent under 12, sunrise/sunset suns, cartouche icons, hub diamond."""
     crescent(art, st, 140, L["CRESCENT_Y"], 6)
     metal = art.metal(80, 120, st["metal"])
@@ -515,26 +507,83 @@ def fixed_icons(art, st):
     art.add(hexc(st["glow"]) * 0.3, art.blur(m, 1.5), 0.8)
     art.paint(art.metal(iy - 8, iy + 6, st["metal"]), m)
     crescent(art, st, rx, iy, 5)
+    if not hub_diamond:
+        return
     # hub diamond
     dy = L["HUB_DIAMOND_Y"]
     art.paint(art.metal(dy - 4, dy + 4, st["metal"]),
               art.mask(lambda d, u: poly(d, u, [(140, dy - 4.5), (144.5, dy), (140, dy + 4.5), (135.5, dy)], fill=255)))
 
 
+# ------------------------------------------------------------------ illustrated background
+ILLUSTRATION = os.path.join(ROOT, "tools", "art-src", "mosque-night.png")   # supplied by the owner
+ILLU_CENTRE = (626.0, 617.0)
+ILLU_RADIUS = 623.0
+
+# colour grading of the illustration per style: (deep, mid, light) for the blue night tones and
+# the colour the warm golden lights are pulled towards (None = keep them golden)
+GRADES = [
+    None,                                                                   # Luxury Blue: original
+    (("#050403", "#2d2210", "#8a6a34"), None),                              # Royal Gold
+    (("#010c08", "#0b3b28", "#5fae86"), None),                              # Emerald Night
+    (("#0e0207", "#4a0f26", "#c2708c"), "#ffc7b0"),                         # Burgundy Royale (rose gold)
+    (("#020814", "#1b3a63", "#b8d4ee"), "#e8eef5"),                         # Ice Silver
+    (("#040506", "#24282d", "#a9b0b8"), "#e6e8ea"),                         # Stealth
+]
+
+
+def layer_illustration(art, style_index):
+    img = Image.open(ILLUSTRATION).convert("RGB")
+    s = 280.0 / (2 * ILLU_RADIUS)
+    left, top = ILLU_CENTRE[0] - ILLU_RADIUS, ILLU_CENTRE[1] - ILLU_RADIUS
+    crop = img.crop((int(left), int(top), int(left + 2 * ILLU_RADIUS), int(top + 2 * ILLU_RADIUS)))
+    a = np.asarray(crop.resize((art.n, art.n), Image.LANCZOS), dtype=np.float64) / 255.0
+    g = GRADES[style_index]
+    if g is not None:
+        (deep, mid, light), warm = g
+        deep, mid, light = hexc(deep), hexc(mid), hexc(light)
+        lum = (0.299 * a[..., 0] + 0.587 * a[..., 1] + 0.114 * a[..., 2])
+        t = np.clip(lum / 0.6, 0, 1)[..., None]
+        mapped = np.where(t < 0.5, deep + (mid - deep) * (t * 2), mid + (light - mid) * ((t - 0.5) * 2))
+        blue = np.clip((a[..., 2] - a[..., 0]) / 0.25 + 0.15, 0, 1)[..., None]   # night / sky tones
+        out = a * (1 - blue) + mapped * blue
+        if warm is not None:
+            wv = hexc(warm)
+            warmth = np.clip((a[..., 0] - a[..., 2]) / 0.3, 0, 1)[..., None]
+            out = out * (1 - warmth) + (lum[..., None] * 1.15 * wv) * warmth
+        a = np.clip(out, 0, 1)
+    art.rgb = a
+
+
+def legibility_shadows(art):
+    """Soft, shapeless shadows under the live texts so they stay readable over the illustration."""
+    for (x0, y0, x1, y1, r, alpha) in [
+            (112, 44, 168, 100, 8, 0.55),                    # date block
+            (70, 100, 210, 124, 7, 0.55),                    # Hijri date
+            (24, 88, 72, 120, 7, 0.5), (208, 88, 256, 120, 7, 0.5),   # sunrise / sunset
+            (70, 206, 210, L["AYAH_REF_Y"] + 10, 9, 0.6)]:   # Ayah
+        m = art.mask(lambda d, u, b=(x0, y0, x1, y1): d.ellipse([u(b[0]), u(b[1]), u(b[2]), u(b[3])], fill=255))
+        art.paint(np.zeros(3), art.blur(m, r), alpha)
+
+
 def render(size, style_index, bg):
     st = STYLES[style_index]
     art = Art(size)
-    layer_base(art, st)
-    layer_pattern(art, st, bg)
-    # soft vignette towards the bezel
-    vig = np.clip((np.hypot(art.x - 140, art.y - 140) - 70) / 60.0, 0, 1) ** 2
-    art.rgb *= (1 - 0.35 * vig)[..., None]
-    arch_window(art, st, bg)
+    if bg == "mosque":
+        layer_illustration(art, style_index)
+        legibility_shadows(art)
+    else:
+        layer_base(art, st)
+        layer_pattern(art, st, bg)
+        # soft vignette towards the bezel
+        vig = np.clip((np.hypot(art.x - 140, art.y - 140) - 70) / 60.0, 0, 1) ** 2
+        art.rgb *= (1 - 0.35 * vig)[..., None]
+        arch_window(art, st, bg)
     chapter_ring(art, st)
     gauge_recesses(art, st)
     cartouches(art, st)
     indices_and_numerals(art, st)
-    fixed_icons(art, st)
+    fixed_icons(art, st, hub_diamond=(bg != "mosque"))
     # outside the round display: black
     outside = art.mask(lambda d, u: circle(d, u, 140, 140, 140, fill=255))
     art.rgb *= outside[..., None]
