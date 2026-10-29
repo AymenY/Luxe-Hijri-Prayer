@@ -7,8 +7,8 @@ cartouches and fixed icons — with 3x supersampling, gradients, glows, bevels, 
 and textures. The watch draws only the live content (texts, gauge arcs, hands) on top, at the
 positions of source/Layout.mc, which this module reads.
 
-AMOLED sizes (>= 360 px) are kept in full colour; MIP sizes (<= 280 px) are error-diffused to
-the 64-colour MIP palette so that the image is exactly what the display can show.
+Images are produced in full colour; for MIP screens the Connect IQ compiler converts them to the
+palette of each device. to_mip() simulates the 64-colour case for the previews.
 """
 import math
 import os

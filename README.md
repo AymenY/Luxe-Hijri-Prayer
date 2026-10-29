@@ -34,8 +34,10 @@ night sky) change the art; the layout is identical on every screen size.
 faceted indices, bevelled numerals, recessed gauges, glass cartouches and fixed icons — is
 rendered offline with 3x supersampling, gradients, glows, inner shadows and textures
 (`tools/render_hd.py`), once per screen size, style and background: 24 images per size
-(`tools/build_hd.py`). AMOLED sizes use full-colour JPEG (`packingFormat="jpg"`), MIP sizes a
-64-colour PNG dithered offline. The watch draws only the live content (texts, gauge arcs,
+(`tools/build_hd.py`). Images are stored in full colour; AMOLED devices keep them as JPEG
+(`packingFormat="jpg"`), and for MIP devices the compiler converts them to each device's own
+palette (Garmin documents 64 colours for the fēnix 7 family in one place and 256 in another;
+the compiler uses the device file, so no depth is assumed). MIP previews show the 64-colour case. The watch draws only the live content (texts, gauge arcs,
 hands with drop shadows) on top. If an image cannot be loaded, the vector version is used.
 
 Not reproduced from the concept: photographic glow and reflections (vector art instead), the

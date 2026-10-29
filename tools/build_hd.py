@@ -5,8 +5,10 @@ write them, with their drawables.xml, into the resource folders:
   resources/drawables/                 280 px (base set, MIP) + launcher icon
   resources-round-WxH/drawables/       other sizes (MIP below 360 px, AMOLED from 360 px)
 
-MIP images are stored as 64-colour PNG (dithering="none": the dithering is done here);
-AMOLED images as JPEG (quality 90) with packingFormat="jpg" so the package stays small.
+All images are stored in full colour (JPEG, quality 90). For AMOLED sizes they are packed as
+JPEG on the device (packingFormat="jpg"). For MIP sizes the Connect IQ compiler converts them
+to the exact palette declared by each device file (64 or more colours, Floyd-Steinberg
+dithering) and packs the result as PNG, so no colour depth is assumed here.
 Usage: python3 tools/build_hd.py [size ...]   (default: all sizes; 4 worker processes)
 """
 import multiprocessing as mp
@@ -28,17 +30,14 @@ def folder(size):
 
 
 def fname(size, s, b):
-    return "dial_%d_%d.%s" % (s, b, "jpg" if size >= render_hd.AMOLED_FROM else "png")
+    return "dial_%d_%d.jpg" % (s, b)
 
 
 def job(args):
     size, s, b = args
-    img = render_hd.render_for_device(size, s, BGS[b])
+    img = render_hd.render(size, s, BGS[b])
     path = os.path.join(folder(size), fname(size, s, b))
-    if size >= render_hd.AMOLED_FROM:
-        img.convert("RGB").save(path, "JPEG", quality=90, optimize=True, subsampling=0)
-    else:
-        img.save(path, "PNG", optimize=True)
+    img.convert("RGB").save(path, "JPEG", quality=90, optimize=True, subsampling=0)
     return path, os.path.getsize(path)
 
 
@@ -53,7 +52,7 @@ def write_xml(size):
             if amoled:
                 lines.append('    <bitmap id="Dial%d%d" filename="%s" packingFormat="jpg" />' % (s, b, fname(size, s, b)))
             else:
-                lines.append('    <bitmap id="Dial%d%d" filename="%s" dithering="none" packingFormat="png" />'
+                lines.append('    <bitmap id="Dial%d%d" filename="%s" dithering="floyd_steinberg" packingFormat="png" />'
                              % (s, b, fname(size, s, b)))
     lines.append("</drawables>")
     with open(os.path.join(folder(size), "drawables.xml"), "w") as fh:

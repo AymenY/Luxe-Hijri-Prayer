@@ -99,8 +99,10 @@ Requested by the owner: “HD graphics and a contemporary, elaborate design”.
   metallic brushed chapter ring, faceted indices with drop shadows, bevelled numerals, recessed
   gauges with inner shadows, glass cartouches, a night scene with lit windows, bloom and a
   rippled reflection, marble texture, Milky Way.
-* AMOLED sizes keep full colour (JPEG); MIP sizes are dithered to the 64-colour palette here so
-  the result is predictable on the display.
+* All dial images are stored in full colour. AMOLED devices keep them as JPEG; for MIP devices
+  the Connect IQ compiler converts them to the palette of each device file (Floyd-Steinberg).
+  Garmin's documentation gives 64 colours for the fēnix 7 family on the compatible-devices page
+  and 256 elsewhere (open bug report); letting the compiler decide avoids assuming either.
 * Live content is unchanged (positions from `source/Layout.mc`); hands gained a drop shadow.
 * The vector art remains as a fallback when an image cannot be loaded.
 
