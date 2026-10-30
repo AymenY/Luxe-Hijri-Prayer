@@ -6,7 +6,7 @@ simulator/device screenshots before submission (the Store requires genuine scree
 
 * App type: Watch face
 * Supported devices: round colour watches with Connect IQ 4+ (fēnix 7 / 7 Pro / 8, epix 2 / Pro,
-  Enduro 2 / 3, Forerunner 165 / 255 / 265 / 955 / 965, Venu 2 / 3, vívoactive 5, MARQ 2); final list
+  Enduro 3, Forerunner 165 / 255 / 265 / 955 / 965, Venu 2 / 3, vívoactive 5, MARQ 2); final list
   from `tools/update_products.py`
 * Languages: English, French
 * Price: free (suggested)

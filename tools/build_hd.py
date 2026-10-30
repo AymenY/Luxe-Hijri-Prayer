@@ -8,7 +8,7 @@ write them, with their drawables.xml, into the resource folders:
 All images are stored in full colour (JPEG, quality 90). For AMOLED sizes they are packed as
 JPEG on the device (packingFormat="jpg"). For MIP sizes the Connect IQ compiler converts them
 to the exact palette declared by each device file (64 or more colours, Floyd-Steinberg
-dithering) and packs the result as PNG, so no colour depth is assumed here.
+dithering) with its default packing, so no colour depth is assumed here.
 Usage: python3 tools/build_hd.py [size ...]   (default: all sizes; 4 worker processes)
 """
 import multiprocessing as mp
@@ -52,7 +52,7 @@ def write_xml(size):
             if amoled:
                 lines.append('    <bitmap id="Dial%d%d" filename="%s" packingFormat="jpg" />' % (s, b, fname(size, s, b)))
             else:
-                lines.append('    <bitmap id="Dial%d%d" filename="%s" dithering="floyd_steinberg" packingFormat="png" />'
+                lines.append('    <bitmap id="Dial%d%d" filename="%s" dithering="floyd_steinberg" />'
                              % (s, b, fname(size, s, b)))
     lines.append("</drawables>")
     with open(os.path.join(folder(size), "drawables.xml"), "w") as fh:
