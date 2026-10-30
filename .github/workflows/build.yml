@@ -72,7 +72,14 @@ jobs:
           connect-iq-sdk-manager login
           connect-iq-sdk-manager sdk set "$SDK"
           echo "$(connect-iq-sdk-manager sdk current-path --bin)" >> "$GITHUB_PATH"
-          connect-iq-sdk-manager device download --manifest=manifest.xml
+          # one device at a time: an id unknown to Garmin's catalogue is reported, not fatal
+          missing=""
+          for d in $(grep -o 'iq:product id="[^"]*"' manifest.xml | sed 's/.*id="\([^"]*\)"/\1/'); do
+            connect-iq-sdk-manager device download -d "$d" > /dev/null 2>&1 || missing="$missing $d"
+          done
+          echo "Devices not found in the catalogue:${missing:- none}"
+          echo "Installed device files:"
+          ls "$HOME/.Garmin/ConnectIQ/Devices" | tr '\n' ' '; echo
       - name: Temporary developer key
         run: |
           openssl genrsa -out "$RUNNER_TEMP/key.pem" 4096
