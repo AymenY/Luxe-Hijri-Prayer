@@ -372,17 +372,17 @@ def rosette(art, st, cx, cy, simple=False):
 
 def chapter_ring(art, st):
     r0, r1 = hexc(st["ring"][0]), hexc(st["ring"][1])
-    band = art.mask(lambda d, u: (circle(d, u, 140, 140, 140, fill=255), circle(d, u, 140, 140, 127, fill=0)))
+    band = art.mask(lambda d, u: (circle(d, u, 140, 140, 140, fill=255), circle(d, u, 140, 140, L["RING_R_IN"], fill=0)))
     ang = np.arctan2(art.y - 140, art.x - 140)
     brushed = 0.5 + 0.5 * np.cos(2 * ang + 0.6)
     ring = r1 + (r0 - r1) * brushed[..., None]
     ring = np.clip(ring + (art.noise(0.5, 17) - 0.5)[..., None] * 0.02, 0, 1)
     art.paint(ring, band)
     # inner shadow under the bezel
-    edge = art.mask(lambda d, u: circle(d, u, 140, 140, 127, outline=255, width=max(1, int(u(1.0)))))
+    edge = art.mask(lambda d, u: circle(d, u, 140, 140, L["RING_R_IN"], outline=255, width=max(1, int(u(1.0)))))
     art.paint(np.zeros(3), art.blur(edge, 2.5), 0.6)
     metal = art.metal(0, 280, st["metal"])
-    for r, w in ((127.2, 0.9), (139.0, 1.2)):
+    for r, w in ((L["RING_R_IN"] + 0.2, 0.8), (139.2, 1.0)):
         m = art.mask(lambda d, u, r=r, w=w: circle(d, u, 140, 140, r, outline=255, width=max(1, int(u(w)))))
         art.paint(metal, m)
     # minute ticks

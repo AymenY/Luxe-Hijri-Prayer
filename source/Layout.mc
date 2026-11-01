@@ -8,14 +8,15 @@ module Layout {
     const CY = 140;
     const SAFE_R = 128;          // all text and gauges must stay inside this radius
 
-    // Chapter ring
-    const TICK_R_IN = 131;       // minute ticks
-    const TICK_R_OUT = 137;
-    const IDX_R_IN = 121;        // gold hour indices (not at 12/3/6/9)
-    const IDX_R_OUT = 135;
+    // Chapter ring (thin metal band from RING_R_IN to the edge)
+    const RING_R_IN = 133;
+    const TICK_R_IN = 134;       // minute ticks
+    const TICK_R_OUT = 138;
+    const IDX_R_IN = 125;        // gold hour indices (not at 12/3/6/9)
+    const IDX_R_OUT = 138;
     const IDX_W_IN = 2;          // half widths of an index at its inner / outer end
     const IDX_W_OUT = 4;
-    const NUM_R = 118;           // centre radius of the 12 / 3 / 6 / 9 numerals
+    const NUM_R = 121;           // centre radius of the 12 / 3 / 6 / 9 numerals
 
     // Date block (between the two upper gauges) and Hijri line
     const CRESCENT_Y = 45;
