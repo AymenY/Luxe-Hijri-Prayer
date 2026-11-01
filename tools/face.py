@@ -266,6 +266,9 @@ def format_time(minutes, is24=True):
 LABELS = ["LabelSteps", "LabelHeart", "LabelCalories", "LabelBattery", "LabelKm", "LabelFloors",
           "LabelBodyBattery", "LabelStress", "LabelActive"]
 NONE_SOURCE = 9
+SUN_RING = 10
+# Themes.SUN_DAY, SUN_TWILIGHT, SUN_NIGHT, SUN_NIGHT_TEXT
+SUN_DAY, SUN_TWILIGHT, SUN_NIGHT, SUN_NIGHT_TEXT = 0xFFC83A, 0x8A5BC8, 0x3355AA, 0x9FB8FF
 
 
 def ayah_pick(mode, fixed, included, hour):
@@ -512,6 +515,88 @@ class Face:
         dc.setColor(color, -1)
         dc.drawText(x, y + p(L.GAUGE_BATT_LABEL_DY if batt else L.GAUGE_LABEL_DY), self.f_xs, label, CENTER | VCENTER)
 
+    # ---- daylight / darkness ring (mirror of drawSunRing, sunArc, ringDeg)
+    @staticmethod
+    def ring_deg(m):
+        return (90 - int((m - 720) / 4)) % 360
+
+    def sun_arc(self, dc, x, y, r, m0, m1, color):
+        if m1 - m0 < 4:
+            return
+        dc.setColor(color, -1)
+        dc.drawArc(x, y, r, CLOCKWISE, self.ring_deg(m0), self.ring_deg(m1))
+
+    def sun_ring(self, dc, x, y, now, watch_offset):
+        s, p, c = self.s, self.p, self.c
+        offset = s["utc_offset"] if s.get("tz_manual") else watch_offset
+        tz = offset / 3600.0
+        day = calc.local_epoch_day(now, offset)
+        comp = lambda d: calc.compute_day(day + d, s["lat"], s["lon"], tz, s["method"], s["asr"], s["highlat"])
+        d0 = comp(0)
+        rise, sset = calc.to_minutes(d0[calc.SUNRISE]), calc.to_minutes(d0[calc.SUNSET])
+        if (s["lat"] == 0 and s["lon"] == 0) or rise is None or sset is None:
+            dc.setColor(c[T["DIM"]], -1)
+            dc.drawText(x, y + p(L.GAUGE_VALUE_DY), self.f_m, "--", CENTER | VCENTER)
+            return
+        fajr, isha = calc.to_minutes(d0[calc.FAJR]), calc.to_minutes(d0[calc.ISHA])
+        fajr = rise if fajr is None else fajr
+        isha = sset if isha is None else isha
+        r = p(L.GAUGE_R)
+        dc.setPenWidth(self.pen(L.GAUGE_PEN))
+        self.sun_arc(dc, x, y, r, isha, fajr + 1440, SUN_NIGHT)
+        self.sun_arc(dc, x, y, r, fajr, rise, SUN_TWILIGHT)
+        self.sun_arc(dc, x, y, r, rise, sset, SUN_DAY)
+        self.sun_arc(dc, x, y, r, sset, isha, SUN_TWILIGHT)
+        dc.setPenWidth(1)
+        now_min = ((now + offset) % 86400) // 60
+        a = (now_min - 720) * math.pi / 720.0
+        mx, my = x + int(r * math.sin(a)), y - int(r * math.cos(a))
+        dc.setColor(0x000000, -1); dc.fillCircle(mx, my, p(4))
+        dc.setColor(0xFFFFFF, -1); dc.fillCircle(mx, my, p(3))
+        is_day = rise <= now_min < sset
+        if is_day:
+            target = calc.moment(day, d0[calc.SUNSET], tz)
+        elif now_min >= sset:
+            target = calc.moment(day + 1, comp(1)[calc.SUNRISE], tz)
+        else:
+            target = calc.moment(day, d0[calc.SUNRISE], tz)
+        col = SUN_DAY if is_day else SUN_NIGHT_TEXT
+        ix, iy = x, y + p(L.GAUGE_ICON_DY)
+        dc.setColor(col, -1)
+        if is_day:
+            dc.fillCircle(ix, iy, p(3))
+            for k in range(8):
+                ra = k * math.pi / 4
+                dc.drawLine(ix + int(p(5) * math.cos(ra)), iy + int(p(5) * math.sin(ra)),
+                            ix + int(p(6) * math.cos(ra)), iy + int(p(6) * math.sin(ra)))
+        else:
+            dc.fillCircle(ix, iy, p(5))
+            dc.setColor(c[T["PLATE"]], -1); dc.fillCircle(ix + p(2), iy - p(2), p(4))
+        value = "--" if target is None else calc.countdown_text(target - now)
+        fnt = self.f_m if self.f_m.width(value) <= 2 * (r - 2) - 4 else self.f_s
+        dc.setColor(self.text, -1)
+        dc.drawText(x, y + p(L.GAUGE_VALUE_DY), fnt, value, CENTER | VCENTER)
+        dc.setColor(col, -1)
+        dc.drawText(x, y + p(L.GAUGE_LABEL_DY), self.f_xs, self.str["LabelDay" if is_day else "LabelNight"],
+                    CENTER | VCENTER)
+
+    def battery_line(self, dc, sensors):
+        """Mirror of drawBatteryLine."""
+        p, c = self.p, self.c
+        value, progress, warn = read_source(3, sensors)
+        txt = value + "%"
+        w = self.f_xs.width(txt)
+        x0 = p(140) - (w + p(16)) // 2
+        y = p(L.BATT_Y)
+        dc.setColor(c[T["WARN"]] if warn else c[T["DIM"]], -1)
+        dc.setPenWidth(1)
+        dc.drawRoundedRectangle(x0, y - p(3), p(11), p(7), 1)
+        dc.fillRectangle(x0 + p(11), y - p(1), p(1) + 1, p(3))
+        fill = int(p(7) * progress)
+        if fill > 0:
+            dc.fillRectangle(x0 + p(2), y - p(1), fill, p(3))
+        dc.drawText(x0 + p(16) + w // 2, y, self.f_xs, txt, CENTER | VCENTER)
+
     def sun_icon(self, dc, x, y, rising):
         p = self.p
         if self.hd is not None:
@@ -652,11 +737,14 @@ class Face:
         else:
             dc.drawText(p(140), p(L.HIJRI_Y), self.f_xs, "%d %s %d %s" % (hd, self.str["Hijri%d" % hm], hy,
                                                                          self.str["HijriSuffix"]), CENTER | VCENTER)
+        nxt = self.draw_prayers(dc, now, watch_offset)
         g = s["gauges"]
         for (x, yy), src in zip(self.gauge_centres(), g):
-            self.draw_gauge(dc, x, yy, src, sensors)
-        nxt = self.draw_prayers(dc, now, watch_offset)
-        # Ayah and reference (mirror of drawAyah)
+            if src == SUN_RING:
+                self.sun_ring(dc, x, yy, now, watch_offset)
+            else:
+                self.draw_gauge(dc, x, yy, src, sensors)
+        # Ayah (mirror of drawAyah), then the battery line when no gauge shows the battery
         idx = ayah_pick(s.get("ayah_mode", 0), s.get("ayah_fixed", 18), s.get("ayah_included", [True] * 39),
                         local // 3600)
         self.ayah_index = idx
@@ -664,8 +752,8 @@ class Face:
             fa = font("ayah%d" % (idx // 8), self.size)
             dc.setColor(c[T["GOLD"]], -1)
             dc.drawText(p(140), p(L.AYAH_Y), fa, chr(ord("A") + idx % 8), CENTER | VCENTER)
-            dc.setColor(c[T["DIM"]], -1)
-            dc.drawText(p(140), p(L.AYAH_REF_Y), fa, chr(ord("a") + idx % 8), CENTER | VCENTER)
+        if 3 not in g:
+            self.battery_line(dc, sensors)
         # hands
         self.hand(dc, ((hour % 12) + minute / 60.0) * math.pi / 6, L.HOUR_LEN, L.HOUR_W, L.HOUR_TAIL)
         self.hand(dc, minute * math.pi / 30, L.MIN_LEN, L.MIN_W, L.MIN_TAIL)
@@ -703,7 +791,7 @@ class Face:
         return img, {"lit_fraction": lit}
 
 
-DEFAULT_SETTINGS = dict(preset=0, background=0, gauges=[0, 1, 2, 3], hijri_corr=0, ayah_mode=1, ayah_fixed=18, method=0, asr=1,
+DEFAULT_SETTINGS = dict(preset=0, background=0, gauges=[0, 1, 2, SUN_RING], hijri_corr=0, ayah_mode=1, ayah_fixed=18, method=0, asr=1,
                         highlat=1, lat=33.8754, lon=10.8575, tz_manual=False, utc_offset=3600, is24=True)
 
 # Simulated sensor values for previews (clearly NOT live data)

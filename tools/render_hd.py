@@ -472,7 +472,7 @@ def cartouches(art, st):
         x0 = 140 + sgn * L["PANEL_DX"] - w / 2.0
         glass_panel(art, st, None, y0, y0 + h, radius=7, rect=(x0, y0, x0 + w, y0 + h))
     # no Ayah cartouche: a soft, shapeless shadow keeps the verse readable over the pattern
-    shade = art.mask(lambda d, u: d.ellipse([u(72), u(L["AYAH_Y"] - 16), u(208), u(L["AYAH_REF_Y"] + 9)], fill=255))
+    shade = art.mask(lambda d, u: d.ellipse([u(72), u(L["AYAH_Y"] - 16), u(208), u(L["BATT_Y"] + 9)], fill=255))
     art.paint(np.zeros(3), art.blur(shade, 9), 0.55)
 
 
@@ -561,7 +561,7 @@ def legibility_shadows(art):
             (112, 44, 168, 100, 8, 0.55),                    # date block
             (66, 101, 214, 125, 6, 0.85),                    # Hijri date (darker: busy minarets behind)
             (24, 88, 72, 120, 7, 0.5), (208, 88, 256, 120, 7, 0.5),   # sunrise / sunset
-            (66, 204, 214, L["AYAH_REF_Y"] + 10, 8, 0.75)]:  # Ayah
+            (66, 204, 214, L["BATT_Y"] + 10, 8, 0.75)]:  # Ayah
         m = art.mask(lambda d, u, b=(x0, y0, x1, y1): d.ellipse([u(b[0]), u(b[1]), u(b[2]), u(b[3])], fill=255))
         art.paint(np.zeros(3), art.blur(m, r), alpha)
 

@@ -18,7 +18,7 @@ class LuxeSettings {
     var secondsMode as Number = 0;        // 0 always, 1 after wrist raise, 2 hidden
     var secondsColor as Number = 0;       // 0 = preset, else Themes.COLOUR_CHOICES[i - 1]
     // Data fields
-    var gauges as Array<Number> = [0, 1, 2, 3];
+    var gauges as Array<Number> = [0, 1, 2, 10];
     var gaugeColors as Number = 0;        // 0 per data type, 1 accent, 2 text
     // Faith & calendar
     var hijriArabic as Boolean = true;
@@ -51,9 +51,9 @@ class LuxeSettings {
         secondsMode = readList("SecondsMode", 2, 0);
         secondsColor = readList("SecondsColor", Themes.COLOUR_CHOICES.size(), 0);
 
-        var last = DataFields.NONE;
+        var last = DataFields.SUN_RING;
         gauges = [readList("Gauge1", last, 0), readList("Gauge2", last, 1),
-                  readList("Gauge3", last, 2), readList("Gauge4", last, 3)];
+                  readList("Gauge3", last, 2), readList("Gauge4", last, DataFields.SUN_RING)];
         gaugeColors = readList("GaugeColors", 2, 0);
 
         hijriArabic = readList("HijriScript", 1, 0) == 0;

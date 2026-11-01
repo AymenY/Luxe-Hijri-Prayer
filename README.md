@@ -7,10 +7,10 @@ Forerunner 165 / 255 / 265 / 955 / 965, Venu 2 / 3, vívoactive 5, MARQ 2 — MI
 
 ![Styles (reference renders)](docs/previews/overview-styles.png)
 
-> **Status.** The source is complete but **has not been compiled yet**: the Connect IQ SDK
-> could not be downloaded where it was written. Images in `docs/previews/` are **reference
-> renders** from a Python mirror of the drawing code (same layout, fonts, colours, vector art),
-> **not** simulator screenshots. See [`docs/AUDIT.md`](docs/AUDIT.md) and
+> **Status.** The watch face compiles with Connect IQ SDK 9.3.0 (GitHub Actions, 8 preview
+> devices) and has run on a real fēnix 7X Pro. It is not published. Images in `docs/previews/`
+> are **reference renders** from a Python mirror of the drawing code (same layout, fonts,
+> colours, vector art), **not** simulator or device screenshots. See [`docs/AUDIT.md`](docs/AUDIT.md) and
 > [`docs/RELEASE_CHECKLIST.md`](docs/RELEASE_CHECKLIST.md).
 
 ## Design
@@ -23,11 +23,15 @@ Based on the approved concept image:
 * sunrise (left) and sunset (right)
 * the default background is the owner's night illustration of a mosque (`tools/art-src/`),
   colour-graded for each style; the other backgrounds are rendered procedurally
-* four ring gauges in smoked glass — steps and heart rate at the top, calories and battery at the sides —
+* four ring gauges in smoked glass — steps and heart rate at the top, calories on the left —
   with icon, value and label; one colour per data type in Luxury Blue and Ice Silver
+* on the right, a 24 h **daylight / darkness ring** (noon at the top): darkness, twilight
+  (Fajr → sunrise, sunset → Isha) and daylight, a white dot at the current time, and the time
+  left until sunset (DAY) or sunrise (NIGHT)
+* a thin metal chapter ring; a small battery line under the verse (when no gauge shows the battery)
 * a pointed Islamic arch with a night scene (mosque, minarets, palms, water, crescent)
 * two cartouches: **next prayer + countdown** and **the following prayer + its time**
-* a complete Quranic verse in Arabic at the bottom, with its Arabic reference, changing every
+* a complete Quranic verse in Arabic at the bottom (without surah name or number), changing every
   hour (39 short verses; see [`docs/AYAT.md`](docs/AYAT.md))
 * the Hijri date in Arabic (Eastern Arabic digits, month names, هـ) or in Latin script
 
@@ -61,7 +65,7 @@ Everything is customisable; the settings are generated from `tools/gen_settings.
 | Appearance | Accent colour (countdown, gauges) | Preset, red, orange, gold, green, cyan, blue, white |
 | Appearance | Hands / hands colour | Baton with lume, Dauphine, Sword / preset, gold, rose gold, silver, bronze |
 | Appearance | Seconds hand / colour | Always, only after wrist raise, hidden / preset + 7 colours |
-| Data fields | Gauges 1–4 | Steps, heart rate, calories, battery, distance, floors, Body Battery, stress, active minutes (week), none |
+| Data fields | Gauges 1–4 | Steps, heart rate, calories, battery, distance, floors, Body Battery, stress, active minutes (week), none, daylight / darkness (24 h); default steps, heart rate, calories, daylight |
 | Data fields | Gauge colours | One colour per data type, accent colour, text colour |
 | Faith & calendar | Hijri date script / correction | Arabic, Latin / −2…+2 days (0) |
 | Faith & calendar | Ayah | Hourly rotation (ticked verses), fixed verse, hidden |

@@ -9,14 +9,14 @@ module Layout {
     const SAFE_R = 128;          // all text and gauges must stay inside this radius
 
     // Chapter ring (thin metal band from RING_R_IN to the edge)
-    const RING_R_IN = 133;
-    const TICK_R_IN = 134;       // minute ticks
-    const TICK_R_OUT = 138;
-    const IDX_R_IN = 125;        // gold hour indices (not at 12/3/6/9)
-    const IDX_R_OUT = 138;
+    const RING_R_IN = 136;
+    const TICK_R_IN = 137;       // minute ticks
+    const TICK_R_OUT = 139;
+    const IDX_R_IN = 129;        // gold hour indices (not at 12/3/6/9)
+    const IDX_R_OUT = 139;
     const IDX_W_IN = 2;          // half widths of an index at its inner / outer end
     const IDX_W_OUT = 4;
-    const NUM_R = 121;           // centre radius of the 12 / 3 / 6 / 9 numerals
+    const NUM_R = 124;           // centre radius of the 12 / 3 / 6 / 9 numerals
 
     // Date block (between the two upper gauges) and Hijri line
     const CRESCENT_Y = 45;
@@ -61,12 +61,12 @@ module Layout {
     const PANEL_Y0 = 178;
     const PANEL_H = 28;
 
-    // Ayah: no cartouche; the verse and its Arabic reference sit on the dial, inside a circle
-    // clear of the hour indices and above the 6 numeral
+    // Ayah: no cartouche and no reference; the verse sits on the dial, inside a circle clear of
+    // the hour indices and above the 6 numeral. The small battery line goes below it.
     const AYAH_Y = 219;
     const AYAH_MAX_W = 136;
     const AYAH_MAX_H = 26;
-    const AYAH_REF_Y = 241;
+    const BATT_Y = 241;
     const AYAH_AREA_R = 117;
     const AYAH_AREA_BOTTOM = 248;
 

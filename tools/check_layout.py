@@ -107,23 +107,19 @@ def check_size(size, report):
         ck.add("daynum-" + lang, ck.text_box("luxe_l", "28", p(140), p(L.DAY_NUM_Y)))
         ck.add("month-" + lang, ck.text_box("luxe_xs", widest("luxe_xs", size, ["%s 2026" % s["Month%d" % m]
                                                                                 for m in range(1, 13)]), p(140), p(L.MONTH_Y)))
-        # Arabic pieces (language independent): widest Hijri date and widest Ayah reference
+        # Arabic pieces (language independent): widest Hijri date
         ck.add("hijri", ck.text_box("ar_small", widest("ar_small", size, ["M 1448 %s 30" % chr(ord("A") + m)
                                                                           for m in range(12)]), p(140), p(L.HIJRI_Y)))
         ck.add("hijri_latin-" + lang, ck.text_box("luxe_xs", widest("luxe_xs", size, [
             "30 %s 1448 %s" % (s["Hijri%d" % m], s["HijriSuffix"]) for m in range(1, 13)]), p(140), p(L.HIJRI_Y)))
-        refs = []
-        for g in range(5):
-            fa = face.font("ayah%d" % g, size)
-            for ch in "abcdefgh":
-                if ord(ch) in fa.chars:
-                    refs.append(ck.text_box("ayah%d" % g, ch, p(140), p(L.AYAH_REF_Y)))
-        rb = (min(b[0] for b in refs), min(b[1] for b in refs), max(b[2] for b in refs), max(b[3] for b in refs))
-        ck.add("ayahref", rb)
-        ck.inside(rb, "ayahref", L.AYAH_AREA_R)
+        # small battery line under the verse: icon (16 units with its gap) then "100%"
+        tb = ck.text_box("luxe_xs", "100%", p(140) + p(8), p(L.BATT_Y))
+        bb = (tb[0] - p(16), min(tb[1], p(L.BATT_Y) - p(3)), tb[2], max(tb[3], p(L.BATT_Y) + p(4)))
+        ck.add("battery", bb)
+        ck.inside(bb, "battery", L.AYAH_AREA_R)
         # gauge content must fit inside the ring
         rin = p(L.GAUGE_R) - max(1, p(L.GAUGE_PEN)) // 2
-        for key in face.LABELS + ["LabelMi"]:
+        for key in face.LABELS + ["LabelMi", "LabelDay", "LabelNight"]:
             b = ck.text_box("luxe_xs", s[key], 0, p(L.GAUGE_LABEL_DY))
             half = max(-b[0], b[2])
             yb = max(abs(b[1]), abs(b[3]))
@@ -141,7 +137,7 @@ def check_size(size, report):
 
     # values inside the ring
     inner = 2 * (p(L.GAUGE_R) - max(1, p(L.GAUGE_PEN)) // 2) - 2
-    for v in ["9999", "99.9k", "999k", "--", "200", "100", "88.8"]:
+    for v in ["9999", "99.9k", "999k", "--", "200", "100", "88.8", "23h59"]:
         w = min(face.font(fontname_for(f), size).width(v) for f in ("luxe_l", "luxe_m", "luxe_s"))
         if w > inner:
             ck.fail.append("gauge value '%s' (%d px) wider than the ring interior (%d px)" % (v, w, inner))

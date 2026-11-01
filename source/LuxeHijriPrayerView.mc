@@ -59,6 +59,8 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     hidden var mPrayerNames as Array = [];
     hidden var mLabels as Array<String> = [];
     hidden var mLabelMi as String = "MI";
+    hidden var mLabelDay as String = "DAY";
+    hidden var mLabelNight as String = "NIGHT";
     hidden var mHijriMonths as Array<String> = [];
     hidden var mHijriSuffix as String = "";
     hidden var mSetLocation as String = "";
@@ -210,6 +212,8 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
                         s(Rez.Strings.Hijri9), s(Rez.Strings.Hijri10), s(Rez.Strings.Hijri11), s(Rez.Strings.Hijri12)];
         mHijriSuffix = s(Rez.Strings.HijriSuffix);
         mLabelMi = s(Rez.Strings.LabelMi);
+        mLabelDay = s(Rez.Strings.LabelDay);
+        mLabelNight = s(Rez.Strings.LabelNight);
         mSetLocation = s(Rez.Strings.SetLocation);
         mSetLocation2 = s(Rez.Strings.SetLocation2);
     }
@@ -478,15 +482,27 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
                         h[2].toString() + " " + mHijriMonths[h[1] - 1] + " " + h[0].toString() + " " + mHijriSuffix, vc);
         }
 
+        // prayers first: they bring the schedule up to date for the daylight ring
+        drawPrayers(dc, now, clock);
+
         // gauges
         var info = ActivityMonitor.getInfo();
+        var battGauge = false;
         for (var g = 0; g < 4; g++) {
             var gc = gaugeCentre(g);
-            drawGauge(dc, gc[0], gc[1], mSettings.gauges[g], info);
+            var src = mSettings.gauges[g];
+            if (src == DataFields.SUN_RING) {
+                drawSunRing(dc, gc[0], gc[1], now, clock);
+            } else {
+                drawGauge(dc, gc[0], gc[1], src, info);
+            }
+            battGauge = battGauge || (src == DataFields.BATTERY);
         }
 
-        drawPrayers(dc, now, clock);
         drawAyah(dc, now, clock);
+        if (!battGauge) {
+            drawBatteryLine(dc);
+        }
         drawHourMinuteHands(dc, clock);
     }
 
@@ -554,6 +570,111 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         dc.setColor(color, Graphics.COLOR_TRANSPARENT);
         dc.drawText(x, y + p(isBatt ? Layout.GAUGE_BATT_LABEL_DY : Layout.GAUGE_LABEL_DY), mFontXS, label,
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+    }
+
+    // 24 h daylight / darkness ring in a gauge: noon at the top, midnight at the bottom. Darkness
+    // (Isha -> Fajr), twilight (Fajr -> sunrise, sunset -> Isha) and daylight (sunrise -> sunset);
+    // a white dot marks the current time. Centre: time left until sunset (day) or sunrise (night).
+    hidden function drawSunRing(dc as Graphics.Dc, x as Number, y as Number, now as Number,
+                                clock as System.ClockTime) as Void {
+        var vc = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
+        var sch = mSchedule;
+        var riseM = sch.minutes(0, PrayerTimes.SUNRISE);
+        var setM = sch.minutes(0, PrayerTimes.SUNSET);
+        if (!mSettings.locationSet || riseM == null || setM == null) {
+            dc.setColor(mColors[Themes.DIM], Graphics.COLOR_TRANSPARENT);
+            dc.drawText(x, y + p(Layout.GAUGE_VALUE_DY), mFontM, "--", vc);
+            return;
+        }
+        var rise = riseM as Number;
+        var sunset = setM as Number;
+        var fajrM = sch.minutes(0, PrayerTimes.FAJR);
+        var ishaM = sch.minutes(0, PrayerTimes.ISHA);
+        var fajr = (fajrM == null) ? rise : fajrM as Number;
+        var isha = (ishaM == null) ? sunset : ishaM as Number;
+        var r = p(Layout.GAUGE_R);
+        dc.setPenWidth(pen(Layout.GAUGE_PEN));
+        sunArc(dc, x, y, r, isha, fajr + 1440, Themes.SUN_NIGHT);
+        sunArc(dc, x, y, r, fajr, rise, Themes.SUN_TWILIGHT);
+        sunArc(dc, x, y, r, rise, sunset, Themes.SUN_DAY);
+        sunArc(dc, x, y, r, sunset, isha, Themes.SUN_TWILIGHT);
+        dc.setPenWidth(1);
+
+        var offset = mSettings.tzManual ? mSettings.utcOffsetSeconds : clock.timeZoneOffset;
+        var nowMin = (((now.toLong() + offset) % 86400 + 86400) % 86400).toNumber() / 60;
+        var a = (nowMin - 720) * Math.PI / 720.0;
+        var mx = x + (r * Math.sin(a)).toNumber();
+        var my = y - (r * Math.cos(a)).toNumber();
+        dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_TRANSPARENT);
+        dc.fillCircle(mx, my, p(4));
+        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+        dc.fillCircle(mx, my, p(3));
+
+        var day = (nowMin >= rise && nowMin < sunset);
+        var target = day ? sch.momentOf(0, PrayerTimes.SUNSET)
+                         : sch.momentOf(nowMin >= sunset ? 1 : 0, PrayerTimes.SUNRISE);
+        var col = day ? Themes.SUN_DAY : Themes.SUN_NIGHT_TEXT;
+        var ix = x;
+        var iy = y + p(Layout.GAUGE_ICON_DY);
+        dc.setColor(col, Graphics.COLOR_TRANSPARENT);
+        if (day) {
+            dc.fillCircle(ix, iy, p(3));
+            dc.setPenWidth(1);
+            for (var k = 0; k < 8; k++) {
+                var ra = k * Math.PI / 4.0;
+                dc.drawLine(ix + (p(5) * Math.cos(ra)).toNumber(), iy + (p(5) * Math.sin(ra)).toNumber(),
+                            ix + (p(6) * Math.cos(ra)).toNumber(), iy + (p(6) * Math.sin(ra)).toNumber());
+            }
+        } else {
+            dc.fillCircle(ix, iy, p(5));
+            dc.setColor(mColors[Themes.PLATE], Graphics.COLOR_TRANSPARENT);
+            dc.fillCircle(ix + p(2), iy - p(2), p(4));
+        }
+        var value = (target == null) ? "--" : countdown(((target as Long) - now).toNumber());
+        var font = mFontM;
+        if (dc.getTextWidthInPixels(value, font) > 2 * (r - 2) - 4) {
+            font = mFontS;
+        }
+        dc.setColor(mText, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(x, y + p(Layout.GAUGE_VALUE_DY), font, value, vc);
+        dc.setColor(col, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(x, y + p(Layout.GAUGE_LABEL_DY), mFontXS, day ? mLabelDay : mLabelNight, vc);
+    }
+
+    // Clockwise arc of the 24 h ring between two local times in minutes (m1 may exceed 1440).
+    hidden function sunArc(dc as Graphics.Dc, x as Number, y as Number, r as Number, m0 as Number,
+                           m1 as Number, color as Number) as Void {
+        if (m1 - m0 < 4) {
+            return;
+        }
+        dc.setColor(color, Graphics.COLOR_TRANSPARENT);
+        dc.drawArc(x, y, r, Graphics.ARC_CLOCKWISE, ringDeg(m0), ringDeg(m1));
+    }
+
+    // Local time in minutes -> arc degrees (0 = 3 o'clock, counter-clockwise), noon at the top.
+    hidden function ringDeg(m as Number) as Number {
+        var d = (90 - (m - 720) / 4) % 360;
+        return (d < 0) ? d + 360 : d;
+    }
+
+    // Small battery line under the verse (only when no gauge shows the battery).
+    hidden function drawBatteryLine(dc as Graphics.Dc) as Void {
+        var data = DataFields.read(DataFields.BATTERY, null);
+        var pct = (data[1] as Float) * 100.0;
+        var txt = (data[0] as String) + "%";
+        var col = ((data[2] as Number) == 1) ? mColors[Themes.WARN] : mColors[Themes.DIM];
+        var w = dc.getTextWidthInPixels(txt, mFontXS);
+        var x0 = p(140) - (w + p(16)) / 2;
+        var y = p(Layout.BATT_Y);
+        dc.setColor(col, Graphics.COLOR_TRANSPARENT);
+        dc.setPenWidth(1);
+        dc.drawRoundedRectangle(x0, y - p(3), p(11), p(7), 1);
+        dc.fillRectangle(x0 + p(11), y - p(1), p(1) + 1, p(3));
+        var fill = (p(7) * pct / 100.0).toNumber();
+        if (fill > 0) {
+            dc.fillRectangle(x0 + p(2), y - p(1), fill, p(3));
+        }
+        dc.drawText(x0 + p(16) + w / 2, y, mFontXS, txt, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 
     // Icon above the value (about 13 x 12 dial units), in the current colour.
@@ -726,8 +847,8 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     }
 
     // ------------------------------------------------------------------ Ayah
-    // 39 complete verses in 5 fonts of up to 8 (tools/ayat.json): verse glyphs "A".."H" and their
-    // Arabic references "a".."h". The verse changes every hour (rotation over the verses ticked in
+    // 39 complete verses in 5 fonts of up to 8 (tools/ayat.json): verse glyphs "A".."H" (the surah
+    // and verse number are not shown on the dial). The verse changes every hour (rotation over the verses ticked in
     // the settings) unless a fixed verse is chosen.
     hidden function drawAyah(dc as Graphics.Dc, now as Number, clock as System.ClockTime) as Void {
         var st = mSettings;
@@ -739,12 +860,9 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         var font = ayahFont(idx / 8);
         var slot = idx % 8;
         var code = (('A' as Char).toNumber() + slot).toChar().toString();
-        var ref = (('a' as Char).toNumber() + slot).toChar().toString();
         var vc = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
         dc.setColor(mColors[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
         dc.drawText(p(140), p(Layout.AYAH_Y), font, code, vc);
-        dc.setColor(mColors[Themes.DIM], Graphics.COLOR_TRANSPARENT);
-        dc.drawText(p(140), p(Layout.AYAH_REF_Y), font, ref, vc);
     }
 
     // ------------------------------------------------------------------ hands

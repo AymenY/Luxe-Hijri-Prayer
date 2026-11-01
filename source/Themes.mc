@@ -53,6 +53,13 @@ module Themes {
     // Gauge colour per data source (DataFields order), used by MULTICOLOR presets.
     const SOURCE_COLORS = [0x00AAFF, 0xFF0055, 0xFFAA00, 0x00FF55, 0x55FFFF, 0xAAAAFF, 0x00FFAA, 0xFFFF55, 0xFF55FF, 0xAAAAAA];
 
+    // Daylight / darkness ring (full colour; MIP devices map them to their own palette):
+    // daylight (sunrise -> sunset), twilight (Fajr -> sunrise, sunset -> Isha), darkness, night text
+    const SUN_DAY = 0xFFC83A;
+    const SUN_TWILIGHT = 0x8A5BC8;
+    const SUN_NIGHT = 0x3355AA;
+    const SUN_NIGHT_TEXT = 0x9FB8FF;
+
     // User colour choices (settings index - 1). Order must match tools/gen_settings.py.
     const COLOUR_CHOICES = [0xFF0000, 0xFF5500, 0xFFAA00, 0x00FF55, 0x00FFFF, 0x00AAFF, 0xFFFFFF];
     const TEXT_CHOICES = [0xFFFFFF, 0xFFFFAA, 0xFFAA00, 0xAAAAAA, 0xAAFFFF];

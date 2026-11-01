@@ -233,6 +233,14 @@ class PrayerSchedule {
         return PrayerTimes.toMinutes((mDays[dayIndex] as Array)[index]);
     }
 
+    // UTC moment of event `index` on day `dayIndex` (0 = today), or null when undefined.
+    function momentOf(dayIndex as Number, index as Number) as Long? {
+        if (mDays.size() <= dayIndex) {
+            return null;
+        }
+        return PrayerTimes.moment(mDay + dayIndex, (mDays[dayIndex] as Array)[index], mOffset);
+    }
+
     // [prayer index, UTC moment as Long, day index] of the next prayer strictly after
     // `nowUtc`, or null when no prayer can be computed in the next three days.
     function next(nowUtc as Number) as Array? {

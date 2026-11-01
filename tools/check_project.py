@@ -160,7 +160,7 @@ def main():
     expect = {
         "StylePreset": n_presets,
         "Background": len([j for j in res["JsonData"] if j.startswith("Bg")]),
-        "Gauge1": 10, "Gauge2": 10, "Gauge3": 10, "Gauge4": 10, "GaugeColors": 3,
+        "Gauge1": 11, "Gauge2": 11, "Gauge3": 11, "Gauge4": 11, "GaugeColors": 3,
         "HijriCorrection": 5, "HijriScript": 2,
         "AyahMode": 3, "AyahFixed": n_ayat,
         "FontFamily": 3, "HandStyle": 3, "SecondsMode": 3,
@@ -182,9 +182,10 @@ def main():
     body = themes[themes.index("const PRESETS"):themes.index("const MULTICOLOR")]
     if len(re.findall(r"true|false", themes[themes.index("const MULTICOLOR"):themes.index("const SOURCE_COLORS")])) != n_presets:
         errors.append("Themes.MULTICOLOR must have one entry per preset")
-    src_cols = re.findall(r"0x[0-9A-Fa-f]{6}", themes[themes.index("const SOURCE_COLORS"):themes.index("const COLOUR_CHOICES")])
+    i_src = themes.index("const SOURCE_COLORS")
+    src_cols = re.findall(r"0x[0-9A-Fa-f]{6}", themes[i_src:themes.index(";", i_src)])
     if len(src_cols) != 10:
-        errors.append("Themes.SOURCE_COLORS must have one colour per gauge source")
+        errors.append("Themes.SOURCE_COLORS must have one colour per gauge source (0..9; the daylight ring has its own)")
     for c in src_cols:
         c = int(c, 16)
         if any(((c >> sh) & 255) not in {0x00, 0x55, 0xAA, 0xFF} for sh in (16, 8, 0)):
@@ -241,7 +242,7 @@ def main():
         for g in range(n_groups):
             count = min(8, n_ayat - g * 8)
             for i in range(count):
-                for ch in (chr(ord("A") + i), chr(ord("a") + i)):
+                for ch in (chr(ord("A") + i),):
                     if ord(ch) not in cs["ayah%d" % g]:
                         errors.append("%s: ayah%d lacks %r" % (rel(fd), g, ch))
         for f, chars in (("luxe_num", "12369"), ("ar_small", "0123456789ABCDEFGHIJKLM ")):

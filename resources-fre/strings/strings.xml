@@ -49,4 +49,6 @@
     <string id="Hijri12">Dhou al-Hijja</string>
     <string id="HijriSuffix">H</string>
     <string id="LabelActive">MIN</string>
+    <string id="LabelDay">JOUR</string>
+    <string id="LabelNight">NUIT</string>
 </strings>

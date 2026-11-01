@@ -175,36 +175,23 @@ def render_arabic_line(text, size):
 
 def ayah_fits(w, h, L, k):
     """Single line centred on AYAH_Y, inside the Ayah area circle with a 4 px margin (scaled by k)."""
-    # on the smallest screens the 8 px floor of the reference costs one pixel of verse height
-    max_h = L["AYAH_MAX_H"] * k - (1 if k < 0.9 else 0)
+    max_h = L["AYAH_MAX_H"] * k
     if h > max_h or w > L["AYAH_MAX_W"] * k:
         return False
     bottom = (L["AYAH_Y"] - L["CY"]) * k + (h + 1) / 2.0
     return w <= 2 * math.sqrt(max(0.0, ((L["AYAH_AREA_R"] - 4) * k) ** 2 - bottom ** 2))
 
 
-def render_small_arabic(text, size):
-    """Arabic text on a common baseline: (image, yoffset, width) for the small Arabic pieces."""
-    font = amiri(size)
-    ascent, descent = font.getmetrics()
-    bbox = font.getbbox(text, direction="rtl", language="ar", anchor="ls")
-    w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
-    img = arabic_image((w + 2, h + 2), (1 - bbox[0], 1 - bbox[1]), text, size, anchor="ls")
-    return img, ascent + bbox[1] - 1, w, ascent + descent
-
-
 AYAH_GROUP = 8
-AYAH_REF_PX = 10   # at 280 px: surah name and verse number under the verse
 AYAH_MIN_PX = 13   # at 280 px: complete verses below this size are not included
 
 
 def build_ayah_fonts(folder, k, L):
-    """One font per group of 8 verses (Ayah0..Ayah4): verse glyphs "A".."H" (as large as the Ayah
-    area allows) and their Arabic references "a".."h" (surah name and verse number)."""
+    """One font per group of 8 verses (Ayah0..Ayah4): verse glyphs "A".."H", each as large as
+    the Ayah area allows. The surah name and verse number are not shown on the dial."""
     if not features.check("raqm"):
         raise SystemExit("Pillow was built without raqm: Arabic shaping unavailable")
     data = json.load(open(os.path.join(ROOT, "tools", "ayat.json")))
-    ref_px = max(8, int(AYAH_REF_PX * k))
     sizes = {}
     groups = {}
     for a in data["ayat"]:
@@ -223,16 +210,9 @@ def build_ayah_fonts(folder, k, L):
                 raise SystemExit("Ayah %s would be %d px at 280 px (< %d)" % (a["ref"], size, AYAH_MIN_PX))
             verse_imgs.append((a, img))
             sizes[a["ref"]] = {"px": size, "w": img.width, "h": img.height}
-        refs = [(a, render_small_arabic(a["ref_ar"], ref_px)) for a in items]
-        line_h = max([i.height for _, i in verse_imgs] + [r[3] for _, r in refs])
+        line_h = max(i.height for _, i in verse_imgs)
         for a, img in verse_imgs:
             glyphs.append((ord(a["code"]), img, 0, (line_h - img.height) // 2, img.width))
-        for a, (img, yoff, w, lh) in refs:
-            # each reference is shown alone: centre its ink rather than sharing a baseline
-            # (240 px: the 8 px floor leaves no room below, so the reference moves up 1 px)
-            nudge = 1 if 0.8 < k < 0.9 else 0
-            glyphs.append((ord(a["ref_code"]), img, -1, (line_h - img.height) // 2 - nudge, w + 2))
-            sizes[a["ref"]]["ref_w"] = w
         glyphs.append((32, None, 0, 0, 4))
         pack_and_write(folder, "ayah%d" % g, glyphs, line_h, line_h, line_h, "Amiri-Bold (pre-shaped Ayat %d)" % g)
     return sizes

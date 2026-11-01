@@ -66,6 +66,7 @@
     <string id="S_Gauge1_7">Stress</string>
     <string id="S_Gauge1_8">Minutes intensives (semaine)</string>
     <string id="S_Gauge1_9">Aucune (jauge vide)</string>
+    <string id="S_Gauge1_10">Lumière / obscurité (24 h)</string>
     <string id="S_Gauge2">Données : jauge 2 (haut droite)</string>
     <string id="S_Gauge2_0">Pas</string>
     <string id="S_Gauge2_1">Fréquence cardiaque</string>
@@ -77,6 +78,7 @@
     <string id="S_Gauge2_7">Stress</string>
     <string id="S_Gauge2_8">Minutes intensives (semaine)</string>
     <string id="S_Gauge2_9">Aucune (jauge vide)</string>
+    <string id="S_Gauge2_10">Lumière / obscurité (24 h)</string>
     <string id="S_Gauge3">Données : jauge 3 (gauche)</string>
     <string id="S_Gauge3_0">Pas</string>
     <string id="S_Gauge3_1">Fréquence cardiaque</string>
@@ -88,6 +90,7 @@
     <string id="S_Gauge3_7">Stress</string>
     <string id="S_Gauge3_8">Minutes intensives (semaine)</string>
     <string id="S_Gauge3_9">Aucune (jauge vide)</string>
+    <string id="S_Gauge3_10">Lumière / obscurité (24 h)</string>
     <string id="S_Gauge4">Données : jauge 4 (droite)</string>
     <string id="S_Gauge4_0">Pas</string>
     <string id="S_Gauge4_1">Fréquence cardiaque</string>
@@ -99,6 +102,7 @@
     <string id="S_Gauge4_7">Stress</string>
     <string id="S_Gauge4_8">Minutes intensives (semaine)</string>
     <string id="S_Gauge4_9">Aucune (jauge vide)</string>
+    <string id="S_Gauge4_10">Lumière / obscurité (24 h)</string>
     <string id="S_GaugeColors">Données : couleurs des jauges</string>
     <string id="S_GaugeColors_0">Une couleur par type de donnée</string>
     <string id="S_GaugeColors_1">Couleur d&apos;accent</string>

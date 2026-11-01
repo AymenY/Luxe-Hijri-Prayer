@@ -12,8 +12,8 @@ out = ["# Ayah library", "",
        "* Arabic source: %s." % d["source_arabic"],
        "* French translation (documentation only, too small to show on the watch): %s." % d["source_french"],
        "* Every verse is shaped with HarfBuzz (Amiri Bold, SIL OFL) by `tools/build_assets.py` and stored as one glyph "
-       "of the fonts Ayah0..Ayah4 (8 verses per font, only the font of the current verse is loaded). The reference "
-       "under the verse (surah name and verse number) is in Arabic.",
+       "of the fonts Ayah0..Ayah4 (8 verses per font, only the font of the current verse is loaded). The dial shows "
+       "the verse only; the Arabic reference below is for documentation.",
        "* Settings: *Ayah* = hourly rotation over the verses ticked in the settings (default: all), a fixed verse, "
        "or hidden. The rotation changes verse at every full hour.", "",
        "| # | Reference | Arabic | Reference shown | Font px at 218 / 280 / 454 | French (Hamidullah) |",

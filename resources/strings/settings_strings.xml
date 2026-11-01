@@ -66,6 +66,7 @@
     <string id="S_Gauge1_7">Stress</string>
     <string id="S_Gauge1_8">Active minutes (week)</string>
     <string id="S_Gauge1_9">None (empty gauge)</string>
+    <string id="S_Gauge1_10">Daylight / darkness (24 h)</string>
     <string id="S_Gauge2">Data fields: gauge 2 (upper right)</string>
     <string id="S_Gauge2_0">Steps</string>
     <string id="S_Gauge2_1">Heart rate</string>
@@ -77,6 +78,7 @@
     <string id="S_Gauge2_7">Stress</string>
     <string id="S_Gauge2_8">Active minutes (week)</string>
     <string id="S_Gauge2_9">None (empty gauge)</string>
+    <string id="S_Gauge2_10">Daylight / darkness (24 h)</string>
     <string id="S_Gauge3">Data fields: gauge 3 (left)</string>
     <string id="S_Gauge3_0">Steps</string>
     <string id="S_Gauge3_1">Heart rate</string>
@@ -88,6 +90,7 @@
     <string id="S_Gauge3_7">Stress</string>
     <string id="S_Gauge3_8">Active minutes (week)</string>
     <string id="S_Gauge3_9">None (empty gauge)</string>
+    <string id="S_Gauge3_10">Daylight / darkness (24 h)</string>
     <string id="S_Gauge4">Data fields: gauge 4 (right)</string>
     <string id="S_Gauge4_0">Steps</string>
     <string id="S_Gauge4_1">Heart rate</string>
@@ -99,6 +102,7 @@
     <string id="S_Gauge4_7">Stress</string>
     <string id="S_Gauge4_8">Active minutes (week)</string>
     <string id="S_Gauge4_9">None (empty gauge)</string>
+    <string id="S_Gauge4_10">Daylight / darkness (24 h)</string>
     <string id="S_GaugeColors">Data fields: gauge colours</string>
     <string id="S_GaugeColors_0">One colour per data type</string>
     <string id="S_GaugeColors_1">Accent colour</string>

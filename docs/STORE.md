@@ -27,11 +27,10 @@ Islamic geometric art, designed for round Garmin displays (MIP and AMOLED).
 * Next prayer with a live countdown, and the following prayer with its time (Fajr, Dhuhr, Asr, Maghrib, Isha)
 * Sunrise and sunset times
 * Gregorian date and Hijri date in Arabic script, with a −2…+2 day correction
-* Four configurable gauges: steps, heart rate, calories, battery, distance, floors, Body Battery, stress
-* Large battery percentage
+* Four configurable gauges: steps, heart rate, calories, battery, distance, floors, Body Battery, stress, and a 24 h daylight / darkness ring
 * Six style presets: Luxury Blue, Royal Gold, Emerald Night, Burgundy Royale, Ice Silver, Stealth
 * Four backgrounds: mosque and crescent, Islamic geometric pattern, black marble, night sky
-* A complete Quranic verse in Arabic with its reference, changing every hour (39 short verses to choose from), a fixed verse or none
+* A complete Quranic verse in Arabic, changing every hour (39 short verses to choose from), a fixed verse or none
 * Fully customisable: fonts, text, accent and seconds colours, hand styles, gauge sources and colours, Arabic or Latin Hijri date
 * Mosque night scene under a pointed Islamic arch; burn-in safe always-on mode on AMOLED watches
 * 14 calculation methods (Tunisia, MWL, ISNA, Egypt, Umm al-Qura, Karachi, Gulf, Kuwait,
@@ -64,11 +63,10 @@ géométrique islamique, conçu pour les écrans ronds Garmin (MIP et AMOLED).
 * Prochaine prière avec compte à rebours, et la prière suivante avec son heure (Fajr, Dhohr, Asr, Maghrib, Icha)
 * Heures du lever et du coucher du soleil
 * Date grégorienne et date hégirienne en écriture arabe, avec correction de −2 à +2 jours
-* Quatre jauges configurables : pas, fréquence cardiaque, calories, batterie, distance, étages, Body Battery, stress
-* Grand pourcentage de batterie
+* Quatre jauges configurables : pas, fréquence cardiaque, calories, batterie, distance, étages, Body Battery, stress, et un anneau lumière / obscurité sur 24 h
 * Six styles : Luxury Blue, Royal Gold, Emerald Night, Burgundy Royale, Ice Silver, Stealth
 * Quatre arrière-plans : mosquée et croissant, motif géométrique islamique, marbre noir, ciel nocturne
-* Un verset complet du Coran en arabe avec sa référence, qui change chaque heure (39 versets courts au choix), un verset fixe ou aucun
+* Un verset complet du Coran en arabe, qui change chaque heure (39 versets courts au choix), un verset fixe ou aucun
 * Entièrement personnalisable : polices, couleurs du texte, d'accent et de la trotteuse, styles d'aiguilles, données et couleurs des jauges, date hégirienne en arabe ou en latin
 * Scène nocturne de mosquée sous un arc islamique ; mode toujours allumé protégé contre le marquage sur les montres AMOLED
 * 14 méthodes de calcul (Tunisie, Ligue islamique mondiale, ISNA, Égypte, Umm al-Qura, Karachi,
