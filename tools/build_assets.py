@@ -21,7 +21,7 @@ import re
 import shutil
 import sys
 
-from PIL import Image, ImageDraw, ImageFont, features
+from PIL import Image, ImageDraw, ImageFilter, ImageFont, features
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import shapes  # noqa: E402
@@ -136,12 +136,40 @@ def build_latin_font(folder, name, ttf, size, chars, weight=None):
 
 
 # ------------------------------------------------------------------ Ayah glyph font
+# MIP screens (below 360 px): the device palette turns grey anti-aliased edges into a ragged
+# fringe (seen on a real fenix 7X Pro), so Arabic glyphs are drawn crisp instead: rendered at 4x,
+# and thresholded at 38 % coverage, which keeps thin strokes without closing the letter loops.
+CRISP_BELOW = 360
+CRISP = False
+CRISP_SCALE = 4
+CRISP_LEVEL = 96
+CRISP_GROW = 0     # MaxFilter size at 4x (0: no emboldening; 3 closed the letter loops)
+
+
+def amiri(size):
+    return ImageFont.truetype(os.path.join(FONT_SRC, "Amiri-Bold.ttf"), size, layout_engine=ImageFont.Layout.RAQM)
+
+
+def arabic_image(wh, xy, text, size, **kw):
+    """Coverage image (mode L, size wh) of shaped Arabic text drawn at xy."""
+    if not CRISP:
+        img = Image.new("L", wh, 0)
+        ImageDraw.Draw(img).text(xy, text, font=amiri(size), fill=255, direction="rtl", language="ar", **kw)
+        return img
+    s = CRISP_SCALE
+    big = Image.new("L", (wh[0] * s, wh[1] * s), 0)
+    ImageDraw.Draw(big).text((xy[0] * s, xy[1] * s), text, font=amiri(size * s), fill=255, direction="rtl",
+                             language="ar", **kw)
+    if CRISP_GROW:
+        big = big.filter(ImageFilter.MaxFilter(CRISP_GROW))
+    small = big.resize(wh, Image.BOX)
+    return small.point(lambda v: 255 if v >= CRISP_LEVEL else 0)
+
+
 def render_arabic_line(text, size):
-    font = ImageFont.truetype(os.path.join(FONT_SRC, "Amiri-Bold.ttf"), size, layout_engine=ImageFont.Layout.RAQM)
-    bbox = font.getbbox(text, direction="rtl", language="ar")
+    bbox = amiri(size).getbbox(text, direction="rtl", language="ar")
     w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
-    img = Image.new("L", (w + 2, h + 2), 0)
-    ImageDraw.Draw(img).text((1 - bbox[0], 1 - bbox[1]), text, font=font, fill=255, direction="rtl", language="ar")
+    img = arabic_image((w + 2, h + 2), (1 - bbox[0], 1 - bbox[1]), text, size)
     return img.crop(img.getbbox())
 
 
@@ -157,13 +185,11 @@ def ayah_fits(w, h, L, k):
 
 def render_small_arabic(text, size):
     """Arabic text on a common baseline: (image, yoffset, width) for the small Arabic pieces."""
-    font = ImageFont.truetype(os.path.join(FONT_SRC, "Amiri-Bold.ttf"), size, layout_engine=ImageFont.Layout.RAQM)
+    font = amiri(size)
     ascent, descent = font.getmetrics()
     bbox = font.getbbox(text, direction="rtl", language="ar", anchor="ls")
     w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
-    img = Image.new("L", (w + 2, h + 2), 0)
-    ImageDraw.Draw(img).text((1 - bbox[0], 1 - bbox[1]), text, font=font, fill=255, direction="rtl",
-                             language="ar", anchor="ls")
+    img = arabic_image((w + 2, h + 2), (1 - bbox[0], 1 - bbox[1]), text, size, anchor="ls")
     return img, ascent + bbox[1] - 1, w, ascent + descent
 
 
@@ -222,7 +248,7 @@ def build_arabic_small_font(folder, k):
     common baseline."""
     data = json.load(open(os.path.join(ROOT, "tools", "ayat.json")))
     size = max(8, int(AR_SMALL_PX * k))
-    font = ImageFont.truetype(os.path.join(FONT_SRC, "Amiri-Bold.ttf"), size, layout_engine=ImageFont.Layout.RAQM)
+    font = amiri(size)
     ascent, descent = font.getmetrics()
     items = [(str(i), AR_DIGITS[i]) for i in range(10)]
     items += [(chr(ord("A") + i), m) for i, m in enumerate(data["hijri_months_ar"])]
@@ -232,9 +258,7 @@ def build_arabic_small_font(folder, k):
     for code, text in items:
         bbox = font.getbbox(text, direction="rtl", language="ar", anchor="ls")
         w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
-        img = Image.new("L", (w + 2, h + 2), 0)
-        ImageDraw.Draw(img).text((1 - bbox[0], 1 - bbox[1]), text, font=font, fill=255, direction="rtl",
-                                 language="ar", anchor="ls")
+        img = arabic_image((w + 2, h + 2), (1 - bbox[0], 1 - bbox[1]), text, size, anchor="ls")
         glyphs.append((ord(code), img, -1, ascent + bbox[1] - 1, w + (1 if code.isdigit() else 2)))
         widths[code] = w
     glyphs.append((32, None, 0, 0, max(3, int(round(size * 0.3)))))
@@ -252,6 +276,7 @@ def write_fonts_xml(folder):
 
 
 def build_font_sets():
+    global CRISP
     L = layout_consts()
     report = {}
     for size in RESOLUTIONS:
@@ -263,6 +288,7 @@ def build_font_sets():
         for f in os.listdir(folder):
             if f.endswith((".fnt", ".png")):
                 os.remove(os.path.join(folder, f))
+        CRISP = size < CRISP_BELOW
         fonts = [build_latin_font(folder, n, t, max(9, int(s * k)), c, w) for n, t, s, c, w in FONTS]
         ayah = build_ayah_fonts(folder, k, L)
         arabic = build_arabic_small_font(folder, k)

@@ -559,9 +559,9 @@ def legibility_shadows(art):
     """Soft, shapeless shadows under the live texts so they stay readable over the illustration."""
     for (x0, y0, x1, y1, r, alpha) in [
             (112, 44, 168, 100, 8, 0.55),                    # date block
-            (70, 100, 210, 124, 7, 0.55),                    # Hijri date
+            (66, 101, 214, 125, 6, 0.85),                    # Hijri date (darker: busy minarets behind)
             (24, 88, 72, 120, 7, 0.5), (208, 88, 256, 120, 7, 0.5),   # sunrise / sunset
-            (70, 206, 210, L["AYAH_REF_Y"] + 10, 9, 0.6)]:   # Ayah
+            (66, 204, 214, L["AYAH_REF_Y"] + 10, 8, 0.75)]:  # Ayah
         m = art.mask(lambda d, u, b=(x0, y0, x1, y1): d.ellipse([u(b[0]), u(b[1]), u(b[2]), u(b[3])], fill=255))
         art.paint(np.zeros(3), art.blur(m, r), alpha)
 
