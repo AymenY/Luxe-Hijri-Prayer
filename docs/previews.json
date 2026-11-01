@@ -1,0 +1,468 @@
+[
+ {
+  "file": "previews/style-1-luxury-blue.png",
+  "title": "Style Luxury Blue, background Mosque, 280 px",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/style-2-royal-gold.png",
+  "title": "Style Royal Gold, background Mosque, 280 px",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/style-3-emerald-night.png",
+  "title": "Style Emerald Night, background Mosque, 280 px",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/style-4-burgundy-royale.png",
+  "title": "Style Burgundy Royale, background Mosque, 280 px",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/style-5-ice-silver.png",
+  "title": "Style Ice Silver, background Mosque, 280 px",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/style-6-stealth.png",
+  "title": "Style Stealth, background Mosque, 280 px",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/background-mosque-luxury-blue.png",
+  "title": "Background mosque, style Luxury Blue",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/background-mosque-royal-gold.png",
+  "title": "Background mosque, style Royal Gold",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/background-mosque-burgundy-royale.png",
+  "title": "Background mosque, style Burgundy Royale",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/background-geometric-luxury-blue.png",
+  "title": "Background geometric, style Luxury Blue",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/background-geometric-royal-gold.png",
+  "title": "Background geometric, style Royal Gold",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/background-geometric-burgundy-royale.png",
+  "title": "Background geometric, style Burgundy Royale",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/background-marble-luxury-blue.png",
+  "title": "Background marble, style Luxury Blue",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/background-marble-royal-gold.png",
+  "title": "Background marble, style Royal Gold",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/background-marble-burgundy-royale.png",
+  "title": "Background marble, style Burgundy Royale",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/background-night-sky-luxury-blue.png",
+  "title": "Background night-sky, style Luxury Blue",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/background-night-sky-royal-gold.png",
+  "title": "Background night-sky, style Royal Gold",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/background-night-sky-burgundy-royale.png",
+  "title": "Background night-sky, style Burgundy Royale",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/size-218.png",
+  "title": "218 x 218 px (MIP, 64 colours)",
+  "size": 218,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/size-240.png",
+  "title": "240 x 240 px (MIP, 64 colours)",
+  "size": 240,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/size-260.png",
+  "title": "260 x 260 px (MIP, 64 colours)",
+  "size": 260,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/size-280.png",
+  "title": "280 x 280 px (MIP, 64 colours)",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/size-360.png",
+  "title": "360 x 360 px (AMOLED, full colour)",
+  "size": 360,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/size-390.png",
+  "title": "390 x 390 px (AMOLED, full colour)",
+  "size": 390,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/size-416.png",
+  "title": "416 x 416 px (AMOLED, full colour)",
+  "size": 416,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/size-454.png",
+  "title": "454 x 454 px (AMOLED, full colour)",
+  "size": 454,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/aod-390.png",
+  "title": "AMOLED always-on, 390 px",
+  "lit_pixels": "0.7 %"
+ },
+ {
+  "file": "previews/aod-454.png",
+  "title": "AMOLED always-on, 454 px",
+  "lit_pixels": "0.6 %"
+ },
+ {
+  "file": "previews/ayah-01.png",
+  "title": "Verse Al-Fatiha 1:2",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/ayah-05.png",
+  "title": "Verse Taha 20:25",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/ayah-09.png",
+  "title": "Verse Al-Anbiya 21:107",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/ayah-13.png",
+  "title": "Verse Al-Fajr 89:27",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/ayah-17.png",
+  "title": "Verse Ad-Duha 93:5",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/ayah-21.png",
+  "title": "Verse Ash-Sharh 94:7",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/ayah-25.png",
+  "title": "Verse Al-Qadr 97:3",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/ayah-29.png",
+  "title": "Verse Al-Kawthar 108:1",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/ayah-33.png",
+  "title": "Verse Al-Ikhlas 112:2",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/ayah-37.png",
+  "title": "Verse An-Nas 114:1",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/state-low-battery.png",
+  "title": "Battery 9 % (warning colour), steps over goal, heart rate unavailable",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/state-all-sources.png",
+  "title": "Gauges: distance, floors, Body Battery, stress",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/state-missing-sensors.png",
+  "title": "No optional data available",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/state-set-location.png",
+  "title": "Latitude and longitude left at 0/0",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": null
+ },
+ {
+  "file": "previews/state-english-12h.png",
+  "title": "English strings, 12-hour times",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/state-after-isha.png",
+  "title": "After Isha: countdown to tomorrow's Fajr",
+  "size": 280,
+  "local_time": "2026-09-16T22:40:05+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Fajr"
+ },
+ {
+  "file": "previews/state-midnight.png",
+  "title": "00:00:30 local time",
+  "size": 280,
+  "local_time": "2026-09-17T00:00:30+01:00",
+  "hijri": "1448-04-04",
+  "next_prayer": "Fajr"
+ },
+ {
+  "file": "previews/state-hijri-new-year.png",
+  "title": "1 Muharram 1448 (tabular) on 17 June 2026",
+  "size": 280,
+  "local_time": "2026-06-17T09:00:00+01:00",
+  "hijri": "1448-01-01",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/state-hijri-new-year-minus2.png",
+  "title": "Same day with Hijri correction -2",
+  "size": 280,
+  "local_time": "2026-06-17T09:00:00+01:00",
+  "hijri": "1447-12-29",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/state-makkah-ummalqura.png",
+  "title": "Makkah, Umm al-Qura, UTC+3",
+  "size": 280,
+  "local_time": "2026-09-16T16:20:00+03:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Maghrib"
+ },
+ {
+  "file": "previews/state-oslo-no-highlat-rule.png",
+  "title": "Oslo in June, MWL, no high-latitude rule",
+  "size": 280,
+  "local_time": "2026-06-21T21:00:00+02:00",
+  "hijri": "1448-01-05",
+  "next_prayer": "Maghrib"
+ },
+ {
+  "file": "previews/state-ayah-hidden.png",
+  "title": "Ayah hidden",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/state-hijri-latin.png",
+  "title": "Hijri date in Latin script",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/state-empty-gauges.png",
+  "title": "Gauges 3 and 4 set to None, active minutes in gauge 2",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/state-low-power-no-seconds.png",
+  "title": "MIP low power, 'Only after wrist raise': no seconds hand",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/custom-font-modern.png",
+  "title": "Font: Modern",
+  "size": 454,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/custom-font-classic.png",
+  "title": "Font: Classic",
+  "size": 454,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/custom-font-sport.png",
+  "title": "Font: Sport",
+  "size": 454,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/custom-hands-dauphine-rose.png",
+  "title": "Dauphine hands, rose gold, red seconds",
+  "size": 454,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/custom-hands-sword-silver.png",
+  "title": "Sword hands, silver, cyan accent",
+  "size": 454,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/custom-gold-text.png",
+  "title": "Gold text, gauges in accent colour",
+  "size": 454,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ }
+]

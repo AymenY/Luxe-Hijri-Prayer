@@ -1,0 +1,8 @@
+<resources>
+    <!-- Vector geometry of the backgrounds (colour roles, see source/Backgrounds.mc) -->
+    <jsonData id="BgMosque" filename="bg_mosque.json" />
+    <jsonData id="BgGeometric" filename="bg_geometric.json" />
+    <jsonData id="BgMarble" filename="bg_marble.json" />
+    <jsonData id="BgNight" filename="bg_night.json" />
+    <jsonData id="Frame" filename="frame.json" />
+</resources>
