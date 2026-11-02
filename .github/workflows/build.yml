@@ -77,8 +77,6 @@ jobs:
           for d in $(grep -o 'iq:product id="[^"]*"' manifest.xml | sed 's/.*id="\([^"]*\)"/\1/'); do
             connect-iq-sdk-manager device download -d "$d" > /dev/null 2>&1 || missing="$missing $d"
           done
-          # simulator fonts for the screenshot step
-          connect-iq-sdk-manager device download -d fenix7xpro -F > /dev/null 2>&1 || true
           echo "Devices not found in the catalogue:${missing:- none}"
           echo "Installed device files:"
           ls "$HOME/.Garmin/ConnectIQ/Devices" | tr '\n' ' '; echo
@@ -91,23 +89,6 @@ jobs:
       - name: Compile unit tests
         if: always()
         run: tools/ci_build.sh "$RUNNER_TEMP/key.der" tests
-      - name: Simulator screenshot (best effort, fenix7xpro)
-        if: always()
-        continue-on-error: true
-        run: |
-          sudo apt-get update -qq > /dev/null
-          sudo apt-get install -y -qq xvfb imagemagick libwebkit2gtk-4.1-0 > /dev/null 2>&1 || true
-          export DISPLAY=:99
-          Xvfb :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
-          sleep 3
-          (connectiq > bin/logs/simulator.log 2>&1 &)
-          sleep 15
-          (timeout 90 monkeydo bin/LuxeHijriPrayer-fenix7xpro.prg fenix7xpro > bin/logs/monkeydo.log 2>&1 &)
-          sleep 40
-          import -window root bin/sim-fenix7xpro.png
-          convert bin/sim-fenix7xpro.png -quality 85 bin/sim-fenix7xpro.jpg
-          tail -20 bin/logs/simulator.log bin/logs/monkeydo.log || true
-          echo "SIMSHOT_BEGIN"; base64 -w0 bin/sim-fenix7xpro.jpg; echo; echo "SIMSHOT_END"
       - name: Upload builds and logs
         if: always()
         uses: actions/upload-artifact@v4
@@ -115,6 +96,5 @@ jobs:
           name: LuxeHijriPrayer-${{ env.MODE }}-${{ github.sha }}
           path: |
             bin/*.prg
-            bin/sim-*.png
             bin/*.iq
             bin/logs/

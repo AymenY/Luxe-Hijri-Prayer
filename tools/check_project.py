@@ -242,7 +242,7 @@ def main():
         for g in range(n_groups):
             count = min(8, n_ayat - g * 8)
             for i in range(count):
-                for ch in (chr(ord("A") + i),):
+                for ch in [chr(ord("A") + 4 * i + j) for j in range(4)]:
                     if ord(ch) not in cs["ayah%d" % g]:
                         errors.append("%s: ayah%d lacks %r" % (rel(fd), g, ch))
         for f, chars in (("luxe_num", "12369"), ("ar_small", "0123456789ABCDEFGHIJKLM ")):

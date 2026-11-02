@@ -183,12 +183,13 @@ def ayah_fits(w, h, L, k):
 
 
 AYAH_GROUP = 8
+AYAH_SLICES = 4    # glyphs per verse: codes "A" + 4 * slot + 0..3 (see LuxeHijriPrayerView.drawAyah)
 AYAH_MIN_PX = 13   # at 280 px: complete verses below this size are not included
 
 
 def build_ayah_fonts(folder, k, L):
-    """One font per group of 8 verses (Ayah0..Ayah4): verse glyphs "A".."H", each as large as
-    the Ayah area allows. The surah name and verse number are not shown on the dial."""
+    """One font per group of 8 verses (Ayah0..Ayah4): each verse, as large as the Ayah area
+    allows, is cut into AYAH_SLICES adjacent glyphs. The surah name and verse number are not shown on the dial."""
     if not features.check("raqm"):
         raise SystemExit("Pillow was built without raqm: Arabic shaping unavailable")
     data = json.load(open(os.path.join(ROOT, "tools", "ayat.json")))
@@ -211,8 +212,13 @@ def build_ayah_fonts(folder, k, L):
             verse_imgs.append((a, img))
             sizes[a["ref"]] = {"px": size, "w": img.width, "h": img.height}
         line_h = max(i.height for _, i in verse_imgs)
-        for a, img in verse_imgs:
-            glyphs.append((ord(a["code"]), img, 0, (line_h - img.height) // 2, img.width))
+        for slot, (a, img) in enumerate(verse_imgs):
+            # AYAH_SLICES adjacent glyphs per verse: on a real fenix 7X Pro a single crisp glyph
+            # about 100 px wide was drawn on two staggered rows, while narrow glyphs were fine
+            for j in range(AYAH_SLICES):
+                x0, x1 = img.width * j // AYAH_SLICES, img.width * (j + 1) // AYAH_SLICES
+                glyphs.append((ord("A") + AYAH_SLICES * slot + j, img.crop((x0, 0, x1, img.height)), 0,
+                               (line_h - img.height) // 2, x1 - x0))
         glyphs.append((32, None, 0, 0, 4))
         pack_and_write(folder, "ayah%d" % g, glyphs, line_h, line_h, line_h, "Amiri-Bold (pre-shaped Ayat %d)" % g)
     return sizes

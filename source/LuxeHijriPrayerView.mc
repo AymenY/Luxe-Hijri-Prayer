@@ -847,8 +847,8 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     }
 
     // ------------------------------------------------------------------ Ayah
-    // 39 complete verses in 5 fonts of up to 8 (tools/ayat.json): verse glyphs "A".."H" (the surah
-    // and verse number are not shown on the dial). The verse changes every hour (rotation over the verses ticked in
+    // 39 complete verses in 5 fonts of up to 8 (tools/ayat.json), each drawn as 4 adjacent glyphs
+    // (the surah and verse number are not shown on the dial). The verse changes every hour (rotation over the verses ticked in
     // the settings) unless a fixed verse is chosen.
     hidden function drawAyah(dc as Graphics.Dc, now as Number, clock as System.ClockTime) as Void {
         var st = mSettings;
@@ -859,7 +859,10 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         }
         var font = ayahFont(idx / 8);
         var slot = idx % 8;
-        var code = (('A' as Char).toNumber() + slot).toChar().toString();
+        // each verse is 4 adjacent glyphs (tools/build_assets.py, AYAH_SLICES)
+        var first = ('A' as Char).toNumber() + 4 * slot;
+        var code = first.toChar().toString() + (first + 1).toChar().toString()
+                   + (first + 2).toChar().toString() + (first + 3).toChar().toString();
         var vc = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
         dc.setColor(mColors[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
         dc.drawText(p(140), p(Layout.AYAH_Y), font, code, vc);

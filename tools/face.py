@@ -751,7 +751,8 @@ class Face:
         if idx >= 0:
             fa = font("ayah%d" % (idx // 8), self.size)
             dc.setColor(c[T["GOLD"]], -1)
-            dc.drawText(p(140), p(L.AYAH_Y), fa, chr(ord("A") + idx % 8), CENTER | VCENTER)
+            dc.drawText(p(140), p(L.AYAH_Y), fa, "".join(chr(ord("A") + 4 * (idx % 8) + j) for j in range(4)),
+                        CENTER | VCENTER)
         if 3 not in g:
             self.battery_line(dc, sensors)
         # hands
