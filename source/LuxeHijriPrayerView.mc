@@ -433,7 +433,6 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     // ------------------------------------------------------------------ static layer
     hidden function drawStaticLayer(dc as Graphics.Dc) as Void {
         var c = mColors;
-        var vc = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
         dc.setColor(c[Themes.BG], c[Themes.BG]);
         dc.clear();
         var bg = mBgOps;
