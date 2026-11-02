@@ -245,7 +245,7 @@ def main():
                 for ch in [chr(ord("A") + 4 * i + j) for j in range(4)]:
                     if ord(ch) not in cs["ayah%d" % g]:
                         errors.append("%s: ayah%d lacks %r" % (rel(fd), g, ch))
-        for f, chars in (("luxe_num", "12369"), ("ar_small", "0123456789ABCDEFGHIJKLM ")):
+        for f, chars in (("luxe_num", "12369"), ("ar_small", "0123456789ABCDEFGHIJKLM abcdefghij")):
             for ch in chars:
                 if ord(ch) not in cs[f]:
                     errors.append("%s: %s lacks %r" % (rel(fd), f, ch))
@@ -253,6 +253,7 @@ def main():
 
     # ---- HD dials: 24 per screen size (style x background), same ids in every folder
     dial_ids = {"Dial%d%d" % (st, bg) for st in range(n_presets) for bg in range(4)}
+    dial_ids |= {"Num%d%d%d" % (st, d, q) for st in range(n_presets) for d in range(2) for q in range(4)}
     for dd in [os.path.join(ROOT, "resources", "drawables")] + sorted(glob.glob(os.path.join(ROOT, "resources-round-*", "drawables"))):
         xml = os.path.join(dd, "drawables.xml")
         if not os.path.exists(xml):

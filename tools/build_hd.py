@@ -33,7 +33,24 @@ def fname(size, s, b):
     return "dial_%d_%d.jpg" % (s, b)
 
 
+def num_name(s, d, q):
+    return "num_%d_%d_%d.png" % (s, d, q)
+
+
+def sprite_job(args):
+    """Numeral bitmaps (12 / 3 / 6 / 9, Arabic and Indian digits) of one style."""
+    size, s = args
+    total = 0
+    for (d, q), img in render_hd.numeral_sprites(size, s).items():
+        path = os.path.join(folder(size), num_name(s, d, q))
+        img.save(path, optimize=True)
+        total += os.path.getsize(path)
+    return os.path.join(folder(size), num_name(s, 0, 0)), total
+
+
 def job(args):
+    if len(args) == 2:
+        return sprite_job(args)
     size, s, b = args
     img = render_hd.render(size, s, BGS[b])
     path = os.path.join(folder(size), fname(size, s, b))
@@ -54,6 +71,12 @@ def write_xml(size):
             else:
                 lines.append('    <bitmap id="Dial%d%d" filename="%s" dithering="floyd_steinberg" />'
                              % (s, b, fname(size, s, b)))
+    lines.append("    <!-- numerals 12 / 3 / 6 / 9: NumSDQ = style S, digits D (0 Arabic, 1 Indian), position Q -->")
+    for s in range(NSTYLES):
+        for d in range(2):
+            for q in range(4):
+                extra = '' if amoled else ' dithering="floyd_steinberg"'
+                lines.append('    <bitmap id="Num%d%d%d" filename="%s"%s />' % (s, d, q, num_name(s, d, q), extra))
     lines.append("</drawables>")
     with open(os.path.join(folder(size), "drawables.xml"), "w") as fh:
         fh.write("\n".join(lines) + "\n")
@@ -64,10 +87,11 @@ def main():
     for size in sizes:
         os.makedirs(folder(size), exist_ok=True)
         for f in os.listdir(folder(size)):
-            if f.startswith("dial_"):
+            if f.startswith(("dial_", "num_")):
                 os.remove(os.path.join(folder(size), f))
         write_xml(size)
     jobs = [(size, s, b) for size in sizes for s in range(NSTYLES) for b in range(len(BGS))]
+    jobs += [(size, s) for size in sizes for s in range(NSTYLES)]
     total = {}
     with mp.Pool(4) as pool:
         for path, n in pool.imap_unordered(job, jobs):
@@ -75,7 +99,7 @@ def main():
             total[size] = total.get(size, 0) + n
             print("%6d KB  %s" % (n // 1024, os.path.relpath(path, ROOT)), flush=True)
     for size in sorted(total):
-        print("%d px: %d KB for %d dials" % (size, total[size] // 1024, NSTYLES * len(BGS)))
+        print("%d px: %d KB for %d dials and their numerals" % (size, total[size] // 1024, NSTYLES * len(BGS)))
 
 
 if __name__ == "__main__":

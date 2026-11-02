@@ -402,7 +402,7 @@ def rot(pts, a):
     return [(140 + x * cs - y * sn, 140 + x * sn + y * cs) for x, y in pts]
 
 
-def indices_and_numerals(art, st):
+def indices(art, st):
     metal = art.metal(0, 280, st["metal"])
     dark = hexc(st["metal"][2])
     left, right = [], []
@@ -417,17 +417,58 @@ def indices_and_numerals(art, st):
     art.paint(np.zeros(3), art.blur(np.roll(whole, (SS, SS), (0, 1)), 1.0), 0.7)
     art.paint(metal, art.mask(lambda d, u: [poly(d, u, p, fill=255) for p in left]))
     art.paint(metal * 0.55 + dark * 0.45, art.mask(lambda d, u: [poly(d, u, p, fill=255) for p in right]))
-    # numerals
-    font = ImageFont.truetype(os.path.join(FONT_SRC, "BarlowSemiCondensed-Bold.ttf"), int(art.u(27)))
-    for txt, a in (("12", 0), ("3", 90), ("6", 180), ("9", 270)):
-        cx = 140 + L["NUM_R"] * math.sin(math.radians(a))
-        cy = 140 - L["NUM_R"] * math.cos(math.radians(a))
-        m = art.mask(lambda d, u, txt=txt, cx=cx, cy=cy: d.text((u(cx), u(cy)), txt, font=font, fill=255, anchor="mm"))
-        art.paint(np.zeros(3), art.blur(np.roll(m, (SS, SS), (0, 1)), 1.2), 0.8)
-        art.add(hexc(st["metal"][0]) * 0.25, art.blur(m, 2.0), 0.7)
-        art.paint(art.metal(cy - 11, cy + 11, st["metal"]), m)
-        hi = np.clip(m - np.roll(m, SS, 0), 0, 1)
-        art.add(np.ones(3) * 0.35, hi, 1.0)
+
+
+# 12 / 3 / 6 / 9 in Arabic (Western) and Indian (Eastern Arabic) digits; drawn by the watch over the
+# dial as small bitmaps so the user can choose the digits (Settings: DialDigits)
+NUMERALS = [("12", "\u0661\u0662", 0), ("3", "\u0663", 90), ("6", "\u0666", 180), ("9", "\u0669", 270)]
+SPRITE_HALF = 18   # half size of a numeral bitmap, dial units
+
+
+def numeral_font(art, indian):
+    if not indian:
+        return ImageFont.truetype(os.path.join(FONT_SRC, "BarlowSemiCondensed-Bold.ttf"), int(art.u(27)))
+    # Amiri digits are small for their em size: match the height of the Western "12"
+    ref = ImageFont.truetype(os.path.join(FONT_SRC, "BarlowSemiCondensed-Bold.ttf"), 270).getbbox("12")
+    size = 270
+    f = ImageFont.truetype(os.path.join(FONT_SRC, "Amiri-Bold.ttf"), size)
+    b = f.getbbox("\u0662\u0663")
+    scale = (ref[3] - ref[1]) / float(b[3] - b[1])
+    return ImageFont.truetype(os.path.join(FONT_SRC, "Amiri-Bold.ttf"), int(art.u(27 * scale * 1.1)))
+
+
+def numeral_sprites(size, style_index):
+    """{(indian, q): RGBA image} of the bevelled metal numerals, centred on their dial position."""
+    st = STYLES[style_index]
+    art = Art(size)
+    dark = hexc(st["metal"][2]) * 0.35
+    out = {}
+    for indian in (0, 1):
+        font = numeral_font(art, indian)
+        for q, (west, east, a) in enumerate(NUMERALS):
+            txt = east if indian else west
+            cx = 140 + L["NUM_R"] * math.sin(math.radians(a))
+            cy = 140 - L["NUM_R"] * math.cos(math.radians(a))
+            # Amiri strokes are thin: thicken the Indian digits with an outline of the same colour
+            sw = int(art.u(0.9)) if indian else 0
+            m = art.mask(lambda d, u, t=txt, cx=cx, cy=cy: d.text((u(cx), u(cy)), t, font=font, fill=255, anchor="mm",
+                                                                  stroke_width=sw, stroke_fill=255))
+            shadow = np.clip(np.roll(m, (SS, SS), (0, 1)) - m, 0, 1)
+            body = art.metal(cy - 11, cy + 11, st["metal"])
+            hi = np.clip(m - np.roll(m, SS, 0), 0, 1)
+            body = np.clip(body + hi[..., None] * 0.35, 0, 1)
+            alpha = np.clip(m + shadow, 0, 1)
+            rgb = (body * m[..., None] + dark * shadow[..., None]) / np.maximum(alpha, 1e-6)[..., None]
+            rgba = np.dstack([np.clip(rgb, 0, 1), alpha])
+            img = Image.fromarray((rgba * 255).astype(np.uint8), "RGBA").resize((size, size), Image.LANCZOS)
+            k = size / 280.0
+            half = int(math.ceil(SPRITE_HALF * k))
+            px, py = int(math.floor(cx * k + 0.5)), int(math.floor(cy * k + 0.5))
+            spr = img.crop((px - half, py - half, px + half, py + half))
+            a_ch = spr.split()[3].point(lambda v: 255 if v >= 128 else 0)   # 1-bit transparency
+            spr.putalpha(a_ch)
+            out[(indian, q)] = spr
+    return out
 
 
 def gauge_recesses(art, st):
@@ -582,7 +623,7 @@ def render(size, style_index, bg):
     chapter_ring(art, st)
     gauge_recesses(art, st)
     cartouches(art, st)
-    indices_and_numerals(art, st)
+    indices(art, st)
     fixed_icons(art, st, hub_diamond=(bg != "mosque"))
     # outside the round display: black
     outside = art.mask(lambda d, u: circle(d, u, 140, 140, 140, fill=255))

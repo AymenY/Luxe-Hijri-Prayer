@@ -22,7 +22,13 @@ class LuxeHijriPrayerApp extends Application.AppBase {
         return [view, new LuxeHijriPrayerDelegate(view)];
     }
 
-    // Called when the user saves settings in the Connect IQ / Garmin Connect app.
+    // On-watch settings (watch face menu): see SettingsMenu.mc.
+    function getSettingsView() {
+        return [SettingsMenu.root(), new LuxeRootDelegate()];
+    }
+
+    // Called when the user saves settings in the Connect IQ / Garmin Connect app, and by the
+    // on-watch settings menu after each change.
     function onSettingsChanged() as Void {
         var view = mView;
         if (view != null) {

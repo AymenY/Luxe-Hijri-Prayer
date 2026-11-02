@@ -52,14 +52,23 @@ Not reproduced from the concept: photographic glow and reflections (vector art i
 French translation under the verse (≈6 px at watch size; kept in [`docs/AYAT.md`](docs/AYAT.md)),
 and the “GARMIN fēnix” wordmark (Garmin trademark; replaced by a crescent).
 
-## Settings (Garmin Connect app → watch face → Settings)
+## Settings
 
-Everything is customisable; the settings are generated from `tools/gen_settings.py` (English and French).
+Everything is customisable, in two places that share the same values:
+
+* **on the watch**: hold the menu button on the watch face → *Watch face* → *Settings* (or
+  *Customise*), then *Appearance*, *Complications*, *Date & verse*, *Prayers*, *Location*. This
+  also works for a sideloaded `.prg`. *Location → Use current position* stores the last GPS
+  position known to the watch (start any GPS activity once if none is available).
+* **in the Garmin Connect app** (watch face → Settings), for an app installed from the Store.
+
+The settings and the watch menu are generated from `tools/gen_settings.py` (English and French).
 
 | Group | Setting | Choices (default first) |
 |---|---|---|
 | Appearance | Style | Luxury Blue, Royal Gold, Emerald Night, Burgundy Royale, Ice Silver, Stealth |
 | Appearance | Background | Mosque at night (illustration), Islamic geometric pattern, Black marble, Night sky |
+| Appearance | Dial numerals | Arabic (12 3 6 9), Indian (Eastern Arabic) |
 | Appearance | Font | Modern (Barlow), Classic (Cinzel + Barlow), Sport (Rajdhani) |
 | Appearance | Text colour | Preset, white, cream, gold, silver, ice blue |
 | Appearance | Accent colour (countdown, gauges) | Preset, red, orange, gold, green, cyan, blue, white |
@@ -67,7 +76,7 @@ Everything is customisable; the settings are generated from `tools/gen_settings.
 | Appearance | Seconds hand / colour | Always, only after wrist raise, hidden / preset + 7 colours |
 | Data fields | Gauges 1–4 | Steps, heart rate, calories, battery, distance, floors, Body Battery, stress, active minutes (week), none, daylight / darkness (24 h); default steps, heart rate, calories, daylight |
 | Data fields | Gauge colours | One colour per data type, accent colour, text colour |
-| Faith & calendar | Hijri date script / correction | Arabic, Latin / −2…+2 days (0) |
+| Faith & calendar | Hijri date script / digits / correction | Arabic, Latin / Indian, Arabic digits / −2…+2 days (0) |
 | Faith & calendar | Ayah | Hourly rotation (ticked verses), fixed verse, hidden |
 | Faith & calendar | Fixed verse + 39 “Rotation” check boxes | Ash-Sharh 94:5; all ticked |
 | Faith & calendar | Prayer method, Asr, high-latitude rule | Tunisia 18°/18°, standard, middle of the night |

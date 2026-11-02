@@ -3,7 +3,14 @@
 All dates 2026-10-29. Nothing has been compiled with the Connect IQ SDK yet; see
 `docs/RELEASE_CHECKLIST.md`.
 
-## Unreleased — preview 0.5 (after the first test on a fēnix 7X Pro)
+## Unreleased — preview 0.6
+* On-watch settings menu (watch face → Settings): every setting, verse check boxes, and the
+  prayer location from the watch's last GPS position — works for sideloaded builds.
+* Dial numerals in Arabic (12 3 6 9) or Indian (Eastern Arabic) digits, drawn as HD bitmaps.
+* Hijri date (Arabic script) with Indian or Arabic digits.
+* The verse is drawn as 4 adjacent glyphs (a wide crisp glyph was split on the watch).
+
+## Preview 0.5 (after the first test on a fēnix 7X Pro)
 * Daylight / darkness ring (24 h) as a gauge source, default for gauge 4 (replaces the battery
   gauge); small battery line under the verse when no gauge shows the battery.
 * Verse without surah name and verse number.

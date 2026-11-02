@@ -24,4 +24,53 @@
     <bitmap id="Dial51" filename="dial_5_1.jpg" dithering="floyd_steinberg" />
     <bitmap id="Dial52" filename="dial_5_2.jpg" dithering="floyd_steinberg" />
     <bitmap id="Dial53" filename="dial_5_3.jpg" dithering="floyd_steinberg" />
+    <!-- numerals 12 / 3 / 6 / 9: NumSDQ = style S, digits D (0 Arabic, 1 Indian), position Q -->
+    <bitmap id="Num000" filename="num_0_0_0.png" dithering="floyd_steinberg" />
+    <bitmap id="Num001" filename="num_0_0_1.png" dithering="floyd_steinberg" />
+    <bitmap id="Num002" filename="num_0_0_2.png" dithering="floyd_steinberg" />
+    <bitmap id="Num003" filename="num_0_0_3.png" dithering="floyd_steinberg" />
+    <bitmap id="Num010" filename="num_0_1_0.png" dithering="floyd_steinberg" />
+    <bitmap id="Num011" filename="num_0_1_1.png" dithering="floyd_steinberg" />
+    <bitmap id="Num012" filename="num_0_1_2.png" dithering="floyd_steinberg" />
+    <bitmap id="Num013" filename="num_0_1_3.png" dithering="floyd_steinberg" />
+    <bitmap id="Num100" filename="num_1_0_0.png" dithering="floyd_steinberg" />
+    <bitmap id="Num101" filename="num_1_0_1.png" dithering="floyd_steinberg" />
+    <bitmap id="Num102" filename="num_1_0_2.png" dithering="floyd_steinberg" />
+    <bitmap id="Num103" filename="num_1_0_3.png" dithering="floyd_steinberg" />
+    <bitmap id="Num110" filename="num_1_1_0.png" dithering="floyd_steinberg" />
+    <bitmap id="Num111" filename="num_1_1_1.png" dithering="floyd_steinberg" />
+    <bitmap id="Num112" filename="num_1_1_2.png" dithering="floyd_steinberg" />
+    <bitmap id="Num113" filename="num_1_1_3.png" dithering="floyd_steinberg" />
+    <bitmap id="Num200" filename="num_2_0_0.png" dithering="floyd_steinberg" />
+    <bitmap id="Num201" filename="num_2_0_1.png" dithering="floyd_steinberg" />
+    <bitmap id="Num202" filename="num_2_0_2.png" dithering="floyd_steinberg" />
+    <bitmap id="Num203" filename="num_2_0_3.png" dithering="floyd_steinberg" />
+    <bitmap id="Num210" filename="num_2_1_0.png" dithering="floyd_steinberg" />
+    <bitmap id="Num211" filename="num_2_1_1.png" dithering="floyd_steinberg" />
+    <bitmap id="Num212" filename="num_2_1_2.png" dithering="floyd_steinberg" />
+    <bitmap id="Num213" filename="num_2_1_3.png" dithering="floyd_steinberg" />
+    <bitmap id="Num300" filename="num_3_0_0.png" dithering="floyd_steinberg" />
+    <bitmap id="Num301" filename="num_3_0_1.png" dithering="floyd_steinberg" />
+    <bitmap id="Num302" filename="num_3_0_2.png" dithering="floyd_steinberg" />
+    <bitmap id="Num303" filename="num_3_0_3.png" dithering="floyd_steinberg" />
+    <bitmap id="Num310" filename="num_3_1_0.png" dithering="floyd_steinberg" />
+    <bitmap id="Num311" filename="num_3_1_1.png" dithering="floyd_steinberg" />
+    <bitmap id="Num312" filename="num_3_1_2.png" dithering="floyd_steinberg" />
+    <bitmap id="Num313" filename="num_3_1_3.png" dithering="floyd_steinberg" />
+    <bitmap id="Num400" filename="num_4_0_0.png" dithering="floyd_steinberg" />
+    <bitmap id="Num401" filename="num_4_0_1.png" dithering="floyd_steinberg" />
+    <bitmap id="Num402" filename="num_4_0_2.png" dithering="floyd_steinberg" />
+    <bitmap id="Num403" filename="num_4_0_3.png" dithering="floyd_steinberg" />
+    <bitmap id="Num410" filename="num_4_1_0.png" dithering="floyd_steinberg" />
+    <bitmap id="Num411" filename="num_4_1_1.png" dithering="floyd_steinberg" />
+    <bitmap id="Num412" filename="num_4_1_2.png" dithering="floyd_steinberg" />
+    <bitmap id="Num413" filename="num_4_1_3.png" dithering="floyd_steinberg" />
+    <bitmap id="Num500" filename="num_5_0_0.png" dithering="floyd_steinberg" />
+    <bitmap id="Num501" filename="num_5_0_1.png" dithering="floyd_steinberg" />
+    <bitmap id="Num502" filename="num_5_0_2.png" dithering="floyd_steinberg" />
+    <bitmap id="Num503" filename="num_5_0_3.png" dithering="floyd_steinberg" />
+    <bitmap id="Num510" filename="num_5_1_0.png" dithering="floyd_steinberg" />
+    <bitmap id="Num511" filename="num_5_1_1.png" dithering="floyd_steinberg" />
+    <bitmap id="Num512" filename="num_5_1_2.png" dithering="floyd_steinberg" />
+    <bitmap id="Num513" filename="num_5_1_3.png" dithering="floyd_steinberg" />
 </drawables>

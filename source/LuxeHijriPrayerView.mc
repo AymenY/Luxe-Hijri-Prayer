@@ -36,6 +36,7 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     hidden var mBgOps as Array? = null;
     hidden var mFrameOps as Array? = null;
     hidden var mDial = null;        // HD static layer (BitmapResource) or null
+    hidden var mNums = null;        // the four numeral bitmaps (12, 3, 6, 9) of the HD dial, or null
 
     hidden var mFontNum;
     hidden var mFontL;
@@ -131,7 +132,9 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         }
         loadFonts();
         mDial = null;
+        mNums = null;
         mDial = loadDial(mSettings.preset, mSettings.background);
+        mNums = loadNumerals(mSettings.preset, mSettings.dialDigits);
         if (mDial == null) {
             mBgOps = Backgrounds.load(mSettings.background);
             mFrameOps = Backgrounds.loadFrame();
@@ -157,6 +160,51 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
             return WatchUi.loadResource(ids[st * 4 + bg]);
         } catch (e) {
             return null;
+        }
+    }
+
+    // Numerals 12 / 3 / 6 / 9 of style st in Arabic (d = 0) or Indian (d = 1) digits; null on failure.
+    hidden function loadNumerals(st as Number, d as Number) {
+        var ids = [Rez.Drawables.Num000, Rez.Drawables.Num001, Rez.Drawables.Num002, Rez.Drawables.Num003,
+                   Rez.Drawables.Num010, Rez.Drawables.Num011, Rez.Drawables.Num012, Rez.Drawables.Num013,
+                   Rez.Drawables.Num100, Rez.Drawables.Num101, Rez.Drawables.Num102, Rez.Drawables.Num103,
+                   Rez.Drawables.Num110, Rez.Drawables.Num111, Rez.Drawables.Num112, Rez.Drawables.Num113,
+                   Rez.Drawables.Num200, Rez.Drawables.Num201, Rez.Drawables.Num202, Rez.Drawables.Num203,
+                   Rez.Drawables.Num210, Rez.Drawables.Num211, Rez.Drawables.Num212, Rez.Drawables.Num213,
+                   Rez.Drawables.Num300, Rez.Drawables.Num301, Rez.Drawables.Num302, Rez.Drawables.Num303,
+                   Rez.Drawables.Num310, Rez.Drawables.Num311, Rez.Drawables.Num312, Rez.Drawables.Num313,
+                   Rez.Drawables.Num400, Rez.Drawables.Num401, Rez.Drawables.Num402, Rez.Drawables.Num403,
+                   Rez.Drawables.Num410, Rez.Drawables.Num411, Rez.Drawables.Num412, Rez.Drawables.Num413,
+                   Rez.Drawables.Num500, Rez.Drawables.Num501, Rez.Drawables.Num502, Rez.Drawables.Num503,
+                   Rez.Drawables.Num510, Rez.Drawables.Num511, Rez.Drawables.Num512, Rez.Drawables.Num513];
+        try {
+            var out = [];
+            for (var q = 0; q < 4; q++) {
+                out.add(WatchUi.loadResource(ids[(st * 2 + d) * 4 + q]));
+            }
+            return out;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    // Numerals: HD bitmaps centred on their position, or the vector font (Arabic digits).
+    hidden function drawNumerals(dc as Graphics.Dc) as Void {
+        var nums = mNums;
+        for (var q = 0; q < 4; q++) {
+            var pt = polar(Layout.NUM_R, q * Math.PI / 2.0);
+            if (nums != null) {
+                var b = (nums as Array)[q];
+                dc.drawBitmap(pt[0] - b.getWidth() / 2, pt[1] - b.getHeight() / 2, b);
+            } else {
+                var c = mColors;
+                var txt = ["12", "3", "6", "9"][q];
+                var vc = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
+                dc.setColor(c[Themes.PLATE], Graphics.COLOR_TRANSPARENT);
+                dc.drawText(pt[0] + 1, pt[1] + 1, mFontNum, txt, vc);
+                dc.setColor(c[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
+                dc.drawText(pt[0], pt[1], mFontNum, txt, vc);
+            }
         }
     }
 
@@ -281,6 +329,7 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         var stat = bitmapOf(mStaticRef);
         if (dial != null) {
             target.drawBitmap(0, 0, dial);
+            drawNumerals(target);
         } else if (stat != null) {
             if (mStaticDirty) {
                 var sdc = stat.getDc();
@@ -421,14 +470,7 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
                 dc.fillPolygon(rotatePoly([[0, -ri], [wi, -ri], [wo, -ro], [0, -ro]], a));
             }
         }
-        var nums = ["12", "3", "6", "9"];
-        for (var q = 0; q < 4; q++) {
-            var pt = polar(Layout.NUM_R, q * Math.PI / 2.0);
-            dc.setColor(c[Themes.PLATE], Graphics.COLOR_TRANSPARENT);
-            dc.drawText(pt[0] + 1, pt[1] + 1, mFontNum, nums[q], vc);
-            dc.setColor(c[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
-            dc.drawText(pt[0], pt[1], mFontNum, nums[q], vc);
-        }
+        drawNumerals(dc);
         // crescent above the date block
         dc.setColor(c[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
         dc.fillCircle(p(140), p(Layout.CRESCENT_Y), p(6));
@@ -476,7 +518,7 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         if (mSettings.hijriArabic) {
             var month = (('A' as Char).toNumber() + h[1] - 1).toChar().toString();
             dc.drawText(p(140), p(Layout.HIJRI_Y), mFontAr,
-                        "M " + h[0].toString() + " " + month + " " + h[2].toString(), vc);
+                        "M " + arDigits(h[0]) + " " + month + " " + arDigits(h[2]), vc);
         } else {
             dc.drawText(p(140), p(Layout.HIJRI_Y), mFontXS,
                         h[2].toString() + " " + mHijriMonths[h[1] - 1] + " " + h[0].toString() + " " + mHijriSuffix, vc);
@@ -504,6 +546,21 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
             drawBatteryLine(dc);
         }
         drawHourMinuteHands(dc, clock);
+    }
+
+    // Number in the ArSmall font: "0".."9" are Indian (Eastern Arabic) digits, "a".."j" Arabic
+    // (Western) digits drawn in the same Arabic typeface.
+    hidden function arDigits(n as Number) as String {
+        var str = n.toString();
+        if (mSettings.hijriIndianDigits) {
+            return str;
+        }
+        var out = "";
+        var chars = str.toCharArray();
+        for (var i = 0; i < chars.size(); i++) {
+            out += (chars[i].toNumber() - 48 + 97).toChar().toString();
+        }
+        return out;
     }
 
     // ------------------------------------------------------------------ gauges

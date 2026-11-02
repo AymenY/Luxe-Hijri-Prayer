@@ -230,7 +230,8 @@ AR_SMALL_PX = 11  # at 280 px
 
 def build_arabic_small_font(folder, k):
     """Small Arabic font assembled at runtime: glyph "0".."9" = Eastern Arabic digits, "A".."L" =
-    Hijri month names, "M" = the AH suffix. Every glyph is shaped with HarfBuzz and placed on a
+    Hijri month names, "M" = the AH suffix, "a".."j" = Arabic (Western) digits. Every glyph is
+    shaped with HarfBuzz and placed on a
     common baseline."""
     data = json.load(open(os.path.join(ROOT, "tools", "ayat.json")))
     size = max(8, int(AR_SMALL_PX * k))
@@ -239,13 +240,14 @@ def build_arabic_small_font(folder, k):
     items = [(str(i), AR_DIGITS[i]) for i in range(10)]
     items += [(chr(ord("A") + i), m) for i, m in enumerate(data["hijri_months_ar"])]
     items += [("M", data["hijri_suffix_ar"])]
+    items += [(chr(ord("a") + i), str(i)) for i in range(10)]   # Arabic (Western) digits, same typeface
     glyphs = []
     widths = {}
     for code, text in items:
         bbox = font.getbbox(text, direction="rtl", language="ar", anchor="ls")
         w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
         img = arabic_image((w + 2, h + 2), (1 - bbox[0], 1 - bbox[1]), text, size, anchor="ls")
-        glyphs.append((ord(code), img, -1, ascent + bbox[1] - 1, w + (1 if code.isdigit() else 2)))
+        glyphs.append((ord(code), img, -1, ascent + bbox[1] - 1, w + (1 if code.isdigit() or code.islower() else 2)))
         widths[code] = w
     glyphs.append((32, None, 0, 0, max(3, int(round(size * 0.3)))))
     pack_and_write(folder, "ar_small", glyphs, ascent + descent, ascent, size, "Amiri-Bold (pre-shaped Arabic pieces)")

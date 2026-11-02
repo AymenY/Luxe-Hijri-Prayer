@@ -300,6 +300,7 @@ class Face:
         self.bg_ops = load(BACKGROUNDS[settings["background"]])
         self.frame_ops = load("frame")
         self.hd = self.load_dial(settings["preset"], settings["background"], size)
+        self.nums = self.load_numerals(settings["preset"], settings.get("dial_digits", 0), size) if self.hd else None
         f = lambda n: font(n, size)
         fam = FAMILIES[settings.get("font_family", 0)]
         self.f_num, self.f_l, self.f_m, self.f_s, self.f_xs, self.f_ar = (
@@ -314,6 +315,15 @@ class Face:
             if os.path.exists(path):
                 return Image.open(path).convert("RGB")
         return None
+
+    @staticmethod
+    def load_numerals(preset, digits, size):
+        """Numeral bitmaps 12 / 3 / 6 / 9 (tools/build_hd.py), or None."""
+        base = "resources" if size == BASE else "resources-round-%dx%d" % (size, size)
+        paths = [os.path.join(ROOT, base, "drawables", "num_%d_%d_%d.png" % (preset, digits, q)) for q in range(4)]
+        if not all(os.path.exists(f) for f in paths):
+            return None
+        return [Image.open(f).convert("RGBA") for f in paths]
 
     # ---- scaling (mirror of LuxeHijriPrayerView.p())
     def p(self, v):
@@ -389,6 +399,10 @@ class Face:
         c, p = self.c, self.p
         if self.hd is not None:
             dc.img.paste(self.hd.resize((self.size * S, self.size * S), Image.NEAREST), (0, 0))
+            for q, b in enumerate(self.nums or []):   # mirror of drawNumerals
+                x, y = self.polar(L.NUM_R, q * math.pi / 2)
+                big = b.resize((b.width * S, b.height * S), Image.NEAREST)
+                dc.img.paste(big, ((x - b.width // 2) * S, (y - b.height // 2) * S), big)
             return
         dc.setColor(c[T["BG"]], c[T["BG"]]); dc.clear()
         self.draw_ops(dc, self.bg_ops)
@@ -733,7 +747,10 @@ class Face:
         hy, hm, hd = calc.hijri_for_epoch_day(day, s["hijri_corr"])
         dc.setColor(c[T["GOLD"]], -1)
         if s.get("hijri_arabic", True):
-            dc.drawText(p(140), p(L.HIJRI_Y), self.f_ar, "M %d %s %d" % (hy, chr(ord("A") + hm - 1), hd), CENTER | VCENTER)
+            ar = (lambda n: str(n)) if s.get("hijri_digits", 1) == 1 else \
+                (lambda n: "".join(chr(ord(ch) - 48 + 97) for ch in str(n)))   # mirror of arDigits
+            dc.drawText(p(140), p(L.HIJRI_Y), self.f_ar, "M %s %s %s" % (ar(hy), chr(ord("A") + hm - 1), ar(hd)),
+                        CENTER | VCENTER)
         else:
             dc.drawText(p(140), p(L.HIJRI_Y), self.f_xs, "%d %s %d %s" % (hd, self.str["Hijri%d" % hm], hy,
                                                                          self.str["HijriSuffix"]), CENTER | VCENTER)

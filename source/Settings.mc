@@ -10,6 +10,7 @@ class LuxeSettings {
     // Appearance
     var preset as Number = 0;
     var background as Number = 0;
+    var dialDigits as Number = 0;         // 0 Arabic (12 3 6 9), 1 Indian (Eastern Arabic)
     var fontFamily as Number = 0;         // 0 Modern, 1 Classic, 2 Sport
     var textColor as Number = 0;          // 0 = preset, else Themes.TEXT_CHOICES[i - 1]
     var accentColor as Number = 0;        // 0 = preset, else Themes.COLOUR_CHOICES[i - 1]
@@ -22,6 +23,7 @@ class LuxeSettings {
     var gaugeColors as Number = 0;        // 0 per data type, 1 accent, 2 text
     // Faith & calendar
     var hijriArabic as Boolean = true;
+    var hijriIndianDigits as Boolean = true;
     var hijriCorrection as Number = 0;
     var ayahMode as Number = 0;           // 0 hourly rotation, 1 fixed, 2 hidden
     var ayahFixed as Number = 18;
@@ -43,6 +45,7 @@ class LuxeSettings {
     function load() as Void {
         preset = readList("StylePreset", Themes.COUNT - 1, 0);
         background = readList("Background", 3, 0);
+        dialDigits = readList("DialDigits", 1, 0);
         fontFamily = readList("FontFamily", 2, 0);
         textColor = readList("TextColor", Themes.TEXT_CHOICES.size(), 0);
         accentColor = readList("AccentColor", Themes.COLOUR_CHOICES.size(), 0);
@@ -57,6 +60,7 @@ class LuxeSettings {
         gaugeColors = readList("GaugeColors", 2, 0);
 
         hijriArabic = readList("HijriScript", 1, 0) == 0;
+        hijriIndianDigits = readList("HijriDigits", 1, 1) == 1;
         hijriCorrection = readList("HijriCorrection", 4, 2) - 2;
         ayahMode = readList("AyahMode", 2, 0);
         ayahFixed = readList("AyahFixed", AYAH_COUNT - 1, 18);

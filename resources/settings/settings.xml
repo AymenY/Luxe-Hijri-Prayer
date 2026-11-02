@@ -18,6 +18,12 @@
             <listEntry value="3">@Strings.S_Background_3</listEntry>
         </settingConfig>
     </setting>
+    <setting propertyKey="@Properties.DialDigits" title="@Strings.S_DialDigits">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.S_DialDigits_0</listEntry>
+            <listEntry value="1">@Strings.S_DialDigits_1</listEntry>
+        </settingConfig>
+    </setting>
     <setting propertyKey="@Properties.FontFamily" title="@Strings.S_FontFamily">
         <settingConfig type="list">
             <listEntry value="0">@Strings.S_FontFamily_0</listEntry>
@@ -153,6 +159,12 @@
         <settingConfig type="list">
             <listEntry value="0">@Strings.S_HijriScript_0</listEntry>
             <listEntry value="1">@Strings.S_HijriScript_1</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.HijriDigits" title="@Strings.S_HijriDigits">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.S_HijriDigits_0</listEntry>
+            <listEntry value="1">@Strings.S_HijriDigits_1</listEntry>
         </settingConfig>
     </setting>
     <setting propertyKey="@Properties.HijriCorrection" title="@Strings.S_HijriCorrection">
