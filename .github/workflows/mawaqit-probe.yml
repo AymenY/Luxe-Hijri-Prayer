@@ -1,0 +1,25 @@
+# Temporary: checks the format of the Mawaqit mosque search by position (removed after use).
+name: Mawaqit probe
+on:
+  push:
+    paths: [".github/workflows/mawaqit-probe.yml"]
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -sS -m 30 -A "Mozilla/5.0" -w "\nHTTP %{http_code}\n" \
+            "https://mawaqit.net/api/2.0/mosque/search?lat=33.8754&lon=10.8575" -o r.json || true
+          python3 - <<'PY'
+          import json
+          raw = open("r.json").read()
+          print("bytes", len(raw))
+          try:
+              d = json.loads(raw)
+          except Exception as e:
+              print("not json:", raw[:300]); raise SystemExit
+          print("type", type(d).__name__, "count", len(d))
+          for m in d[:3]:
+              print(sorted(m.keys()))
+              print({k: m.get(k) for k in ("name", "latitude", "longitude", "proximity", "times", "iqama", "jumua", "shuruq", "timezone")})
+          PY
