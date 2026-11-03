@@ -31,6 +31,7 @@ class LuxeSettings {
     var method as Number = 0;
     var asrFactor as Number = 1;          // 1 = standard, 2 = Hanafi
     var highLat as Number = 1;
+    var adjust as Array<Number> = [0, 0, 0, 0, 0];   // minutes, Fajr Dhuhr Asr Maghrib Isha
     var latitude as Double = 33.8754d;
     var longitude as Double = 10.8575d;
     var locationSet as Boolean = true;
@@ -73,6 +74,9 @@ class LuxeSettings {
         method = readList("CalcMethod", PrayerTimes.METHODS.size() - 1, 0);
         asrFactor = readList("AsrMethod", 1, 0) + 1;
         highLat = readList("HighLatRule", 3, 1);
+        // adjustments: list index 0..60 = -30..+30 minutes
+        adjust = [readList("AdjFajr", 60, 30) - 30, readList("AdjDhuhr", 60, 30) - 30, readList("AdjAsr", 60, 30) - 30,
+                  readList("AdjMaghrib", 60, 30) - 30, readList("AdjIsha", 60, 30) - 30];
         latitude = readDegrees("Latitude", 90.0d, 33.8754d);
         longitude = readDegrees("Longitude", 180.0d, 10.8575d);
         // 0/0 (the Gulf of Guinea) is what an empty numeric field turns into: treat it as

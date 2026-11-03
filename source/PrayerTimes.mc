@@ -187,6 +187,7 @@ class PrayerSchedule {
     var method as Number = 0;
     var asrFactor as Number = 1;
     var highLat as Number = 1;
+    var adjust as Array<Number> = [0, 0, 0, 0, 0];   // minutes added to Fajr, Dhuhr, Asr, Maghrib, Isha
 
     hidden var mKey as String = "";
     hidden var mDay as Number = 0;
@@ -206,6 +207,12 @@ class PrayerSchedule {
         mKey = "";
     }
 
+    // Minutes added to Fajr, Dhuhr, Asr, Maghrib and Isha (settings AdjFajr..AdjIsha).
+    function setAdjust(minutes as Array<Number>) as Void {
+        adjust = minutes;
+        mKey = "";
+    }
+
     // Recomputes today, tomorrow and the day after (for polar edge cases) when needed.
     function update(nowUtc as Number, offsetSeconds as Number) as Void {
         var day = CivilDate.localEpochDay(nowUtc, offsetSeconds);
@@ -217,11 +224,18 @@ class PrayerSchedule {
         mDay = day;
         mOffset = offsetSeconds;
         var tz = offsetSeconds / 3600.0d;
-        mDays = [
-            PrayerTimes.computeDay(day, lat, lon, tz, method, asrFactor, highLat),
-            PrayerTimes.computeDay(day + 1, lat, lon, tz, method, asrFactor, highLat),
-            PrayerTimes.computeDay(day + 2, lat, lon, tz, method, asrFactor, highLat)
-        ];
+        mDays = [];
+        for (var d = 0; d < 3; d++) {
+            var times = PrayerTimes.computeDay(day + d, lat, lon, tz, method, asrFactor, highLat);
+            // user adjustment per prayer (to match a mosque timetable)
+            for (var k = 0; k < 5; k++) {
+                var i = PrayerTimes.PRAYERS[k] as Number;
+                if (times[i] != null && adjust[k] != 0) {
+                    times[i] = (times[i] as Numeric) + adjust[k] / 60.0d;
+                }
+            }
+            mDays.add(times);
+        }
     }
 
     // Local time in minutes after midnight of day `dayIndex` (0 = today, 1 = tomorrow) for

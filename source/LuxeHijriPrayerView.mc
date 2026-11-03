@@ -146,6 +146,7 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         }
         mSchedule.configure(mSettings.latitude, mSettings.longitude, mSettings.method,
                             mSettings.asrFactor, mSettings.highLat);
+        mSchedule.setAdjust(mSettings.adjust);
         mStaticDirty = true;
     }
 

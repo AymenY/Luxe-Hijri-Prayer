@@ -29,7 +29,7 @@ Legend: ✅ done in this repository · ⬜ to do on a machine with the Connect I
 
 ## Simulator tests
 
-* ⬜ Unit tests: `monkeyc ... --unit-test -o bin/test.prg` then `monkeydo bin/test.prg fenix7xpro -t` (6 tests in `test/LuxeTests.mc`)
+* ⬜ Unit tests: `monkeyc ... --unit-test -o bin/test.prg` then `monkeydo bin/test.prg fenix7xpro -t` (7 tests in `test/LuxeTests.mc`)
 * ⬜ Compare the simulator with `docs/previews/*` for each style and background
 * ⬜ *Settings → Trigger App Settings* (or the settings editor): change every setting, confirm the dial updates
 * ⬜ *Settings → Low Power Mode* on MIP: seconds hand keeps moving (option “Always”) or disappears (“Only after wrist raise”)

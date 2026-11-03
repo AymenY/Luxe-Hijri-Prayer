@@ -88,6 +88,12 @@ def settings():
         ("HighLatRule", "number", 1, (F + "High-latitude rule", FF + "règle des hautes latitudes"),
          [("None", "Aucune"), ("Middle of the night", "Milieu de la nuit"), ("One-seventh of the night", "Septième de la nuit"),
           ("Angle-based", "Selon l'angle")]),
+    ]
+    adj = [("%+d min" % m if m else "0 min", "%+d min" % m if m else "0 min") for m in range(-30, 31)]
+    for key, (en, fr) in (("AdjFajr", ("Fajr", "Fajr")), ("AdjDhuhr", ("Dhuhr", "Dhohr")), ("AdjAsr", ("Asr", "Asr")),
+                          ("AdjMaghrib", ("Maghrib", "Maghrib")), ("AdjIsha", ("Isha", "Icha"))):
+        out.append((key, "number", 30, (F + "Adjustment " + en + " (minutes)", FF + "ajustement " + fr + " (minutes)"), adj))
+    out += [
         ("LocationMode", "number", 0, (F + "Location for prayer times", FF + "position pour les prières"),
          [("Automatic (watch GPS position)", "Automatique (position GPS de la montre)"),
           ("Manual (latitude / longitude below)", "Manuelle (latitude / longitude ci-dessous)")]),
@@ -120,7 +126,10 @@ MENU = [
         ("AyahFixed", ("Fixed verse", "Verset fixe")), ("#verses", ("Verses in rotation", "Versets en rotation"))]),
     ("Prayers", ("Prayers", "Prières"), [
         ("CalcMethod", ("Method", "Méthode")), ("AsrMethod", ("Asr", "Asr")),
-        ("HighLatRule", ("High latitudes", "Hautes latitudes")), ("TimeZoneMode", ("Time zone", "Fuseau horaire"))]),
+        ("HighLatRule", ("High latitudes", "Hautes latitudes")), ("TimeZoneMode", ("Time zone", "Fuseau horaire")),
+        ("AdjFajr", ("Adjust Fajr", "Ajuster Fajr")), ("AdjDhuhr", ("Adjust Dhuhr", "Ajuster Dhohr")),
+        ("AdjAsr", ("Adjust Asr", "Ajuster Asr")), ("AdjMaghrib", ("Adjust Maghrib", "Ajuster Maghrib")),
+        ("AdjIsha", ("Adjust Isha", "Ajuster Icha"))]),
     ("Location", ("Location", "Position"), [
         ("LocationMode", ("Position", "Position")),
         ("#gps", ("Use current position", "Utiliser la position actuelle"))]),

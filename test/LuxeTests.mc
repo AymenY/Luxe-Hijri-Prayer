@@ -146,3 +146,21 @@ function testAyahRotation(logger as Logger) as Boolean {
     Test.assertEqual(AyahPicker.pick(2, 2, all, 7), -1);
     return true;
 }
+
+(:test)
+function testPrayerAdjustment(logger as Logger) as Boolean {
+    var offset = 3600;
+    var now = 20756 * 86400 - offset + 6 * 3600;      // local morning, Djerba
+    var s = new PrayerSchedule();
+    s.configure(33.8754d, 10.8575d, 0, 1, PrayerTimes.HL_MIDDLE);
+    s.update(now, offset);
+    var fajr = s.minutes(0, PrayerTimes.FAJR) as Number;
+    var isha = s.minutes(0, PrayerTimes.ISHA) as Number;
+    var rise = s.minutes(0, PrayerTimes.SUNRISE) as Number;
+    s.setAdjust([3, 0, 0, 0, -5]);
+    s.update(now, offset);
+    Test.assertEqual(s.minutes(0, PrayerTimes.FAJR), fajr + 3);
+    Test.assertEqual(s.minutes(0, PrayerTimes.ISHA), isha - 5);
+    Test.assertEqual(s.minutes(0, PrayerTimes.SUNRISE), rise);   // sunrise is not a prayer: unchanged
+    return true;
+}

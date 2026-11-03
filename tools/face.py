@@ -532,6 +532,16 @@ class Face:
         dc.setColor(color, -1)
         dc.drawText(x, y + p(L.GAUGE_BATT_LABEL_DY if batt else L.GAUGE_LABEL_DY), self.f_xs, label, CENTER | VCENTER)
 
+    def day_times(self, day, tz):
+        """Mirror of PrayerSchedule.update: computed times plus the per-prayer adjustments."""
+        s = self.s
+        t = list(calc.compute_day(day, s["lat"], s["lon"], tz, s["method"], s["asr"], s["highlat"]))
+        for k, i in enumerate(calc.PRAYERS):
+            adj = s.get("adjust", [0] * 5)[k]
+            if t[i] is not None and adj:
+                t[i] += adj / 60.0
+        return t
+
     # ---- daylight / darkness ring (mirror of drawSunRing, sunArc, ringDeg)
     @staticmethod
     def ring_deg(m):
@@ -548,7 +558,7 @@ class Face:
         offset = s["utc_offset"] if s.get("tz_manual") else watch_offset
         tz = offset / 3600.0
         day = calc.local_epoch_day(now, offset)
-        comp = lambda d: calc.compute_day(day + d, s["lat"], s["lon"], tz, s["method"], s["asr"], s["highlat"])
+        comp = lambda d: self.day_times(day + d, tz)
         d0 = comp(0)
         rise, sset = calc.to_minutes(d0[calc.SUNRISE]), calc.to_minutes(d0[calc.SUNSET])
         if (s["lat"] == 0 and s["lon"] == 0) or rise is None or sset is None:
@@ -694,7 +704,7 @@ class Face:
         offset = s["utc_offset"] if s.get("tz_manual") else watch_offset
         tz = offset / 3600.0
         day = calc.local_epoch_day(now, offset)
-        days = [calc.compute_day(day + k, s["lat"], s["lon"], tz, s["method"], s["asr"], s["highlat"]) for k in range(3)]
+        days = [self.day_times(day + k, tz) for k in range(3)]
         found = []
         for dd in range(3):
             for pr in calc.PRAYERS:

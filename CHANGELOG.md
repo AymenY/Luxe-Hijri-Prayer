@@ -3,7 +3,11 @@
 All dates 2026-10-29. Nothing has been compiled with the Connect IQ SDK yet; see
 `docs/RELEASE_CHECKLIST.md`.
 
-## Unreleased — preview 0.7
+## Unreleased — preview 0.8
+* Per-prayer adjustment (−30…+30 min for Fajr, Dhuhr, Asr, Maghrib, Isha) in the settings and the
+  watch menu (Prayers), to match a mosque timetable; unit test `testPrayerAdjustment`.
+
+## Preview 0.7
 * Moon dial (phase drawn as seen tonight, lunation ring, illuminated fraction) as a gauge source,
   default for gauge 3 instead of calories; validated against astral (Moon age within 0.8 days).
 * Automatic location: the prayer times follow the watch's GPS position (setting *Location*).
