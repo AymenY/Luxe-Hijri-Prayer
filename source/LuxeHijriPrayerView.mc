@@ -1,3 +1,4 @@
+import Toybox.Activity;
 import Toybox.ActivityMonitor;
 import Toybox.Application;
 import Toybox.Graphics;
@@ -311,6 +312,7 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     // ------------------------------------------------------------------ updates
     function onUpdate(dc as Graphics.Dc) as Void {
         var now = Time.now().value();
+        followPosition();
         var clock = System.getClockTime();
         if (mSleeping && mBurnIn) {
             drawAlwaysOn(dc, clock);
@@ -534,6 +536,8 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
             var src = mSettings.gauges[g];
             if (src == DataFields.SUN_RING) {
                 drawSunRing(dc, gc[0], gc[1], now, clock);
+            } else if (src == DataFields.MOON) {
+                drawMoon(dc, gc[0], gc[1], now);
             } else {
                 drawGauge(dc, gc[0], gc[1], src, info);
             }
@@ -713,24 +717,102 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         return (d < 0) ? d + 360 : d;
     }
 
-    // Small battery line under the verse (only when no gauge shows the battery).
+    // Moon dial: the Moon as seen from the northern hemisphere (lit on the right while waxing),
+    // drawn row by row (a crescent is not convex); a ring for the age of the lunation and the
+    // illuminated fraction below.
+    hidden function drawMoon(dc as Graphics.Dc, x as Number, y as Number, now as Number) as Void {
+        var mp = MoonPhase.at(now);
+        var k = mp[0] as Double;
+        var s = (mp[1] as Boolean) ? 1.0 : -1.0;
+        var sweep = (360.0 * (mp[2] as Double) / MoonPhase.SYNODIC).toNumber();
+        if (sweep >= 2) {
+            var end = 90 - sweep;
+            if (end < 0) {
+                end += 360;
+            }
+            dc.setColor(Themes.MOON_RING, Graphics.COLOR_TRANSPARENT);
+            dc.setPenWidth(pen(Layout.GAUGE_PEN));
+            dc.drawArc(x, y, p(Layout.GAUGE_R), Graphics.ARC_CLOCKWISE, 90, end);
+            dc.setPenWidth(1);
+        }
+        var cy = y + p(Layout.MOON_DY);
+        var mr = p(Layout.MOON_R);
+        dc.setColor(Themes.MOON_DARK, Graphics.COLOR_TRANSPARENT);
+        dc.fillCircle(x, cy, mr);
+        dc.setColor(Themes.MOON_LIT, Graphics.COLOR_TRANSPARENT);
+        var e = 1.0 - 2.0 * k;            // terminator: +1 new moon, -1 full moon
+        for (var dy = -mr; dy <= mr; dy++) {
+            var h = Math.sqrt(mr * mr - dy * dy);
+            var limb = s * h;
+            var term = s * e * h;
+            var a0 = (limb < term) ? limb : term;
+            var a1 = (limb < term) ? term : limb;
+            var x0 = Math.round(a0).toNumber();
+            var x1 = Math.round(a1).toNumber();
+            if (x1 > x0) {
+                dc.drawLine(x + x0, cy + dy, x + x1, cy + dy);
+            }
+        }
+        dc.setColor(mText, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(x, y + p(Layout.MOON_LABEL_DY), mFontXS, Math.round(k * 100.0).toNumber().toString() + "%",
+                    Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+    }
+
+    // Battery line under the verse (only when no gauge shows the battery): text colour, fill
+    // green above 30 %, orange from 16 to 30 %, the warning colour at 15 % and below.
     hidden function drawBatteryLine(dc as Graphics.Dc) as Void {
         var data = DataFields.read(DataFields.BATTERY, null);
         var pct = (data[1] as Float) * 100.0;
         var txt = (data[0] as String) + "%";
-        var col = ((data[2] as Number) == 1) ? mColors[Themes.WARN] : mColors[Themes.DIM];
-        var w = dc.getTextWidthInPixels(txt, mFontXS);
-        var x0 = p(140) - (w + p(16)) / 2;
+        var warn = (data[2] as Number) == 1;
+        var fillCol = warn ? mColors[Themes.WARN] : (pct > 30.0 ? 0x55FF55 : 0xFFAA00);
+        var w = dc.getTextWidthInPixels(txt, mFontS);
+        var x0 = p(140) - (w + p(20)) / 2;
         var y = p(Layout.BATT_Y);
-        dc.setColor(col, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(warn ? mColors[Themes.WARN] : mText, Graphics.COLOR_TRANSPARENT);
         dc.setPenWidth(1);
-        dc.drawRoundedRectangle(x0, y - p(3), p(11), p(7), 1);
-        dc.fillRectangle(x0 + p(11), y - p(1), p(1) + 1, p(3));
-        var fill = (p(7) * pct / 100.0).toNumber();
+        dc.drawRoundedRectangle(x0, y - p(4), p(14), p(9), 2);
+        dc.fillRectangle(x0 + p(14), y - p(2), p(2), p(5));
+        var fill = (p(10) * pct / 100.0).toNumber();
         if (fill > 0) {
-            dc.fillRectangle(x0 + p(2), y - p(1), fill, p(3));
+            dc.setColor(fillCol, Graphics.COLOR_TRANSPARENT);
+            dc.fillRectangle(x0 + p(2), y - p(2), fill, p(5));
         }
-        dc.drawText(x0 + p(16) + w / 2, y, mFontXS, txt, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+        dc.setColor(warn ? mColors[Themes.WARN] : mText, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(x0 + p(20) + w / 2, y, mFontS, txt, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+    }
+
+    // Automatic location: when the watch knows a GPS position more than about 3 km from the stored
+    // one, store it (the same properties as the settings) and recompute the prayer times.
+    hidden function followPosition() as Void {
+        var st = mSettings;
+        if (!st.autoLocation) {
+            return;
+        }
+        var info = Activity.getActivityInfo();
+        var loc = (info != null) ? info.currentLocation : null;
+        if (loc == null) {
+            return;
+        }
+        var deg = loc.toDegrees();
+        var lat = deg[0].toDouble();
+        var lon = deg[1].toDouble();
+        if (lat == 0.0d && lon == 0.0d) {
+            return;
+        }
+        if ((lat - st.latitude).abs() < 0.03d && (lon - st.longitude).abs() < 0.03d) {
+            return;
+        }
+        try {
+            Application.Properties.setValue("Latitude", lat.toFloat());
+            Application.Properties.setValue("Longitude", lon.toFloat());
+        } catch (e) {
+            return;
+        }
+        st.latitude = lat;
+        st.longitude = lon;
+        st.locationSet = true;
+        mSchedule.configure(st.latitude, st.longitude, st.method, st.asrFactor, st.highLat);
     }
 
     // Icon above the value (about 13 x 12 dial units), in the current colour.
@@ -975,10 +1057,11 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         } else if (style == 2) {
             dc.setColor(mHandDark, Graphics.COLOR_TRANSPARENT);
             dc.fillPolygon(rotatePoly([[0, tail], [w * 0.6, tail], [w + 0.8, -len * 0.62], [0, -len - 2]], a));
-            dc.setColor(mText, Graphics.COLOR_TRANSPARENT);
-            dc.fillPolygon(rotatePoly([[-0.8, -12], [0.8, -12], [0.8, -len * 0.6], [-0.8, -len * 0.6]], a));
+            dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+            dc.fillPolygon(rotatePoly([[-1.2, -12], [1.2, -12], [1.2, -len * 0.6], [-1.2, -len * 0.6]], a));
         } else {
-            dc.setColor(mText, Graphics.COLOR_TRANSPARENT);
+            // bright lume insert: white for legibility in every style
+            dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
             dc.fillPolygon(rotatePoly([[-w + 1.5, -14], [w - 1.5, -14], [w - 1.5, -len + 3], [-w + 1.5, -len + 3]], a));
         }
     }

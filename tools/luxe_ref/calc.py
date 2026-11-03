@@ -201,3 +201,22 @@ def countdown_text(seconds):
     if mins < 60:
         return "%dm" % mins
     return "%dh%02d" % (mins // 60, mins % 60)
+
+
+# ---- Moon phase (mirror of source/MoonPhase.mc)
+SYNODIC = 29.530588853
+
+
+def moon_phase(utc_seconds):
+    """[illuminated fraction 0..1, waxing, age in days since the mean new moon]."""
+    jd = utc_seconds / 86400.0 + 2440587.5
+    t = (jd - 2451545.0) / 36525.0
+    norm = lambda x: x - 360.0 * math.floor(x / 360.0)
+    d = norm(297.8501921 + 445267.1114034 * t)
+    m = norm(357.5291092 + 35999.0502909 * t)
+    mp = norm(134.9633964 + 477198.8675055 * t)
+    r = math.pi / 180.0
+    i = (180.0 - d - 6.289 * math.sin(mp * r) + 2.100 * math.sin(m * r) - 1.274 * math.sin((2 * d - mp) * r)
+         - 0.658 * math.sin(2 * d * r) - 0.214 * math.sin(2 * mp * r) - 0.110 * math.sin(d * r))
+    k = (1.0 + math.cos(i * r)) / 2.0
+    return [k, d < 180.0, d / 360.0 * SYNODIC]

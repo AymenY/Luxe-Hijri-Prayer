@@ -160,7 +160,7 @@ def main():
     expect = {
         "StylePreset": n_presets,
         "Background": len([j for j in res["JsonData"] if j.startswith("Bg")]),
-        "Gauge1": 11, "Gauge2": 11, "Gauge3": 11, "Gauge4": 11, "GaugeColors": 3,
+        "Gauge1": 12, "Gauge2": 12, "Gauge3": 12, "Gauge4": 12, "GaugeColors": 3,
         "HijriCorrection": 5, "HijriScript": 2,
         "AyahMode": 3, "AyahFixed": n_ayat,
         "FontFamily": 3, "HandStyle": 3, "SecondsMode": 3,

@@ -112,9 +112,9 @@ def check_size(size, report):
                                                                           for m in range(12)]), p(140), p(L.HIJRI_Y)))
         ck.add("hijri_latin-" + lang, ck.text_box("luxe_xs", widest("luxe_xs", size, [
             "30 %s 1448 %s" % (s["Hijri%d" % m], s["HijriSuffix"]) for m in range(1, 13)]), p(140), p(L.HIJRI_Y)))
-        # small battery line under the verse: icon (16 units with its gap) then "100%"
-        tb = ck.text_box("luxe_xs", "100%", p(140) + p(8), p(L.BATT_Y))
-        bb = (tb[0] - p(16), min(tb[1], p(L.BATT_Y) - p(3)), tb[2], max(tb[3], p(L.BATT_Y) + p(4)))
+        # battery line under the verse: icon (20 units with its gap) then "100%"
+        tb = ck.text_box("luxe_s", "100%", p(140) + p(10), p(L.BATT_Y))
+        bb = (tb[0] - p(20), min(tb[1], p(L.BATT_Y) - p(4)), tb[2], max(tb[3], p(L.BATT_Y) + p(5)))
         ck.add("battery", bb)
         ck.inside(bb, "battery", L.AYAH_AREA_R)
         # gauge content must fit inside the ring

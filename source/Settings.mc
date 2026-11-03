@@ -19,7 +19,7 @@ class LuxeSettings {
     var secondsMode as Number = 0;        // 0 always, 1 after wrist raise, 2 hidden
     var secondsColor as Number = 0;       // 0 = preset, else Themes.COLOUR_CHOICES[i - 1]
     // Data fields
-    var gauges as Array<Number> = [0, 1, 2, 10];
+    var gauges as Array<Number> = [0, 1, 11, 10];
     var gaugeColors as Number = 0;        // 0 per data type, 1 accent, 2 text
     // Faith & calendar
     var hijriArabic as Boolean = true;
@@ -34,6 +34,7 @@ class LuxeSettings {
     var latitude as Double = 33.8754d;
     var longitude as Double = 10.8575d;
     var locationSet as Boolean = true;
+    var autoLocation as Boolean = true;   // follow the watch's GPS position
     var tzManual as Boolean = false;
     var utcOffsetSeconds as Number = 3600;
 
@@ -54,9 +55,9 @@ class LuxeSettings {
         secondsMode = readList("SecondsMode", 2, 0);
         secondsColor = readList("SecondsColor", Themes.COLOUR_CHOICES.size(), 0);
 
-        var last = DataFields.SUN_RING;
+        var last = DataFields.MOON;
         gauges = [readList("Gauge1", last, 0), readList("Gauge2", last, 1),
-                  readList("Gauge3", last, 2), readList("Gauge4", last, DataFields.SUN_RING)];
+                  readList("Gauge3", last, DataFields.MOON), readList("Gauge4", last, DataFields.SUN_RING)];
         gaugeColors = readList("GaugeColors", 2, 0);
 
         hijriArabic = readList("HijriScript", 1, 0) == 0;
@@ -77,6 +78,7 @@ class LuxeSettings {
         // 0/0 (the Gulf of Guinea) is what an empty numeric field turns into: treat it as
         // "not configured" and ask the user to set a location instead of showing wrong times.
         locationSet = !(latitude == 0.0d && longitude == 0.0d);
+        autoLocation = readList("LocationMode", 1, 0) == 0;
         tzManual = readList("TimeZoneMode", 1, 0) == 1;
         var off = readDegrees("UtcOffset", 14.0d, 1.0d);
         if (off < -12.0d) {

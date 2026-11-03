@@ -3,7 +3,15 @@
 All dates 2026-10-29. Nothing has been compiled with the Connect IQ SDK yet; see
 `docs/RELEASE_CHECKLIST.md`.
 
-## Unreleased — preview 0.6
+## Unreleased — preview 0.7
+* Moon dial (phase drawn as seen tonight, lunation ring, illuminated fraction) as a gauge source,
+  default for gauge 3 instead of calories; validated against astral (Moon age within 0.8 days).
+* Automatic location: the prayer times follow the watch's GPS position (setting *Location*).
+* Battery line: larger text in the text colour, coloured level (green, orange, warning).
+* Hour and minute hands longer and wider, with white lume inserts.
+* Mawaqit: not integrated — its API is private (search endpoint answers 401 without a token).
+
+## Preview 0.6
 * On-watch settings menu (watch face → Settings): every setting, verse check boxes, and the
   prayer location from the watch's last GPS position — works for sideloaded builds.
 * Dial numerals in Arabic (12 3 6 9) or Indian (Eastern Arabic) digits, drawn as HD bitmaps.

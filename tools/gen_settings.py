@@ -16,7 +16,8 @@ COLOURS = [("Preset", "Selon le style"), ("Red", "Rouge"), ("Orange", "Orange"),
 SOURCES = [("Steps", "Pas"), ("Heart rate", "Fréquence cardiaque"), ("Calories", "Calories"),
            ("Battery percentage", "Batterie (%)"), ("Distance", "Distance"), ("Floors climbed", "Étages montés"),
            ("Body Battery", "Body Battery"), ("Stress", "Stress"), ("Active minutes (week)", "Minutes intensives (semaine)"),
-           ("None (empty gauge)", "Aucune (jauge vide)"), ("Daylight / darkness (24 h)", "Lumière / obscurité (24 h)")]
+           ("None (empty gauge)", "Aucune (jauge vide)"), ("Daylight / darkness (24 h)", "Lumière / obscurité (24 h)"),
+           ("Moon phase", "Phase de la lune")]
 METHODS = [("Tunisia (18° / 18°)", "Tunisie (18° / 18°)"), ("Muslim World League (18° / 17°)", "Ligue islamique mondiale (18° / 17°)"),
            ("ISNA North America (15° / 15°)", "ISNA Amérique du Nord (15° / 15°)"), ("Egypt (19.5° / 17.5°)", "Égypte (19,5° / 17,5°)"),
            ("Umm al-Qura, Makkah (18.5° / 90 min)", "Umm al-Qura, La Mecque (18,5° / 90 min)"),
@@ -63,7 +64,7 @@ def settings():
         ("SecondsColor", "number", 0, (A + "Seconds hand colour", AF + "couleur de la trotteuse"), COLOURS),
         ("Gauge1", "number", 0, (D + "gauge 1 (upper left)", DF + "jauge 1 (haut gauche)"), SOURCES),
         ("Gauge2", "number", 1, (D + "gauge 2 (upper right)", DF + "jauge 2 (haut droite)"), SOURCES),
-        ("Gauge3", "number", 2, (D + "gauge 3 (left)", DF + "jauge 3 (gauche)"), SOURCES),
+        ("Gauge3", "number", 11, (D + "gauge 3 (left)", DF + "jauge 3 (gauche)"), SOURCES),
         ("Gauge4", "number", 10, (D + "gauge 4 (right)", DF + "jauge 4 (droite)"), SOURCES),
         ("GaugeColors", "number", 0, (D + "gauge colours", DF + "couleurs des jauges"),
          [("One colour per data type", "Une couleur par type de donnée"), ("Accent colour", "Couleur d'accent"), ("Text colour", "Couleur du texte")]),
@@ -87,6 +88,9 @@ def settings():
         ("HighLatRule", "number", 1, (F + "High-latitude rule", FF + "règle des hautes latitudes"),
          [("None", "Aucune"), ("Middle of the night", "Milieu de la nuit"), ("One-seventh of the night", "Septième de la nuit"),
           ("Angle-based", "Selon l'angle")]),
+        ("LocationMode", "number", 0, (F + "Location for prayer times", FF + "position pour les prières"),
+         [("Automatic (watch GPS position)", "Automatique (position GPS de la montre)"),
+          ("Manual (latitude / longitude below)", "Manuelle (latitude / longitude ci-dessous)")]),
         ("Latitude", "float", 33.8754, (F + "Latitude (decimal degrees, north positive)", FF + "latitude (degrés décimaux, nord positif)"), (-90, 90)),
         ("Longitude", "float", 10.8575, (F + "Longitude (decimal degrees, east positive)", FF + "longitude (degrés décimaux, est positif)"), (-180, 180)),
         ("TimeZoneMode", "number", 0, (F + "Time zone for prayer times", FF + "fuseau horaire des prières"),
@@ -118,6 +122,7 @@ MENU = [
         ("CalcMethod", ("Method", "Méthode")), ("AsrMethod", ("Asr", "Asr")),
         ("HighLatRule", ("High latitudes", "Hautes latitudes")), ("TimeZoneMode", ("Time zone", "Fuseau horaire"))]),
     ("Location", ("Location", "Position"), [
+        ("LocationMode", ("Position", "Position")),
         ("#gps", ("Use current position", "Utiliser la position actuelle"))]),
 ]
 MENU_TEXTS = [("M_Title", ("Luxe Hijri Prayer", "Luxe Hijri Prayer")),

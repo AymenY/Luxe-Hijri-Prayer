@@ -23,12 +23,15 @@ Based on the approved concept image:
 * sunrise (left) and sunset (right)
 * the default background is the owner's night illustration of a mosque (`tools/art-src/`),
   colour-graded for each style; the other backgrounds are rendered procedurally
-* four ring gauges in smoked glass — steps and heart rate at the top, calories on the left —
+* four ring gauges in smoked glass — steps and heart rate at the top —
   with icon, value and label; one colour per data type in Luxury Blue and Ice Silver
+* on the left, a **Moon dial**: the Moon as seen tonight (northern hemisphere), a ring for the
+  age of the lunation and the illuminated fraction
 * on the right, a 24 h **daylight / darkness ring** (noon at the top): darkness, twilight
   (Fajr → sunrise, sunset → Isha) and daylight, a white dot at the current time, and the time
   left until sunset (DAY) or sunrise (NIGHT)
-* a thin metal chapter ring; a small battery line under the verse (when no gauge shows the battery)
+* a thin metal chapter ring; a battery line under the verse (when no gauge shows the battery)
+* large hands with white lume inserts
 * a pointed Islamic arch with a night scene (mosque, minarets, palms, water, crescent)
 * two cartouches: **next prayer + countdown** and **the following prayer + its time**
 * a complete Quranic verse in Arabic at the bottom (without surah name or number), changing every
@@ -74,16 +77,23 @@ The settings and the watch menu are generated from `tools/gen_settings.py` (Engl
 | Appearance | Accent colour (countdown, gauges) | Preset, red, orange, gold, green, cyan, blue, white |
 | Appearance | Hands / hands colour | Baton with lume, Dauphine, Sword / preset, gold, rose gold, silver, bronze |
 | Appearance | Seconds hand / colour | Always, only after wrist raise, hidden / preset + 7 colours |
-| Data fields | Gauges 1–4 | Steps, heart rate, calories, battery, distance, floors, Body Battery, stress, active minutes (week), none, daylight / darkness (24 h); default steps, heart rate, calories, daylight |
+| Data fields | Gauges 1–4 | Steps, heart rate, calories, battery, distance, floors, Body Battery, stress, active minutes (week), none, daylight / darkness (24 h), Moon phase; default steps, heart rate, Moon, daylight |
 | Data fields | Gauge colours | One colour per data type, accent colour, text colour |
 | Faith & calendar | Hijri date script / digits / correction | Arabic, Latin / Indian, Arabic digits / −2…+2 days (0) |
 | Faith & calendar | Ayah | Hourly rotation (ticked verses), fixed verse, hidden |
 | Faith & calendar | Fixed verse + 39 “Rotation” check boxes | Ash-Sharh 94:5; all ticked |
 | Faith & calendar | Prayer method, Asr, high-latitude rule | Tunisia 18°/18°, standard, middle of the night |
+| Faith & calendar | Location | Automatic (follows the watch's GPS position), manual |
 | Faith & calendar | Latitude / longitude / time zone | 33.8754 / 10.8575 (Houmt Souk, Djerba) / watch time zone |
 
-Coordinates are entered manually (decimal degrees, north and east positive). 0 / 0 is treated as
-“not set” and the dial asks to set the location.
+In automatic mode the watch face stores the watch's GPS position (as known from the last GPS
+activity) whenever it moves by more than about 3 km and recomputes the prayer times. In manual
+mode the coordinates are entered in decimal degrees (north and east positive). 0 / 0 is treated
+as “not set” and the dial asks to set the location.
+
+**Mawaqit.** Prayer times are computed on the watch. Mawaqit's API is private ("Our API is
+currently private"): its mosque search answers HTTP 401 without an access token (tested on
+2026-11-03), so mosque timetables cannot be fetched without Mawaqit's agreement.
 
 ## Multiple watches
 

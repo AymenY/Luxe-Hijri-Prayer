@@ -38,6 +38,9 @@ module Layout {
     const GAUGE_LABEL_DY = 11;
     const GAUGE_BATT_ICON_DY = -17;  // battery: larger value, so icon and label move outwards
     const GAUGE_BATT_LABEL_DY = 14;
+    const MOON_DY = -4;          // Moon dial: disc centre, radius and illuminated fraction below
+    const MOON_R = 11;
+    const MOON_LABEL_DY = 14;
 
     // Sunrise (left) and sunset (right): icon above the time
     const SUN_DX = 93;
@@ -71,11 +74,11 @@ module Layout {
     const AYAH_AREA_BOTTOM = 248;
 
     // Hands (lengths from the centre; tails point the other way)
-    const HOUR_LEN = 54;
-    const HOUR_W = 4;
+    const HOUR_LEN = 62;
+    const HOUR_W = 5;
     const HOUR_TAIL = 10;
-    const MIN_LEN = 96;
-    const MIN_W = 3;
+    const MIN_LEN = 106;
+    const MIN_W = 4;
     const MIN_TAIL = 12;
     const SEC_LEN = 120;
     const SEC_TAIL = 24;

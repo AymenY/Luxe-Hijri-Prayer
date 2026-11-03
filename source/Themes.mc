@@ -60,6 +60,11 @@ module Themes {
     const SUN_NIGHT = 0x3355AA;
     const SUN_NIGHT_TEXT = 0x9FB8FF;
 
+    // Moon dial: lit surface, dark surface (earthshine), lunation ring
+    const MOON_LIT = 0xFFF2C0;
+    const MOON_DARK = 0x2A3350;
+    const MOON_RING = 0xC8D2E6;
+
     // User colour choices (settings index - 1). Order must match tools/gen_settings.py.
     const COLOUR_CHOICES = [0xFF0000, 0xFF5500, 0xFFAA00, 0x00FF55, 0x00FFFF, 0x00AAFF, 0xFFFFFF];
     const TEXT_CHOICES = [0xFFFFFF, 0xFFFFAA, 0xFFAA00, 0xAAAAAA, 0xAAFFFF];

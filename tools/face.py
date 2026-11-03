@@ -267,6 +267,9 @@ LABELS = ["LabelSteps", "LabelHeart", "LabelCalories", "LabelBattery", "LabelKm"
           "LabelBodyBattery", "LabelStress", "LabelActive"]
 NONE_SOURCE = 9
 SUN_RING = 10
+MOON = 11
+# Themes.MOON_LIT, MOON_DARK, MOON_RING
+MOON_LIT, MOON_DARK, MOON_RING = 0xFFF2C0, 0x2A3350, 0xC8D2E6
 # Themes.SUN_DAY, SUN_TWILIGHT, SUN_NIGHT, SUN_NIGHT_TEXT
 SUN_DAY, SUN_TWILIGHT, SUN_NIGHT, SUN_NIGHT_TEXT = 0xFFC83A, 0x8A5BC8, 0x3355AA, 0x9FB8FF
 
@@ -594,22 +597,50 @@ class Face:
         dc.drawText(x, y + p(L.GAUGE_LABEL_DY), self.f_xs, self.str["LabelDay" if is_day else "LabelNight"],
                     CENTER | VCENTER)
 
+    def moon(self, dc, x, y, now):
+        """Mirror of drawMoon."""
+        p = self.p
+        k, waxing, age = calc.moon_phase(now)
+        s = 1.0 if waxing else -1.0
+        sweep = int(360.0 * age / calc.SYNODIC)
+        if sweep >= 2:
+            dc.setColor(MOON_RING, -1)
+            dc.setPenWidth(self.pen(L.GAUGE_PEN))
+            dc.drawArc(x, y, p(L.GAUGE_R), CLOCKWISE, 90, (90 - sweep) % 360)
+            dc.setPenWidth(1)
+        cy, mr = y + p(L.MOON_DY), p(L.MOON_R)
+        dc.setColor(MOON_DARK, -1); dc.fillCircle(x, cy, mr)
+        dc.setColor(MOON_LIT, -1)
+        e = 1.0 - 2.0 * k
+        for dy in range(-mr, mr + 1):
+            h = math.sqrt(mr * mr - dy * dy)
+            a0, a1 = sorted((s * h, s * e * h))
+            x0, x1 = int(math.floor(a0 + 0.5)), int(math.floor(a1 + 0.5))
+            if x1 > x0:
+                dc.drawLine(x + x0, cy + dy, x + x1, cy + dy)
+        dc.setColor(self.text, -1)
+        dc.drawText(x, y + p(L.MOON_LABEL_DY), self.f_xs, "%d%%" % int(math.floor(k * 100 + 0.5)), CENTER | VCENTER)
+
     def battery_line(self, dc, sensors):
         """Mirror of drawBatteryLine."""
         p, c = self.p, self.c
         value, progress, warn = read_source(3, sensors)
+        pct = progress * 100.0
         txt = value + "%"
-        w = self.f_xs.width(txt)
-        x0 = p(140) - (w + p(16)) // 2
+        fill_col = c[T["WARN"]] if warn else (0x55FF55 if pct > 30 else 0xFFAA00)
+        w = self.f_s.width(txt)
+        x0 = p(140) - (w + p(20)) // 2
         y = p(L.BATT_Y)
-        dc.setColor(c[T["WARN"]] if warn else c[T["DIM"]], -1)
+        dc.setColor(c[T["WARN"]] if warn else self.text, -1)
         dc.setPenWidth(1)
-        dc.drawRoundedRectangle(x0, y - p(3), p(11), p(7), 1)
-        dc.fillRectangle(x0 + p(11), y - p(1), p(1) + 1, p(3))
-        fill = int(p(7) * progress)
+        dc.drawRoundedRectangle(x0, y - p(4), p(14), p(9), 2)
+        dc.fillRectangle(x0 + p(14), y - p(2), p(2), p(5))
+        fill = int(p(10) * pct / 100.0)
         if fill > 0:
-            dc.fillRectangle(x0 + p(2), y - p(1), fill, p(3))
-        dc.drawText(x0 + p(16) + w // 2, y, self.f_xs, txt, CENTER | VCENTER)
+            dc.setColor(fill_col, -1)
+            dc.fillRectangle(x0 + p(2), y - p(2), fill, p(5))
+        dc.setColor(c[T["WARN"]] if warn else self.text, -1)
+        dc.drawText(x0 + p(20) + w // 2, y, self.f_s, txt, CENTER | VCENTER)
 
     def sun_icon(self, dc, x, y, rising):
         p = self.p
@@ -712,10 +743,10 @@ class Face:
         elif style == 2:
             dc.setColor(self.hand_dark, -1)
             dc.fillPolygon(self.rotate_poly([(0, tail), (w * 0.6, tail), (w + 0.8, -ln * 0.62), (0, -ln - 2)], a))
-            dc.setColor(self.text, -1)
-            dc.fillPolygon(self.rotate_poly([(-0.8, -12), (0.8, -12), (0.8, -ln * 0.6), (-0.8, -ln * 0.6)], a))
+            dc.setColor(0xFFFFFF, -1)
+            dc.fillPolygon(self.rotate_poly([(-1.2, -12), (1.2, -12), (1.2, -ln * 0.6), (-1.2, -ln * 0.6)], a))
         else:
-            dc.setColor(self.text, -1)
+            dc.setColor(0xFFFFFF, -1)
             dc.fillPolygon(self.rotate_poly([(-w + 1.5, -14), (w - 1.5, -14), (w - 1.5, -ln + 3), (-w + 1.5, -ln + 3)], a))
 
     def seconds_hand(self, dc, sec):
@@ -759,6 +790,8 @@ class Face:
         for (x, yy), src in zip(self.gauge_centres(), g):
             if src == SUN_RING:
                 self.sun_ring(dc, x, yy, now, watch_offset)
+            elif src == MOON:
+                self.moon(dc, x, yy, now)
             else:
                 self.draw_gauge(dc, x, yy, src, sensors)
         # Ayah (mirror of drawAyah), then the battery line when no gauge shows the battery
@@ -809,7 +842,7 @@ class Face:
         return img, {"lit_fraction": lit}
 
 
-DEFAULT_SETTINGS = dict(preset=0, background=0, gauges=[0, 1, 2, SUN_RING], hijri_corr=0, ayah_mode=1, ayah_fixed=18, method=0, asr=1,
+DEFAULT_SETTINGS = dict(preset=0, background=0, gauges=[0, 1, MOON, SUN_RING], hijri_corr=0, ayah_mode=1, ayah_fixed=18, method=0, asr=1,
                         highlat=1, lat=33.8754, lon=10.8575, tz_manual=False, utc_offset=3600, is24=True)
 
 # Simulated sensor values for previews (clearly NOT live data)

@@ -70,6 +70,7 @@
     <string id="S_Gauge1_8">Active minutes (week)</string>
     <string id="S_Gauge1_9">None (empty gauge)</string>
     <string id="S_Gauge1_10">Daylight / darkness (24 h)</string>
+    <string id="S_Gauge1_11">Moon phase</string>
     <string id="S_Gauge2">Data fields: gauge 2 (upper right)</string>
     <string id="S_Gauge2_0">Steps</string>
     <string id="S_Gauge2_1">Heart rate</string>
@@ -82,6 +83,7 @@
     <string id="S_Gauge2_8">Active minutes (week)</string>
     <string id="S_Gauge2_9">None (empty gauge)</string>
     <string id="S_Gauge2_10">Daylight / darkness (24 h)</string>
+    <string id="S_Gauge2_11">Moon phase</string>
     <string id="S_Gauge3">Data fields: gauge 3 (left)</string>
     <string id="S_Gauge3_0">Steps</string>
     <string id="S_Gauge3_1">Heart rate</string>
@@ -94,6 +96,7 @@
     <string id="S_Gauge3_8">Active minutes (week)</string>
     <string id="S_Gauge3_9">None (empty gauge)</string>
     <string id="S_Gauge3_10">Daylight / darkness (24 h)</string>
+    <string id="S_Gauge3_11">Moon phase</string>
     <string id="S_Gauge4">Data fields: gauge 4 (right)</string>
     <string id="S_Gauge4_0">Steps</string>
     <string id="S_Gauge4_1">Heart rate</string>
@@ -106,6 +109,7 @@
     <string id="S_Gauge4_8">Active minutes (week)</string>
     <string id="S_Gauge4_9">None (empty gauge)</string>
     <string id="S_Gauge4_10">Daylight / darkness (24 h)</string>
+    <string id="S_Gauge4_11">Moon phase</string>
     <string id="S_GaugeColors">Data fields: gauge colours</string>
     <string id="S_GaugeColors_0">One colour per data type</string>
     <string id="S_GaugeColors_1">Accent colour</string>
@@ -228,6 +232,9 @@
     <string id="S_HighLatRule_1">Middle of the night</string>
     <string id="S_HighLatRule_2">One-seventh of the night</string>
     <string id="S_HighLatRule_3">Angle-based</string>
+    <string id="S_LocationMode">Faith &amp; calendar: Location for prayer times</string>
+    <string id="S_LocationMode_0">Automatic (watch GPS position)</string>
+    <string id="S_LocationMode_1">Manual (latitude / longitude below)</string>
     <string id="S_Latitude">Faith &amp; calendar: Latitude (decimal degrees, north positive)</string>
     <string id="S_Longitude">Faith &amp; calendar: Longitude (decimal degrees, east positive)</string>
     <string id="S_TimeZoneMode">Faith &amp; calendar: Time zone for prayer times</string>
@@ -264,6 +271,7 @@
     <string id="M_HighLatRule">High latitudes</string>
     <string id="M_TimeZoneMode">Time zone</string>
     <string id="MG_Location">Location</string>
+    <string id="M_LocationMode">Position</string>
     <string id="M_Gps">Use current position</string>
     <string id="M_Title">Luxe Hijri Prayer</string>
     <string id="M_GpsNone">No position: start a GPS activity first</string>

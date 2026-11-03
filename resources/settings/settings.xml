@@ -101,6 +101,7 @@
             <listEntry value="8">@Strings.S_Gauge1_8</listEntry>
             <listEntry value="9">@Strings.S_Gauge1_9</listEntry>
             <listEntry value="10">@Strings.S_Gauge1_10</listEntry>
+            <listEntry value="11">@Strings.S_Gauge1_11</listEntry>
         </settingConfig>
     </setting>
     <setting propertyKey="@Properties.Gauge2" title="@Strings.S_Gauge2">
@@ -116,6 +117,7 @@
             <listEntry value="8">@Strings.S_Gauge2_8</listEntry>
             <listEntry value="9">@Strings.S_Gauge2_9</listEntry>
             <listEntry value="10">@Strings.S_Gauge2_10</listEntry>
+            <listEntry value="11">@Strings.S_Gauge2_11</listEntry>
         </settingConfig>
     </setting>
     <setting propertyKey="@Properties.Gauge3" title="@Strings.S_Gauge3">
@@ -131,6 +133,7 @@
             <listEntry value="8">@Strings.S_Gauge3_8</listEntry>
             <listEntry value="9">@Strings.S_Gauge3_9</listEntry>
             <listEntry value="10">@Strings.S_Gauge3_10</listEntry>
+            <listEntry value="11">@Strings.S_Gauge3_11</listEntry>
         </settingConfig>
     </setting>
     <setting propertyKey="@Properties.Gauge4" title="@Strings.S_Gauge4">
@@ -146,6 +149,7 @@
             <listEntry value="8">@Strings.S_Gauge4_8</listEntry>
             <listEntry value="9">@Strings.S_Gauge4_9</listEntry>
             <listEntry value="10">@Strings.S_Gauge4_10</listEntry>
+            <listEntry value="11">@Strings.S_Gauge4_11</listEntry>
         </settingConfig>
     </setting>
     <setting propertyKey="@Properties.GaugeColors" title="@Strings.S_GaugeColors">
@@ -373,6 +377,12 @@
             <listEntry value="1">@Strings.S_HighLatRule_1</listEntry>
             <listEntry value="2">@Strings.S_HighLatRule_2</listEntry>
             <listEntry value="3">@Strings.S_HighLatRule_3</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.LocationMode" title="@Strings.S_LocationMode">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.S_LocationMode_0</listEntry>
+            <listEntry value="1">@Strings.S_LocationMode_1</listEntry>
         </settingConfig>
     </setting>
     <setting propertyKey="@Properties.Latitude" title="@Strings.S_Latitude">

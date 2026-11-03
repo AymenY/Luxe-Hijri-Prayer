@@ -22,6 +22,7 @@ module DataFields {
     const ACTIVE_MINUTES = 8;
     const NONE = 9;               // empty gauge
     const SUN_RING = 10;          // 24 h daylight / darkness ring (drawn by the view)
+    const MOON = 11;              // Moon phase dial (drawn by the view)
 
     const HR_SCALE_MIN = 40.0;   // the heart-rate ring is a meter from 40 to 200 bpm
     const HR_SCALE_MAX = 200.0;

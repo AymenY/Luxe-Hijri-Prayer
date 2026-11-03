@@ -70,6 +70,7 @@
     <string id="S_Gauge1_8">Minutes intensives (semaine)</string>
     <string id="S_Gauge1_9">Aucune (jauge vide)</string>
     <string id="S_Gauge1_10">Lumière / obscurité (24 h)</string>
+    <string id="S_Gauge1_11">Phase de la lune</string>
     <string id="S_Gauge2">Données : jauge 2 (haut droite)</string>
     <string id="S_Gauge2_0">Pas</string>
     <string id="S_Gauge2_1">Fréquence cardiaque</string>
@@ -82,6 +83,7 @@
     <string id="S_Gauge2_8">Minutes intensives (semaine)</string>
     <string id="S_Gauge2_9">Aucune (jauge vide)</string>
     <string id="S_Gauge2_10">Lumière / obscurité (24 h)</string>
+    <string id="S_Gauge2_11">Phase de la lune</string>
     <string id="S_Gauge3">Données : jauge 3 (gauche)</string>
     <string id="S_Gauge3_0">Pas</string>
     <string id="S_Gauge3_1">Fréquence cardiaque</string>
@@ -94,6 +96,7 @@
     <string id="S_Gauge3_8">Minutes intensives (semaine)</string>
     <string id="S_Gauge3_9">Aucune (jauge vide)</string>
     <string id="S_Gauge3_10">Lumière / obscurité (24 h)</string>
+    <string id="S_Gauge3_11">Phase de la lune</string>
     <string id="S_Gauge4">Données : jauge 4 (droite)</string>
     <string id="S_Gauge4_0">Pas</string>
     <string id="S_Gauge4_1">Fréquence cardiaque</string>
@@ -106,6 +109,7 @@
     <string id="S_Gauge4_8">Minutes intensives (semaine)</string>
     <string id="S_Gauge4_9">Aucune (jauge vide)</string>
     <string id="S_Gauge4_10">Lumière / obscurité (24 h)</string>
+    <string id="S_Gauge4_11">Phase de la lune</string>
     <string id="S_GaugeColors">Données : couleurs des jauges</string>
     <string id="S_GaugeColors_0">Une couleur par type de donnée</string>
     <string id="S_GaugeColors_1">Couleur d&apos;accent</string>
@@ -228,6 +232,9 @@
     <string id="S_HighLatRule_1">Milieu de la nuit</string>
     <string id="S_HighLatRule_2">Septième de la nuit</string>
     <string id="S_HighLatRule_3">Selon l&apos;angle</string>
+    <string id="S_LocationMode">Foi et calendrier : position pour les prières</string>
+    <string id="S_LocationMode_0">Automatique (position GPS de la montre)</string>
+    <string id="S_LocationMode_1">Manuelle (latitude / longitude ci-dessous)</string>
     <string id="S_Latitude">Foi et calendrier : latitude (degrés décimaux, nord positif)</string>
     <string id="S_Longitude">Foi et calendrier : longitude (degrés décimaux, est positif)</string>
     <string id="S_TimeZoneMode">Foi et calendrier : fuseau horaire des prières</string>
@@ -264,6 +271,7 @@
     <string id="M_HighLatRule">Hautes latitudes</string>
     <string id="M_TimeZoneMode">Fuseau horaire</string>
     <string id="MG_Location">Position</string>
+    <string id="M_LocationMode">Position</string>
     <string id="M_Gps">Utiliser la position actuelle</string>
     <string id="M_Title">Luxe Hijri Prayer</string>
     <string id="M_GpsNone">Pas de position : lancez d&apos;abord une activité GPS</string>

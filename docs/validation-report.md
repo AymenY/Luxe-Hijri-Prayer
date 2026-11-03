@@ -88,6 +88,10 @@ Days on which Fajr/Isha were replaced by the high-latitude rule are excluded fro
 | 2026-06-19 | +0 | 1448-01-03 |
 | 2026-06-19 | +2 | 1448-01-05 |
 
+## Moon phase vs astral (independent implementation)
+
+Daily, 2026-2027: max difference of the Moon's age 0.80 days (tolerance 1 day).
+
 ## Result
 
 **PASS** (0 failures)

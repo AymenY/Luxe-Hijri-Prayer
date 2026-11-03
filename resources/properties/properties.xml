@@ -12,7 +12,7 @@
     <property id="SecondsColor" type="number">0</property>
     <property id="Gauge1" type="number">0</property>
     <property id="Gauge2" type="number">1</property>
-    <property id="Gauge3" type="number">2</property>
+    <property id="Gauge3" type="number">11</property>
     <property id="Gauge4" type="number">10</property>
     <property id="GaugeColors" type="number">0</property>
     <property id="HijriScript" type="number">0</property>
@@ -62,6 +62,7 @@
     <property id="CalcMethod" type="number">0</property>
     <property id="AsrMethod" type="number">0</property>
     <property id="HighLatRule" type="number">1</property>
+    <property id="LocationMode" type="number">0</property>
     <property id="Latitude" type="float">33.8754</property>
     <property id="Longitude" type="float">10.8575</property>
     <property id="TimeZoneMode" type="number">0</property>

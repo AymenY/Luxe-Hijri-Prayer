@@ -18,10 +18,10 @@ module MenuTable {
                 ["SecondsColor", Rez.Strings.M_SecondsColor, [Rez.Strings.S_SecondsColor_0, Rez.Strings.S_SecondsColor_1, Rez.Strings.S_SecondsColor_2, Rez.Strings.S_SecondsColor_3, Rez.Strings.S_SecondsColor_4, Rez.Strings.S_SecondsColor_5, Rez.Strings.S_SecondsColor_6, Rez.Strings.S_SecondsColor_7]],
             ]],
             [Rez.Strings.MG_Complications, [
-                ["Gauge1", Rez.Strings.M_Gauge1, [Rez.Strings.S_Gauge1_0, Rez.Strings.S_Gauge1_1, Rez.Strings.S_Gauge1_2, Rez.Strings.S_Gauge1_3, Rez.Strings.S_Gauge1_4, Rez.Strings.S_Gauge1_5, Rez.Strings.S_Gauge1_6, Rez.Strings.S_Gauge1_7, Rez.Strings.S_Gauge1_8, Rez.Strings.S_Gauge1_9, Rez.Strings.S_Gauge1_10]],
-                ["Gauge2", Rez.Strings.M_Gauge2, [Rez.Strings.S_Gauge2_0, Rez.Strings.S_Gauge2_1, Rez.Strings.S_Gauge2_2, Rez.Strings.S_Gauge2_3, Rez.Strings.S_Gauge2_4, Rez.Strings.S_Gauge2_5, Rez.Strings.S_Gauge2_6, Rez.Strings.S_Gauge2_7, Rez.Strings.S_Gauge2_8, Rez.Strings.S_Gauge2_9, Rez.Strings.S_Gauge2_10]],
-                ["Gauge3", Rez.Strings.M_Gauge3, [Rez.Strings.S_Gauge3_0, Rez.Strings.S_Gauge3_1, Rez.Strings.S_Gauge3_2, Rez.Strings.S_Gauge3_3, Rez.Strings.S_Gauge3_4, Rez.Strings.S_Gauge3_5, Rez.Strings.S_Gauge3_6, Rez.Strings.S_Gauge3_7, Rez.Strings.S_Gauge3_8, Rez.Strings.S_Gauge3_9, Rez.Strings.S_Gauge3_10]],
-                ["Gauge4", Rez.Strings.M_Gauge4, [Rez.Strings.S_Gauge4_0, Rez.Strings.S_Gauge4_1, Rez.Strings.S_Gauge4_2, Rez.Strings.S_Gauge4_3, Rez.Strings.S_Gauge4_4, Rez.Strings.S_Gauge4_5, Rez.Strings.S_Gauge4_6, Rez.Strings.S_Gauge4_7, Rez.Strings.S_Gauge4_8, Rez.Strings.S_Gauge4_9, Rez.Strings.S_Gauge4_10]],
+                ["Gauge1", Rez.Strings.M_Gauge1, [Rez.Strings.S_Gauge1_0, Rez.Strings.S_Gauge1_1, Rez.Strings.S_Gauge1_2, Rez.Strings.S_Gauge1_3, Rez.Strings.S_Gauge1_4, Rez.Strings.S_Gauge1_5, Rez.Strings.S_Gauge1_6, Rez.Strings.S_Gauge1_7, Rez.Strings.S_Gauge1_8, Rez.Strings.S_Gauge1_9, Rez.Strings.S_Gauge1_10, Rez.Strings.S_Gauge1_11]],
+                ["Gauge2", Rez.Strings.M_Gauge2, [Rez.Strings.S_Gauge2_0, Rez.Strings.S_Gauge2_1, Rez.Strings.S_Gauge2_2, Rez.Strings.S_Gauge2_3, Rez.Strings.S_Gauge2_4, Rez.Strings.S_Gauge2_5, Rez.Strings.S_Gauge2_6, Rez.Strings.S_Gauge2_7, Rez.Strings.S_Gauge2_8, Rez.Strings.S_Gauge2_9, Rez.Strings.S_Gauge2_10, Rez.Strings.S_Gauge2_11]],
+                ["Gauge3", Rez.Strings.M_Gauge3, [Rez.Strings.S_Gauge3_0, Rez.Strings.S_Gauge3_1, Rez.Strings.S_Gauge3_2, Rez.Strings.S_Gauge3_3, Rez.Strings.S_Gauge3_4, Rez.Strings.S_Gauge3_5, Rez.Strings.S_Gauge3_6, Rez.Strings.S_Gauge3_7, Rez.Strings.S_Gauge3_8, Rez.Strings.S_Gauge3_9, Rez.Strings.S_Gauge3_10, Rez.Strings.S_Gauge3_11]],
+                ["Gauge4", Rez.Strings.M_Gauge4, [Rez.Strings.S_Gauge4_0, Rez.Strings.S_Gauge4_1, Rez.Strings.S_Gauge4_2, Rez.Strings.S_Gauge4_3, Rez.Strings.S_Gauge4_4, Rez.Strings.S_Gauge4_5, Rez.Strings.S_Gauge4_6, Rez.Strings.S_Gauge4_7, Rez.Strings.S_Gauge4_8, Rez.Strings.S_Gauge4_9, Rez.Strings.S_Gauge4_10, Rez.Strings.S_Gauge4_11]],
                 ["GaugeColors", Rez.Strings.M_GaugeColors, [Rez.Strings.S_GaugeColors_0, Rez.Strings.S_GaugeColors_1, Rez.Strings.S_GaugeColors_2]],
             ]],
             [Rez.Strings.MG_DateVerse, [
@@ -39,6 +39,7 @@ module MenuTable {
                 ["TimeZoneMode", Rez.Strings.M_TimeZoneMode, [Rez.Strings.S_TimeZoneMode_0, Rez.Strings.S_TimeZoneMode_1]],
             ]],
             [Rez.Strings.MG_Location, [
+                ["LocationMode", Rez.Strings.M_LocationMode, [Rez.Strings.S_LocationMode_0, Rez.Strings.S_LocationMode_1]],
                 ["#gps", Rez.Strings.M_Gps, null],
             ]]
         ];
