@@ -5,6 +5,7 @@ Connect IQ SDK, so that the watch face targets every current round colour watch.
 Run it on the machine where the SDK Manager has downloaded the devices:
     python3 tools/update_products.py            # show what would change
     python3 tools/update_products.py --write    # update manifest.xml
+    python3 tools/update_products.py --report   # one line per device with the reason it is (not) selected
 
 A device is selected when its compiler.json says:
   * round display whose resolution has a font set in this project (218 ... 454 px),
@@ -79,6 +80,7 @@ def assess(cfg):
 def main():
     write = "--write" in sys.argv
     include_unknown = "--include-unknown" in sys.argv
+    report = "--report" in sys.argv
     base = device_dirs()
     if base is None:
         sys.exit("Connect IQ device folder not found (set CIQ_DEVICES=/path/to/Devices).")
@@ -88,6 +90,17 @@ def main():
         cfg = json.load(open(cfg_path))
         dev = cfg.get("deviceId", dev)
         ok, reasons, unknown = assess(cfg)
+        if report:
+            res = cfg.get("resolution") or {}
+            vers = [version(p.get("connectIQVersion")) for p in cfg.get("partNumbers", [])
+                    if isinstance(p, dict) and p.get("connectIQVersion")]
+            print("| %s | %s | %sx%s | %s | %s | %s | %s |" % (
+                dev, cfg.get("displayName", ""), res.get("width"), res.get("height"), cfg.get("displayType"),
+                cfg.get("bitsPerPixel"), ".".join(map(str, max(vers))) if vers else "?",
+                "yes" if ok else ", ".join(reasons + ["missing " + u for u in unknown])))
+            if ok:
+                selected.append(dev)
+            continue
         if ok or (include_unknown and not reasons):
             selected.append(dev)
             print("  + %-24s %s" % (dev, cfg.get("displayName", "")))

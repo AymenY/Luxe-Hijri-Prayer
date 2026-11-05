@@ -20,7 +20,7 @@ on:
         description: "preview (one device per screen size), all (every product), iq (Store package)"
         default: preview
         type: choice
-        options: [preview, all, iq]
+        options: [preview, all, iq, devices]
       sdk:
         description: "Connect IQ SDK version constraint"
         default: ">=7.4.0"
@@ -79,6 +79,16 @@ jobs:
             connect-iq-sdk-manager device download -d "$d" > /dev/null 2>&1 || missing="$missing $d"
           done
           echo "Devices not found in the catalogue:${missing:- none}"
+          if [ "$MODE" = "devices" ]; then
+            # compatibility report: download every device of the catalogue and list them
+            connect-iq-sdk-manager device list > "$RUNNER_TEMP/devices.txt" 2>&1 || true
+            echo "device list output (first lines):"; head -5 "$RUNNER_TEMP/devices.txt"
+            for d in $(awk '{print $1}' "$RUNNER_TEMP/devices.txt" | grep -E '^[a-z0-9_]+$' | sort -u); do
+              connect-iq-sdk-manager device download -d "$d" > /dev/null 2>&1 || true
+            done
+            echo "| id | name | size | shape | bits/px | CIQ | selected |"
+            python3 tools/update_products.py --report
+          fi
           echo "Installed device files:"
           ls "$HOME/.Garmin/ConnectIQ/Devices" | tr '\n' ' '; echo
       - name: Developer key (secret CIQ_DEVELOPER_KEY, else a temporary key for test builds)
@@ -98,9 +108,10 @@ jobs:
             echo "Signing with a temporary key (test builds only)"
           fi
       - name: Compile watch face
+        if: env.MODE != 'devices'
         run: tools/ci_build.sh "$RUNNER_TEMP/key.der" "$MODE"
       - name: Compile unit tests
-        if: always()
+        if: always() && env.MODE != 'devices'
         run: tools/ci_build.sh "$RUNNER_TEMP/key.der" tests
       - name: Upload builds and logs
         if: always()
