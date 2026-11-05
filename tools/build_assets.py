@@ -31,7 +31,7 @@ FONT_SRC = os.path.join(ROOT, "tools", "fonts-src")
 RES = os.path.join(ROOT, "resources")
 BASE = 280
 # Round colour screens of current Connect IQ watches (pixels). 280 is the base resource set.
-RESOLUTIONS = [218, 240, 260, 280, 360, 390, 416, 454]
+RESOLUTIONS = [218, 240, 260, 280, 360, 390, 416, 454, 466]
 
 LATIN = "".join(chr(c) for c in range(32, 127)) + "ÀÂÄÇÉÈÊËÎÏÔÖÙÛÜàâäçéèêëîïôöùûü·°’«»−"
 

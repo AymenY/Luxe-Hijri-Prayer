@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 import render_hd  # noqa: E402
 
 ROOT = render_hd.ROOT
-SIZES = [218, 240, 260, 280, 360, 390, 416, 454]
+SIZES = [218, 240, 260, 280, 360, 390, 416, 454, 466]
 NSTYLES = len(render_hd.STYLES)
 BGS = render_hd.BACKGROUNDS
 

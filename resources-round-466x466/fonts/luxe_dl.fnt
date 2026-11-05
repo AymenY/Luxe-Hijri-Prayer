@@ -1,0 +1,16 @@
+info face="BarlowSemiCondensed-Medium" size=46 bold=0 italic=0 charset="" unicode=1 stretchH=100 smooth=1 aa=1 padding=0,0,0,0 spacing=1,1 outline=0
+common lineHeight=56 base=46 scaleW=256 scaleH=64 pages=1 packed=0 alphaChnl=0 redChnl=4 greenChnl=4 blueChnl=4
+page id=0 file="luxe_dl.png"
+chars count=11
+char id=32    x=0    y=0    width=0    height=0    xoffset=0    yoffset=0    xadvance=9    page=0  chnl=15
+char id=48    x=1    y=0    width=23   height=32   xoffset=0    yoffset=14   xadvance=23   page=0  chnl=15
+char id=49    x=25   y=0    width=14   height=32   xoffset=0    yoffset=14   xadvance=14   page=0  chnl=15
+char id=50    x=40   y=0    width=22   height=32   xoffset=0    yoffset=14   xadvance=22   page=0  chnl=15
+char id=51    x=63   y=0    width=22   height=32   xoffset=0    yoffset=14   xadvance=22   page=0  chnl=15
+char id=52    x=86   y=0    width=23   height=32   xoffset=0    yoffset=14   xadvance=23   page=0  chnl=15
+char id=53    x=110  y=0    width=22   height=32   xoffset=0    yoffset=14   xadvance=22   page=0  chnl=15
+char id=54    x=133  y=0    width=22   height=32   xoffset=0    yoffset=14   xadvance=22   page=0  chnl=15
+char id=55    x=156  y=0    width=20   height=32   xoffset=0    yoffset=14   xadvance=20   page=0  chnl=15
+char id=56    x=177  y=0    width=22   height=32   xoffset=0    yoffset=14   xadvance=22   page=0  chnl=15
+char id=57    x=200  y=0    width=21   height=32   xoffset=0    yoffset=14   xadvance=21   page=0  chnl=15
+kernings count=0

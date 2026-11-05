@@ -1,9 +1,11 @@
 # Luxe Hijri Prayer
 
 Luxury analog-digital Connect IQ **watch face** with Islamic prayer times, written in Monkey C,
-for **round colour Garmin watches** — fēnix 7 / 7 Pro / 8, epix 2 / Pro, Enduro 3,
-Forerunner 165 / 255 / 265 / 955 / 965, Venu 2 / 3, vívoactive 5, MARQ 2 — MIP and AMOLED,
-218 to 454 px.
+for **round colour Garmin watches** with Connect IQ 4 or later — 70 models, MIP and AMOLED,
+218 to 466 px: fēnix 7 / 7 Pro / 8 / 8 Pro / 9 / 9 Pro / E, epix 2 / Pro, tactix 7 AMOLED / 8,
+quatix 7 / 8, Enduro 3 / 4, Forerunner 165 / 170 / 255 / 265 / 570 / 70 / 955 / 965 / 970,
+Venu 2 / 3 / 4, vívoactive 5 / 6, MARQ 2 / 3, Instinct 3 AMOLED / Crossover AMOLED, D2 Mach 1 / 2,
+D2 Air X10, Descent G2 / Mk3, Approach S50 / S70 / S72.
 
 ![Styles (reference renders)](docs/previews/overview-styles.png)
 

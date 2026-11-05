@@ -5,9 +5,10 @@ owner's permanent developer key (README, “Store package”). Screenshots in `s
 renders and must be replaced by real simulator or device screenshots before submission.
 
 * App type: Watch face
-* Supported devices: round colour watches with Connect IQ 4+ listed in `manifest.xml` (fēnix 7 /
-  7 Pro / 8, epix 2 / Pro, Enduro 3, Forerunner 165 / 255 / 265 / 955 / 965, Venu 2 / 3,
-  vívoactive 5, MARQ 2)
+* Supported devices: the 70 round colour watches with Connect IQ 4+ listed in `manifest.xml`
+  (fēnix 7 / 8 / 9 / E and Pro models, epix 2, tactix, quatix, Enduro 3 / 4, Forerunner 165 / 170 /
+  255 / 265 / 570 / 70 / 955 / 965 / 970, Venu 2 / 3 / 4, vívoactive 5 / 6, MARQ 2 / 3, Instinct
+  AMOLED, D2, Descent, Approach). Older watches (Connect IQ 3, e.g. fēnix 6) are not supported.
 * Languages: English, French
 * Price: free (suggested)
 * Category: Watch faces

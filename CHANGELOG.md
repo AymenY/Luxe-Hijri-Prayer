@@ -7,6 +7,9 @@ Remaining release steps: `docs/RELEASE_CHECKLIST.md`.
   with the owner's permanent key (GitHub secret `CIQ_DEVELOPER_KEY`, key file deleted after
   each job), development notes removed.
 * Hijri date with Arabic numerals by default.
+* 70 watch models from the SDK catalogue (was 33): fēnix 8 Pro, fēnix 9 / 9 Pro / E, Enduro 4,
+  Forerunner 170 / 570 / 70 / 970, Venu 4, vívoactive 6, MARQ 3, Instinct AMOLED, D2 Mach 2,
+  Descent Mk3 / G2, Approach S50 / S70 / S72; new 466 px resource set (fēnix 9 Pro 51 mm).
 
 ## Preview 0.9
 * Date block in a lighter weight (Barlow Semi Condensed Medium), month without the year.

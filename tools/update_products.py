@@ -8,7 +8,8 @@ Run it on the machine where the SDK Manager has downloaded the devices:
     python3 tools/update_products.py --report   # one line per device with the reason it is (not) selected
 
 A device is selected when its compiler.json says:
-  * round display whose resolution has a font set in this project (218 ... 454 px),
+  * square MIP or AMOLED display (round on Garmin watches) whose resolution has a font set in
+    this project (218 ... 466 px),
   * more than 1 bit per pixel (colour; monochrome Instinct models are excluded),
   * watch faces are supported,
   * Connect IQ 4.0 or newer (the manifest's minApiLevel).
@@ -22,7 +23,7 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SIZES = {218, 240, 260, 280, 360, 390, 416, 454}
+SIZES = {218, 240, 260, 280, 360, 390, 416, 454, 466}
 MIN_CIQ = (4, 0, 0)
 
 
@@ -49,6 +50,8 @@ def assess(cfg):
     unknown, reasons = [], []
     res = cfg.get("resolution") or {}
     w, h = res.get("width"), res.get("height")
+    # device files have no shape field: displayType is the technology (mip, amoled, lcd). Square
+    # resolutions are round on every current MIP / AMOLED watch; the LCD Venu Sq is square.
     shape = cfg.get("displayType")
     bpp = cfg.get("bitsPerPixel")
     if w is None or h is None:
@@ -57,7 +60,7 @@ def assess(cfg):
         reasons.append("%sx%s" % (w, h))
     if shape is None:
         unknown.append("displayType")
-    elif str(shape).lower() != "round":
+    elif str(shape).lower() not in ("mip", "amoled"):
         reasons.append(str(shape))
     if bpp is None:
         unknown.append("bitsPerPixel")

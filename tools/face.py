@@ -53,7 +53,7 @@ PRESETS, MULTICOLOR, SOURCE_COLORS, COLOUR_CHOICES, TEXT_CHOICES, HAND_CHOICES =
 FAMILIES = ["luxe", "classic", "sport"]
 PRESET_NAMES = ["Luxury Blue", "Royal Gold", "Emerald Night", "Burgundy Royale", "Ice Silver", "Stealth"]
 BACKGROUNDS = ["bg_mosque", "bg_geometric", "bg_marble", "bg_night"]
-RESOLUTIONS = [218, 240, 260, 280, 360, 390, 416, 454]
+RESOLUTIONS = [218, 240, 260, 280, 360, 390, 416, 454, 466]
 
 
 def strings(lang="eng"):

@@ -7,7 +7,7 @@ Legend: ✅ done · ⬜ to do by the owner (needs the SDK simulator, the watch o
 * ✅ Static checks — `python3 tools/check_project.py` (resources, settings, menu, fonts, Monkey C syntax)
 * ✅ Algorithms validated against independent libraries — `python3 tools/validate_calculations.py`
   (prayer times, sunrise/sunset, Hijri calendar, Moon phase)
-* ✅ Layout validated for 8 screen sizes (218–454 px), 3 font families, EN/FR — `python3 tools/check_layout.py`
+* ✅ Layout validated for 9 screen sizes (218–466 px), 3 font families, EN/FR — `python3 tools/check_layout.py`
 * ✅ Compiles without errors with Connect IQ SDK 9.3.0 (GitHub Actions): 8 preview devices and the
   unit-test build
 * ✅ Runs on a fēnix 7X Pro (sideloaded): dial, gauges, prayers, verse, Moon, daylight ring
