@@ -88,7 +88,26 @@ jobs:
             for d in $(awk '{print $1}' "$RUNNER_TEMP/devices.txt" | grep -E '^[a-z0-9_]+$' | grep -v '^NAME$' | sort -u); do
               (cd "$RUNNER_TEMP" && connect-iq-sdk-manager device download -d "$d" > /dev/null 2>&1) || true
             done
-            python3 -c "import json,os;d=json.load(open(os.path.expanduser('~/.Garmin/ConnectIQ/Devices/fenix6/compiler.json')));print('fenix6 appTypes:', d.get('appTypes'))"
+            # colour depth and palette of the fenix 7X Pro (and Pro Solar) as the compiler sees them
+            python3 - <<'PY'
+          import json, os, glob
+          base = os.path.expanduser("~/.Garmin/ConnectIQ/Devices/fenix7xpro")
+          c = json.load(open(os.path.join(base, "compiler.json")))
+          print("fenix7xpro compiler.json:", {k: c.get(k) for k in ("displayName", "bitsPerPixel", "pixelFormat", "displayType")})
+          for f in sorted(glob.glob(os.path.join(base, "*.json"))):
+              d = json.load(open(f))
+              def walk(o, path=""):
+                  if isinstance(o, dict):
+                      for k, v in o.items():
+                          if "palette" in k.lower() or "color" in k.lower() or "colour" in k.lower():
+                              n = len(v) if isinstance(v, list) else v
+                              print(os.path.basename(f), path + "/" + k, "->", n if isinstance(n, int) else str(v)[:300])
+                          walk(v, path + "/" + k)
+                  elif isinstance(o, list):
+                      for i, v in enumerate(o[:3]):
+                          walk(v, path + "[%d]" % i)
+              walk(d)
+          PY
             echo "| id | name | size | display | bits/px | CIQ | watch face memory | selected |"
             python3 tools/update_products.py --report
           fi

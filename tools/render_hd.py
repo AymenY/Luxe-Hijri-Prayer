@@ -66,6 +66,10 @@ STYLES = [
          metal=("#f2f4f6", "#9aa1a8", "#3a3f44"), glow="#d8e2ec", tick="#d0d4d8",
          sky=("#040506", "#283038"), pattern="#30363d", recess=("#121417", "#020303"), track="#2a2f35",
          panel=("#16191c", "#040505")),
+    dict(name="scarlet-noir", base=("#2a0306", "#000000"), ring=("#1c1c1e", "#030303"),
+         metal=("#ffffff", "#c9c9ce", "#55585e"), glow="#ff1a1a", tick="#ffffff",
+         sky=("#030000", "#4a0508"), pattern="#5a0a10", recess=("#160204", "#000000"), track="#4a0a0e",
+         panel=("#1a0306", "#050001")),
 ]
 BACKGROUNDS = ["mosque", "geometric", "marble", "night"]
 
@@ -210,27 +214,37 @@ def layer_pattern(art, st, bg):
         art.add(hexc(st["glow"]) * 0.35, art.blur(m, 1.6), 0.6)
         art.paint(metal * 0.55, m, 0.75)
     elif bg == "marble":
+        # Black marble with veins bold enough to survive a 64-colour MIP palette: a cloudy stone,
+        # wide gold veins with a glow, and fine white quartz veins branching off them
         f = art.fractal(11, 6, 70)
-        veins = np.abs(np.sin((art.x * 0.035 + art.y * 0.022 + f * 7.5) * math.pi))
-        dark = hexc(st["recess"][1]) * 0.6 + 0.012
-        cloud = hexc(st["pattern"]) * 0.55
-        art.rgb = dark + (cloud - dark) * (f ** 1.6)[..., None]
-        thin = np.clip(1 - veins / 0.035, 0, 1)
+        g = art.fractal(29, 5, 45)
+        dark = hexc(st["recess"][1]) * 0.7 + 0.03
+        cloud = hexc(st["pattern"]) * 0.9 + 0.06
+        art.rgb = dark + (cloud - dark) * (np.clip(f * 1.35 - 0.2, 0, 1) ** 1.4)[..., None]
         gold = hexc(st["metal"][1])
-        art.add(gold * 0.45, art.blur(thin, 0.9), 0.8)
-        art.paint(gold, thin, 0.75)
-        grey = np.clip(1 - np.abs(np.sin((art.x * 0.05 - art.y * 0.03 + f * 5) * math.pi)) / 0.05, 0, 1)
-        art.paint(np.array([0.55, 0.57, 0.6]), grey, 0.18)
+        veins = np.abs(np.sin((art.x * 0.035 + art.y * 0.022 + f * 7.5) * math.pi))
+        main = np.clip(1 - veins / 0.07, 0, 1)
+        art.add(gold * 0.6, art.blur(main, 2.2), 0.9)
+        art.paint(gold, np.clip(main * 1.6, 0, 1), 0.95)
+        art.paint(hexc(st["metal"][0]), np.clip(1 - veins / 0.02, 0, 1), 0.9)
+        quartz = np.abs(np.sin((art.x * 0.05 - art.y * 0.03 + g * 6) * math.pi))
+        white = np.clip(1 - quartz / 0.04, 0, 1) * np.clip(g * 1.6 - 0.35, 0, 1)
+        art.paint(np.array([0.86, 0.88, 0.92]), white, 0.85)
     elif bg == "night":
-        sky = art.radial(170, 90, 230, hexc(st["sky"][1]) * 0.8, hexc(st["sky"][0]), 0.9)
-        art.rgb = sky
-        band = np.exp(-(((art.x - 280 + art.y) / math.sqrt(2) - 0) / 34.0) ** 2)
-        mw = band * art.fractal(23, 5, 30) ** 2
-        art.add(np.array([0.55, 0.62, 0.85]), art.blur(mw, 2.0), 0.55)
-        stars(art, 260, 31, st, big=10)
+        # Night sky: deep blue to violet towards the horizon, a bright Milky Way and stars of
+        # several sizes (single-pixel stars vanish in a MIP palette, so most are 2-3 px)
+        sky = art.radial(170, 60, 260, hexc(st["sky"][1]) * 1.1, hexc(st["sky"][0]), 0.9)
+        horizon = np.clip((art.y - 150) / 130.0, 0, 1)[..., None]
+        art.rgb = sky * (1 - horizon * 0.5) + np.array([0.30, 0.12, 0.38]) * horizon * 0.5
+        band = np.exp(-(((art.x - 280 + art.y) / math.sqrt(2)) / 40.0) ** 2)
+        mw = band * np.clip(art.fractal(23, 5, 30) * 1.4 - 0.2, 0, 1) ** 1.5
+        art.add(np.array([0.62, 0.66, 0.92]), art.blur(mw, 1.6), 0.9)
+        art.add(np.array([0.9, 0.75, 0.95]), art.blur(mw ** 2, 3.0), 0.5)
+        stars(art, 520, 31, st, big=26, size=1.0)
+        stars(art, 160, 47, st, big=0, size=0.55)
 
 
-def stars(art, count, seed, st, big=6, region=None):
+def stars(art, count, seed, st, big=6, region=None, size=0.35):
     rng = np.random.default_rng(seed)
     m = np.zeros((art.n, art.n))
     glow = np.zeros((art.n, art.n))
@@ -244,7 +258,7 @@ def stars(art, count, seed, st, big=6, region=None):
             m[cy, cx] = b
             if i < big:
                 glow[cy, cx] = 1.0
-    core = art.blur(m, 0.35) * 9
+    core = art.blur(m, size) * (9 if size <= 0.35 else 9 * (size / 0.35) ** 2)
     art.add(np.array([1.0, 0.98, 0.92]), core, 1.0)
     halo = art.blur(glow, 2.2) * 120
     art.add(hexc(st["glow"]) * 0.6, halo, 1.0)
@@ -570,6 +584,7 @@ GRADES = [
     (("#0e0207", "#4a0f26", "#c2708c"), "#ffc7b0"),                         # Burgundy Royale (rose gold)
     (("#020814", "#1b3a63", "#b8d4ee"), "#e8eef5"),                         # Ice Silver
     (("#040506", "#24282d", "#a9b0b8"), "#e6e8ea"),                         # Stealth
+    (("#040000", "#3c060c", "#d9d9de"), "#ff4040"),                         # Scarlet Noir (red lights)
 ]
 
 
@@ -641,6 +656,17 @@ def to_mip(img):
     flat = MIP.flatten().tolist() + [0] * (768 - MIP.size)
     pal.putpalette(flat)
     return img.quantize(palette=pal, dither=Image.Dither.FLOYDSTEINBERG)
+
+
+def mip_grade(img):
+    """MIP screens: make blues purer. A 64-colour palette dithers navy blues that contain some green
+    with teal pixels, which made the Luxury Blue dial look green on the watch."""
+    a = np.asarray(img.convert("RGB"), dtype=np.float64)
+    r, g, b = a[..., 0], a[..., 1], a[..., 2]
+    blue = b > np.maximum(r, g)
+    a[..., 0] = np.where(blue, r * 0.6, r)
+    a[..., 1] = np.where(blue, g * 0.6, g)
+    return Image.fromarray(np.clip(a, 0, 255).astype(np.uint8), "RGB")
 
 
 def render_for_device(size, style_index, bg):

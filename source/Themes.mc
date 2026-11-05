@@ -22,7 +22,7 @@ module Themes {
     const WARN = 14;     // low battery
     const TICK = 15;     // minute track
 
-    const COUNT = 6;
+    const COUNT = 7;
 
     // Order must match the "StylePreset" list in resources/settings/settings.xml.
     const PRESETS = [
@@ -43,12 +43,15 @@ module Themes {
          0xFFFFFF, 0xAAAAAA, 0x0055AA, 0xAAFFFF, 0x000000, 0xFFFFFF, 0xFF5500, 0xAAFFFF],
         // F  Stealth
         [0x000000, 0x000000, 0x555555, 0x555555, 0xAAAAAA, 0x555555, 0xFFFFFF, 0xFFFFFF,
-         0xFFFFFF, 0xAAAAAA, 0x555555, 0xFFFFFF, 0x555555, 0xAAAAAA, 0xFF5500, 0xAAAAAA]
+         0xFFFFFF, 0xAAAAAA, 0x555555, 0xFFFFFF, 0x555555, 0xAAAAAA, 0xFF5500, 0xAAAAAA],
+        // G  Scarlet Noir: black, red and white
+        [0x000000, 0x000000, 0x550000, 0xAA0000, 0xFFFFFF, 0xAAAAAA, 0xFF0000, 0xFF5555,
+         0xFFFFFF, 0xAAAAAA, 0x550000, 0xFF0000, 0x000000, 0xFFFFFF, 0xFF5500, 0xAAAAAA]
     ];
 
     // Presets whose gauges use one colour per data type (as in the approved concept)
     // instead of the preset accent.
-    const MULTICOLOR = [true, false, false, false, true, false];
+    const MULTICOLOR = [true, false, false, false, true, false, false];
 
     // Gauge colour per data source (DataFields order), used by MULTICOLOR presets.
     const SOURCE_COLORS = [0x00AAFF, 0xFF0055, 0xFFAA00, 0x00FF55, 0x55FFFF, 0xAAAAFF, 0x00FFAA, 0xFFFF55, 0xFF55FF, 0xAAAAAA];

@@ -43,7 +43,8 @@ def settings():
     out = [
         ("StylePreset", "number", 0, (A + "Style", AF + "style"),
          [("Luxury Blue", "Luxury Blue (bleu)"), ("Royal Gold", "Royal Gold (or)"), ("Emerald Night", "Emerald Night (émeraude)"),
-          ("Burgundy Royale", "Burgundy Royale (bordeaux)"), ("Ice Silver", "Ice Silver (argent)"), ("Stealth", "Stealth (graphite)")]),
+          ("Burgundy Royale", "Burgundy Royale (bordeaux)"), ("Ice Silver", "Ice Silver (argent)"), ("Stealth", "Stealth (graphite)"),
+          ("Scarlet Noir (black, red, white)", "Scarlet Noir (noir, rouge, blanc)")]),
         ("Background", "number", 0, (A + "Background", AF + "arrière-plan"),
          [("Mosque at night (illustration)", "Mosquée de nuit (illustration)"), ("Islamic geometric pattern", "Motif géométrique islamique"),
           ("Black marble, gold veining", "Marbre noir veiné d'or"), ("Night sky and crescent", "Ciel nocturne et croissant")]),

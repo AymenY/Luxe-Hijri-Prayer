@@ -165,7 +165,7 @@ def main():
 
     # list sizes vs code tables
     themes = open(os.path.join(ROOT, "source", "Themes.mc")).read()
-    n_presets = len(re.findall(r"//\s+[A-F]\s+\w", themes))
+    n_presets = len(re.findall(r"//\s+[A-Z]\s+\w", themes))
     expect = {
         "StylePreset": n_presets,
         "Background": len([j for j in res["JsonData"] if j.startswith("Bg")]),

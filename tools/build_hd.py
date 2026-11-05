@@ -53,6 +53,8 @@ def job(args):
         return sprite_job(args)
     size, s, b = args
     img = render_hd.render(size, s, BGS[b])
+    if size < render_hd.AMOLED_FROM:
+        img = render_hd.mip_grade(img)
     path = os.path.join(folder(size), fname(size, s, b))
     img.convert("RGB").save(path, "JPEG", quality=90, optimize=True, subsampling=0)
     return path, os.path.getsize(path)
@@ -93,7 +95,7 @@ def main():
     total = {}
     with mp.Pool(4) as pool:
         for path, n in pool.imap_unordered(job, jobs):
-            size = int(path.split("x")[-1].split("/")[0]) if "round" in path else 280
+            size = int(os.path.relpath(path, ROOT).split(os.sep)[1])
             total[size] = total.get(size, 0) + n
             print("%6d KB  %s" % (n // 1024, os.path.relpath(path, ROOT)), flush=True)
     for size in sorted(total):

@@ -3,6 +3,10 @@
 Remaining release steps: `docs/RELEASE_CHECKLIST.md`.
 
 ## 1.0.0 — release candidate (2026-11-05)
+* New style **Scarlet Noir** (black, red and white).
+* MIP watches: blues made purer before the palette conversion (Luxury Blue looked green on the
+  fēnix 7X Pro); black marble with bold gold and quartz veins; night sky with a Milky Way and
+  larger stars (both backgrounds were nearly empty on MIP screens).
 * Store preparation: listing and privacy texts (EN/FR), release checklist, Store package signed
   with the owner's permanent key (GitHub secret `CIQ_DEVELOPER_KEY`, key file deleted after
   each job), development notes removed.

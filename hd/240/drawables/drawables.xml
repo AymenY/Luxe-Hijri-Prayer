@@ -24,6 +24,10 @@
     <bitmap id="Dial51" filename="dial_5_1.jpg" dithering="floyd_steinberg" />
     <bitmap id="Dial52" filename="dial_5_2.jpg" dithering="floyd_steinberg" />
     <bitmap id="Dial53" filename="dial_5_3.jpg" dithering="floyd_steinberg" />
+    <bitmap id="Dial60" filename="dial_6_0.jpg" dithering="floyd_steinberg" />
+    <bitmap id="Dial61" filename="dial_6_1.jpg" dithering="floyd_steinberg" />
+    <bitmap id="Dial62" filename="dial_6_2.jpg" dithering="floyd_steinberg" />
+    <bitmap id="Dial63" filename="dial_6_3.jpg" dithering="floyd_steinberg" />
     <!-- numerals 12 / 3 / 6 / 9: NumSDQ = style S, digits D (0 Arabic, 1 Indian), position Q -->
     <bitmap id="Num000" filename="num_0_0_0.png" dithering="floyd_steinberg" />
     <bitmap id="Num001" filename="num_0_0_1.png" dithering="floyd_steinberg" />
@@ -73,4 +77,12 @@
     <bitmap id="Num511" filename="num_5_1_1.png" dithering="floyd_steinberg" />
     <bitmap id="Num512" filename="num_5_1_2.png" dithering="floyd_steinberg" />
     <bitmap id="Num513" filename="num_5_1_3.png" dithering="floyd_steinberg" />
+    <bitmap id="Num600" filename="num_6_0_0.png" dithering="floyd_steinberg" />
+    <bitmap id="Num601" filename="num_6_0_1.png" dithering="floyd_steinberg" />
+    <bitmap id="Num602" filename="num_6_0_2.png" dithering="floyd_steinberg" />
+    <bitmap id="Num603" filename="num_6_0_3.png" dithering="floyd_steinberg" />
+    <bitmap id="Num610" filename="num_6_1_0.png" dithering="floyd_steinberg" />
+    <bitmap id="Num611" filename="num_6_1_1.png" dithering="floyd_steinberg" />
+    <bitmap id="Num612" filename="num_6_1_2.png" dithering="floyd_steinberg" />
+    <bitmap id="Num613" filename="num_6_1_3.png" dithering="floyd_steinberg" />
 </drawables>
