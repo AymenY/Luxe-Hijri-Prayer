@@ -308,6 +308,7 @@ class Face:
         fam = FAMILIES[settings.get("font_family", 0)]
         self.f_num, self.f_l, self.f_m, self.f_s, self.f_xs, self.f_ar = (
             f("luxe_num"), f(fam + "_l"), f(fam + "_m"), f(fam + "_s"), f(fam + "_xs"), f("ar_small"))
+        self.f_dl, self.f_dxs = f(fam + "_dl"), f(fam + "_dxs")
 
     @staticmethod
     def load_dial(preset, bg, size):
@@ -683,13 +684,17 @@ class Face:
             dc.setColor(self.c[T["PLATE"]], -1); dc.fillCircle(x + p(2), y - p(2), p(4))
             dc.setColor(self.c[T["GOLD"]], -1); dc.fillCircle(x + p(4), y + p(2), 1)
 
-    def draw_panel(self, dc, cx, kind, name, value, value_color):
+    def draw_panel(self, dc, cx, kind, prayer, value, value_color):
         p = self.p
         x0 = cx - p(L.PANEL_W) // 2
         self.panel_icon(dc, x0 + p(11), p(L.PANEL_Y0 + L.PANEL_H // 2), kind)
         tx = x0 + p(20) + (p(L.PANEL_W) - p(22)) // 2
         dc.setColor(self.text, -1)
-        dc.drawText(tx, p(L.PANEL_Y0 + 8), self.f_xs, name, CENTER | VCENTER)
+        if self.s.get("prayer_names", 0) == 0:   # ArSmall "N".."R"
+            k = [0, -1, 1, 2, -1, 3, 4][prayer]
+            dc.drawText(tx, p(L.PANEL_Y0 + 8), self.f_ar, chr(ord("N") + k), CENTER | VCENTER)
+        else:
+            dc.drawText(tx, p(L.PANEL_Y0 + 8), self.f_xs, self.str[PRAYER_NAMES[prayer]], CENTER | VCENTER)
         dc.setColor(value_color, -1)
         dc.drawText(tx, p(L.PANEL_Y0 + 20), self.f_s, value, CENTER | VCENTER)
 
@@ -717,11 +722,11 @@ class Face:
                 break
         if found:
             nxt = found[0]
-            self.draw_panel(dc, p(140 - L.PANEL_DX), 0, self.str[PRAYER_NAMES[nxt[0]]],
+            self.draw_panel(dc, p(140 - L.PANEL_DX), 0, nxt[0],
                             calc.countdown_text(nxt[1] - now), self.accent)
         if len(found) > 1:
             fol = found[1]
-            self.draw_panel(dc, p(140 + L.PANEL_DX), 1, self.str[PRAYER_NAMES[fol[0]]],
+            self.draw_panel(dc, p(140 + L.PANEL_DX), 1, fol[0],
                             format_time(calc.to_minutes(days[fol[2]][fol[0]]), is24), self.text)
         for sgn, idx in ((-1, 1), (1, 4)):
             x = p(140 + sgn * L.SUN_DX)
@@ -782,18 +787,19 @@ class Face:
         # date block
         y, m, d = calc.civil_from_days(day)
         dc.setColor(self.text, -1)
-        dc.drawText(p(140), p(L.DAY_NAME_Y), self.f_xs, self.str["Day%d" % calc.day_of_week(day)], CENTER | VCENTER)
-        dc.drawText(p(140), p(L.DAY_NUM_Y), self.f_l, str(d), CENTER | VCENTER)
-        dc.drawText(p(140), p(L.MONTH_Y), self.f_xs, "%s %d" % (self.str["Month%d" % m], y), CENTER | VCENTER)
+        dc.drawText(p(140), p(L.DAY_NAME_Y), self.f_dxs, self.str["Day%d" % calc.day_of_week(day)], CENTER | VCENTER)
+        dc.drawText(p(140), p(L.DAY_NUM_Y), self.f_dl, str(d), CENTER | VCENTER)
+        dc.drawText(p(140), p(L.MONTH_Y), self.f_dxs, self.str["Month%d" % m], CENTER | VCENTER)
         hy, hm, hd = calc.hijri_for_epoch_day(day, s["hijri_corr"])
         dc.setColor(c[T["GOLD"]], -1)
+        dc.setColor(self.text, -1)
         if s.get("hijri_arabic", True):
             ar = (lambda n: str(n)) if s.get("hijri_digits", 1) == 1 else \
                 (lambda n: "".join(chr(ord(ch) - 48 + 97) for ch in str(n)))   # mirror of arDigits
-            dc.drawText(p(140), p(L.HIJRI_Y), self.f_ar, "M %s %s %s" % (ar(hy), chr(ord("A") + hm - 1), ar(hd)),
+            dc.drawText(p(140), p(L.HIJRI_Y) + (1 if self.k < 0.8 else 0), self.f_ar, "M %s %s %s" % (ar(hy), chr(ord("A") + hm - 1), ar(hd)),
                         CENTER | VCENTER)
         else:
-            dc.drawText(p(140), p(L.HIJRI_Y), self.f_xs, "%d %s %d %s" % (hd, self.str["Hijri%d" % hm], hy,
+            dc.drawText(p(140), p(L.HIJRI_Y) + (1 if self.k < 0.8 else 0), self.f_xs, "%d %s %d %s" % (hd, self.str["Hijri%d" % hm], hy,
                                                                          self.str["HijriSuffix"]), CENTER | VCENTER)
         nxt = self.draw_prayers(dc, now, watch_offset)
         g = s["gauges"]

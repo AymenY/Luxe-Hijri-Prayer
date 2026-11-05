@@ -59,6 +59,7 @@
     <property id="AyahInc37" type="boolean">true</property>
     <property id="AyahInc38" type="boolean">true</property>
     <property id="AyahInc39" type="boolean">true</property>
+    <property id="PrayerNames" type="number">0</property>
     <property id="CalcMethod" type="number">0</property>
     <property id="AsrMethod" type="number">0</property>
     <property id="HighLatRule" type="number">1</property>

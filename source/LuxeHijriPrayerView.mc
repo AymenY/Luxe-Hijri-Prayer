@@ -41,6 +41,8 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
 
     hidden var mFontNum;
     hidden var mFontL;
+    hidden var mFontDL;             // date block: lighter weight (day number, day name and month)
+    hidden var mFontDXS;
     hidden var mFontM;
     hidden var mFontS;
     hidden var mFontXS;
@@ -216,18 +218,23 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         if (f == mFontFamily && mFontM != null) {
             return;
         }
-        var ids = [[Rez.Fonts.LuxeL, Rez.Fonts.LuxeM, Rez.Fonts.LuxeS, Rez.Fonts.LuxeXS],
-                   [Rez.Fonts.ClassicL, Rez.Fonts.ClassicM, Rez.Fonts.ClassicS, Rez.Fonts.ClassicXS],
-                   [Rez.Fonts.SportL, Rez.Fonts.SportM, Rez.Fonts.SportS, Rez.Fonts.SportXS]];
+        var ids = [[Rez.Fonts.LuxeL, Rez.Fonts.LuxeM, Rez.Fonts.LuxeS, Rez.Fonts.LuxeXS, Rez.Fonts.LuxeDL, Rez.Fonts.LuxeDXS],
+                   [Rez.Fonts.ClassicL, Rez.Fonts.ClassicM, Rez.Fonts.ClassicS, Rez.Fonts.ClassicXS,
+                    Rez.Fonts.ClassicDL, Rez.Fonts.ClassicDXS],
+                   [Rez.Fonts.SportL, Rez.Fonts.SportM, Rez.Fonts.SportS, Rez.Fonts.SportXS, Rez.Fonts.SportDL, Rez.Fonts.SportDXS]];
         var set = ids[f] as Array;
         mFontL = null;
         mFontM = null;
         mFontS = null;
         mFontXS = null;
+        mFontDL = null;
+        mFontDXS = null;
         mFontL = WatchUi.loadResource(set[0]);
         mFontM = WatchUi.loadResource(set[1]);
         mFontS = WatchUi.loadResource(set[2]);
         mFontXS = WatchUi.loadResource(set[3]);
+        mFontDL = WatchUi.loadResource(set[4]);
+        mFontDXS = WatchUi.loadResource(set[5]);
         mFontFamily = f;
     }
 
@@ -501,28 +508,29 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
 
     // ------------------------------------------------------------------ live content
     hidden function drawLive(dc as Graphics.Dc, now as Number, clock as System.ClockTime) as Void {
-        var c = mColors;
         var vc = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
         var day = CivilDate.localEpochDay(now, clock.timeZoneOffset);
 
         // date block
         var ymd = CivilDate.fromDays(day);
         dc.setColor(mText, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(p(140), p(Layout.DAY_NAME_Y), mFontXS, mDays[CivilDate.dayOfWeek(day)], vc);
-        dc.drawText(p(140), p(Layout.DAY_NUM_Y), mFontL, ymd[2].toString(), vc);
-        dc.drawText(p(140), p(Layout.MONTH_Y), mFontXS, mMonths[ymd[1] - 1] + " " + ymd[0].toString(), vc);
+        dc.drawText(p(140), p(Layout.DAY_NAME_Y), mFontDXS, mDays[CivilDate.dayOfWeek(day)], vc);
+        dc.drawText(p(140), p(Layout.DAY_NUM_Y), mFontDL, ymd[2].toString(), vc);
+        dc.drawText(p(140), p(Layout.MONTH_Y), mFontDXS, mMonths[ymd[1] - 1], vc);
         // Hijri date in Arabic. The ArSmall font maps "0".."9" to Eastern Arabic digits, "A".."L"
         // to the month names and "M" to the AH suffix; written left to right on screen this
         // reads, right to left, "day month year AH" (numbers keep their left-to-right order).
         // (or in Latin script when the user prefers it)
         var h = HijriCalendar.forEpochDay(day, mSettings.hijriCorrection);
-        dc.setColor(c[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
+        // 218 px: 1 px lower, clear of the upper gauges (the font cannot get smaller there)
+        var hy = p(Layout.HIJRI_Y) + (mK < 0.8 ? 1 : 0);
+        dc.setColor(mText, Graphics.COLOR_TRANSPARENT);
         if (mSettings.hijriArabic) {
             var month = (('A' as Char).toNumber() + h[1] - 1).toChar().toString();
-            dc.drawText(p(140), p(Layout.HIJRI_Y), mFontAr,
+            dc.drawText(p(140), hy, mFontAr,
                         "M " + arDigits(h[0]) + " " + month + " " + arDigits(h[2]), vc);
         } else {
-            dc.drawText(p(140), p(Layout.HIJRI_Y), mFontXS,
+            dc.drawText(p(140), hy, mFontXS,
                         h[2].toString() + " " + mHijriMonths[h[1] - 1] + " " + h[0].toString() + " " + mHijriSuffix, vc);
         }
 
@@ -884,12 +892,11 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         if (list.size() > 0) {
             var n = list[0] as Array;
             var secs = ((n[1] as Long) - now).toNumber();
-            drawPanel(dc, p(Layout.CX - Layout.PANEL_DX), true, mPrayerNames[n[0] as Number] as String,
-                      countdown(secs), mAccent);
+            drawPanel(dc, p(Layout.CX - Layout.PANEL_DX), true, n[0] as Number, countdown(secs), mAccent);
         }
         if (list.size() > 1) {
             var f = list[1] as Array;
-            drawPanel(dc, p(Layout.CX + Layout.PANEL_DX), false, mPrayerNames[f[0] as Number] as String,
+            drawPanel(dc, p(Layout.CX + Layout.PANEL_DX), false, f[0] as Number,
                       formatTime(mSchedule.minutes(f[2] as Number, f[0] as Number), is24), mText);
         }
         drawSun(dc, true, mSchedule.minutes(0, PrayerTimes.SUNRISE), is24);
@@ -897,7 +904,7 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     }
 
     // Cartouche content: icon on the left, name above value. `next` selects the mosque icon.
-    hidden function drawPanel(dc as Graphics.Dc, cx as Number, next as Boolean, name as String, value as String,
+    hidden function drawPanel(dc as Graphics.Dc, cx as Number, next as Boolean, prayer as Number, value as String,
                               valueColor as Number) as Void {
         var c = mColors;
         var vc = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
@@ -920,7 +927,13 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         }
         var tx = x0 + p(20) + (p(Layout.PANEL_W) - p(22)) / 2;
         dc.setColor(mText, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(tx, p(Layout.PANEL_Y0 + 8), mFontXS, name, vc);
+        if (mSettings.prayerArabic) {
+            // ArSmall glyphs "N".."R": the Arabic names of Fajr, Dhuhr, Asr, Maghrib, Isha
+            var k = [0, -1, 1, 2, -1, 3, 4][prayer] as Number;
+            dc.drawText(tx, p(Layout.PANEL_Y0 + 8), mFontAr, (('N' as Char).toNumber() + k).toChar().toString(), vc);
+        } else {
+            dc.drawText(tx, p(Layout.PANEL_Y0 + 8), mFontXS, mPrayerNames[prayer] as String, vc);
+        }
         dc.setColor(valueColor, Graphics.COLOR_TRANSPARENT);
         dc.drawText(tx, p(Layout.PANEL_Y0 + 20), mFontS, value, vc);
     }

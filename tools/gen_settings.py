@@ -82,6 +82,8 @@ def settings():
     for i, (en, fr) in enumerate(verses):
         out.append(("AyahInc%02d" % (i + 1), "boolean", True, ("Rotation: " + en, "Rotation : " + fr), None))
     out += [
+        ("PrayerNames", "number", 0, (F + "Prayer names", FF + "noms des prières"),
+         [("Arabic", "Arabe"), ("Latin script", "Écriture latine")]),
         ("CalcMethod", "number", 0, (F + "Prayer calculation method", FF + "méthode de calcul des prières"), METHODS),
         ("AsrMethod", "number", 0, (F + "Asr convention", FF + "calcul de l'Asr"),
          [("Standard (Maliki, Shafi'i, Hanbali)", "Standard (malikite, chaféite, hanbalite)"), ("Hanafi", "Hanafite")]),
@@ -125,7 +127,7 @@ MENU = [
         ("HijriCorrection", ("Hijri correction", "Correction hégirienne")), ("AyahMode", ("Verse", "Verset")),
         ("AyahFixed", ("Fixed verse", "Verset fixe")), ("#verses", ("Verses in rotation", "Versets en rotation"))]),
     ("Prayers", ("Prayers", "Prières"), [
-        ("CalcMethod", ("Method", "Méthode")), ("AsrMethod", ("Asr", "Asr")),
+        ("PrayerNames", ("Prayer names", "Noms des prières")), ("CalcMethod", ("Method", "Méthode")), ("AsrMethod", ("Asr", "Asr")),
         ("HighLatRule", ("High latitudes", "Hautes latitudes")), ("TimeZoneMode", ("Time zone", "Fuseau horaire")),
         ("AdjFajr", ("Adjust Fajr", "Ajuster Fajr")), ("AdjDhuhr", ("Adjust Dhuhr", "Ajuster Dhohr")),
         ("AdjAsr", ("Adjust Asr", "Ajuster Asr")), ("AdjMaghrib", ("Adjust Maghrib", "Ajuster Maghrib")),

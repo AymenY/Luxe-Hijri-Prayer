@@ -24,6 +24,7 @@ class LuxeSettings {
     // Faith & calendar
     var hijriArabic as Boolean = true;
     var hijriIndianDigits as Boolean = true;
+    var prayerArabic as Boolean = true;   // prayer names in Arabic in the cartouches
     var hijriCorrection as Number = 0;
     var ayahMode as Number = 0;           // 0 hourly rotation, 1 fixed, 2 hidden
     var ayahFixed as Number = 18;
@@ -63,6 +64,7 @@ class LuxeSettings {
 
         hijriArabic = readList("HijriScript", 1, 0) == 0;
         hijriIndianDigits = readList("HijriDigits", 1, 1) == 1;
+        prayerArabic = readList("PrayerNames", 1, 0) == 0;
         hijriCorrection = readList("HijriCorrection", 4, 2) - 2;
         ayahMode = readList("AyahMode", 2, 0);
         ayahFixed = readList("AyahFixed", AYAH_COUNT - 1, 18);

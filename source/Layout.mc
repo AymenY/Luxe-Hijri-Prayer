@@ -23,7 +23,7 @@ module Layout {
     const DAY_NAME_Y = 57;
     const DAY_NUM_Y = 75;
     const MONTH_Y = 93;
-    const HIJRI_Y = 113;
+    const HIJRI_Y = 112;
 
     // Gauges: upper pair (steps / heart rate) and side pair (calories / battery)
     const GAUGE_UP_DX = 56;

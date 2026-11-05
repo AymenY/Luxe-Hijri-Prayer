@@ -83,6 +83,7 @@ The settings and the watch menu are generated from `tools/gen_settings.py` (Engl
 | Faith & calendar | Ayah | Hourly rotation (ticked verses), fixed verse, hidden |
 | Faith & calendar | Fixed verse + 39 “Rotation” check boxes | Ash-Sharh 94:5; all ticked |
 | Faith & calendar | Prayer method, Asr, high-latitude rule | Tunisia 18°/18°, standard, middle of the night |
+| Faith & calendar | Prayer names | Arabic (الفجر …), Latin script |
 | Faith & calendar | Adjust Fajr / Dhuhr / Asr / Maghrib / Isha | −30…+30 min each (0), to match a mosque timetable |
 | Faith & calendar | Location | Automatic (follows the watch's GPS position), manual |
 | Faith & calendar | Latitude / longitude / time zone | 33.8754 / 10.8575 (Houmt Souk, Djerba) / watch time zone |
@@ -204,7 +205,7 @@ keep them in sync when changing `source/`.
 ## Licences
 
 Code: © the author. Background illustration `tools/art-src/mosque-night.png`: supplied by the
-owner. Fonts: Barlow Semi Condensed, Cinzel, Rajdhani and Amiri, SIL Open Font License 1.1
+owner. Fonts: Barlow Semi Condensed (Bold, SemiBold, Medium), Cinzel, Rajdhani and Amiri, SIL Open Font License 1.1
 (`tools/fonts-src/OFL-*.txt`); the bitmap fonts in `resources*/fonts/` are derived from them.
 Arabic text: Tanzil (CC BY 3.0, unmodified text). French translation: M. Hamidullah via Tanzil
 (documentation only).

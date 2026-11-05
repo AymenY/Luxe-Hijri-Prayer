@@ -33,6 +33,7 @@ module MenuTable {
                 ["#verses", Rez.Strings.M_Verses, null],
             ]],
             [Rez.Strings.MG_Prayers, [
+                ["PrayerNames", Rez.Strings.M_PrayerNames, [Rez.Strings.S_PrayerNames_0, Rez.Strings.S_PrayerNames_1]],
                 ["CalcMethod", Rez.Strings.M_CalcMethod, [Rez.Strings.S_CalcMethod_0, Rez.Strings.S_CalcMethod_1, Rez.Strings.S_CalcMethod_2, Rez.Strings.S_CalcMethod_3, Rez.Strings.S_CalcMethod_4, Rez.Strings.S_CalcMethod_5, Rez.Strings.S_CalcMethod_6, Rez.Strings.S_CalcMethod_7, Rez.Strings.S_CalcMethod_8, Rez.Strings.S_CalcMethod_9, Rez.Strings.S_CalcMethod_10, Rez.Strings.S_CalcMethod_11, Rez.Strings.S_CalcMethod_12, Rez.Strings.S_CalcMethod_13]],
                 ["AsrMethod", Rez.Strings.M_AsrMethod, [Rez.Strings.S_AsrMethod_0, Rez.Strings.S_AsrMethod_1]],
                 ["HighLatRule", Rez.Strings.M_HighLatRule, [Rez.Strings.S_HighLatRule_0, Rez.Strings.S_HighLatRule_1, Rez.Strings.S_HighLatRule_2, Rez.Strings.S_HighLatRule_3]],

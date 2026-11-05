@@ -13,6 +13,12 @@
     <font id="SportM" filename="sport_m.fnt" antialias="true" />
     <font id="SportS" filename="sport_s.fnt" antialias="true" />
     <font id="SportXS" filename="sport_xs.fnt" antialias="true" />
+    <font id="LuxeDL" filename="luxe_dl.fnt" antialias="true" />
+    <font id="LuxeDXS" filename="luxe_dxs.fnt" antialias="true" />
+    <font id="ClassicDL" filename="classic_dl.fnt" antialias="true" />
+    <font id="ClassicDXS" filename="classic_dxs.fnt" antialias="true" />
+    <font id="SportDL" filename="sport_dl.fnt" antialias="true" />
+    <font id="SportDXS" filename="sport_dxs.fnt" antialias="true" />
     <font id="ArSmall" filename="ar_small.fnt" antialias="true" />
     <font id="Ayah0" filename="ayah0.fnt" antialias="true" />
     <font id="Ayah1" filename="ayah1.fnt" antialias="true" />

@@ -34,7 +34,7 @@ class Check:
         return int(math.floor(v * self.k + 0.5))
 
     def text_box(self, fontname, text, cx, cy):
-        f = face.font(fontname.replace("luxe_", self.fam + "_") if fontname[5:] in ("l", "m", "s", "xs") else fontname,
+        f = face.font(fontname.replace("luxe_", self.fam + "_") if fontname[5:] in ("l", "m", "s", "xs", "dl", "dxs") else fontname,
                       self.size)
         w = f.width(text)
         x = cx - w // 2
@@ -64,7 +64,7 @@ FAM = "luxe"
 
 
 def fontname_for(fontname):
-    return fontname.replace("luxe_", FAM + "_") if fontname[5:] in ("l", "m", "s", "xs") else fontname
+    return fontname.replace("luxe_", FAM + "_") if fontname[5:] in ("l", "m", "s", "xs", "dl", "dxs") else fontname
 
 
 def widest(fontname, size, cands):
@@ -102,16 +102,16 @@ def check_size(size, report):
         ck.inside(ck.boxes[name], name, L.TICK_R_IN)
 
     for lang, s in S.items():
-        ck.add("dayname-" + lang, ck.text_box("luxe_xs", widest("luxe_xs", size, [s["Day%d" % d] for d in range(7)]),
+        ck.add("dayname-" + lang, ck.text_box("luxe_dxs", widest("luxe_dxs", size, [s["Day%d" % d] for d in range(7)]),
                                               p(140), p(L.DAY_NAME_Y)))
-        ck.add("daynum-" + lang, ck.text_box("luxe_l", "28", p(140), p(L.DAY_NUM_Y)))
-        ck.add("month-" + lang, ck.text_box("luxe_xs", widest("luxe_xs", size, ["%s 2026" % s["Month%d" % m]
-                                                                                for m in range(1, 13)]), p(140), p(L.MONTH_Y)))
+        ck.add("daynum-" + lang, ck.text_box("luxe_dl", "28", p(140), p(L.DAY_NUM_Y)))
+        ck.add("month-" + lang, ck.text_box("luxe_dxs", widest("luxe_dxs", size, [s["Month%d" % m] for m in range(1, 13)]),
+                                            p(140), p(L.MONTH_Y)))
         # Arabic pieces (language independent): widest Hijri date
         ck.add("hijri", ck.text_box("ar_small", widest("ar_small", size, ["M 1448 %s 30" % chr(ord("A") + m)
-                                                                          for m in range(12)]), p(140), p(L.HIJRI_Y)))
+                                                                          for m in range(12)]), p(140), p(L.HIJRI_Y) + (1 if ck.k < 0.8 else 0)))
         ck.add("hijri_latin-" + lang, ck.text_box("luxe_xs", widest("luxe_xs", size, [
-            "30 %s 1448 %s" % (s["Hijri%d" % m], s["HijriSuffix"]) for m in range(1, 13)]), p(140), p(L.HIJRI_Y)))
+            "30 %s 1448 %s" % (s["Hijri%d" % m], s["HijriSuffix"]) for m in range(1, 13)]), p(140), p(L.HIJRI_Y) + (1 if ck.k < 0.8 else 0)))
         # battery line under the verse: icon (20 units with its gap) then "100%"
         tb = ck.text_box("luxe_s", "100%", p(140) + p(10), p(L.BATT_Y))
         bb = (tb[0] - p(20), min(tb[1], p(L.BATT_Y) - p(4)), tb[2], max(tb[3], p(L.BATT_Y) + p(5)))
@@ -128,7 +128,8 @@ def check_size(size, report):
         # cartouche text
         names = [s["Prayer%d" % i] for i in (0, 2, 3, 5, 6)]
         area = p(L.PANEL_W) - p(22)
-        for t, fn in [(widest("luxe_xs", size, names), "luxe_xs"), ("23h59", "luxe_s"), ("00:00", "luxe_s"),
+        for t, fn in [(widest("luxe_xs", size, names), "luxe_xs"), (widest("ar_small", size, list("NOPQR")), "ar_small"),
+                      ("23h59", "luxe_s"), ("00:00", "luxe_s"),
                       (s["SetLocation"], "luxe_xs"), (s["SetLocation2"], "luxe_xs")]:
             w = face.font(fontname_for(fn), size).width(t)
             limit = area if t not in (s["SetLocation"], s["SetLocation2"]) else p(L.PANEL_W) - 4

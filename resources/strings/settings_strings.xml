@@ -209,6 +209,9 @@
     <string id="S_AyahInc37">Rotation: An-Nas 114:1</string>
     <string id="S_AyahInc38">Rotation: An-Nas 114:2</string>
     <string id="S_AyahInc39">Rotation: An-Nas 114:3</string>
+    <string id="S_PrayerNames">Faith &amp; calendar: Prayer names</string>
+    <string id="S_PrayerNames_0">Arabic</string>
+    <string id="S_PrayerNames_1">Latin script</string>
     <string id="S_CalcMethod">Faith &amp; calendar: Prayer calculation method</string>
     <string id="S_CalcMethod_0">Tunisia (18° / 18°)</string>
     <string id="S_CalcMethod_1">Muslim World League (18° / 17°)</string>
@@ -576,6 +579,7 @@
     <string id="M_AyahFixed">Fixed verse</string>
     <string id="M_Verses">Verses in rotation</string>
     <string id="MG_Prayers">Prayers</string>
+    <string id="M_PrayerNames">Prayer names</string>
     <string id="M_CalcMethod">Method</string>
     <string id="M_AsrMethod">Asr</string>
     <string id="M_HighLatRule">High latitudes</string>

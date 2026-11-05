@@ -60,9 +60,20 @@ for _pre, _bold, _semi, _w, _f in FAMILIES:
             continue
         FONTS.append(("%s_%s" % (_pre, _role), _bold if _isbold else _semi, _px * _f, _chars,
                       None if _w is None else (_w[0] if _isbold else _w[1])))
+# Date block (day name, day number, month): a lighter weight than the gauges (owner feedback:
+# the bold date was too heavy). role, ttf per family, size at 280 px, characters, variable weight
+DATE_ROLES = [("dl", 28, " 0123456789"), ("dxs", 12, LATIN)]
+DATE_TTF = {"luxe": ("BarlowSemiCondensed-Medium.ttf", None, "BarlowSemiCondensed-Medium.ttf"),
+            "classic": ("Cinzel-Variable.ttf", 500, "BarlowSemiCondensed-Medium.ttf"),
+            "sport": ("Rajdhani-SemiBold.ttf", None, "Rajdhani-SemiBold.ttf")}
+for _pre, _bold, _semi, _w, _f in FAMILIES:
+    _l, _lw, _xs = DATE_TTF[_pre]
+    FONTS.append(("%s_dl" % _pre, _l, DATE_ROLES[0][1] * _f, DATE_ROLES[0][2], _lw))
+    FONTS.append(("%s_dxs" % _pre, _xs, DATE_ROLES[1][1] * (1.0 if _pre == "classic" else _f), DATE_ROLES[1][2], None))
 FONT_IDS = {"luxe_num": "LuxeNum", "ar_small": "ArSmall"}
 FONT_IDS.update({"ayah%d" % g: "Ayah%d" % g for g in range(5)})
-FONT_IDS.update({"%s_%s" % (p, r): "%s%s" % (p.capitalize(), r.upper()) for p, *_ in FAMILIES for r, *_ in ROLES})
+FONT_IDS.update({"%s_%s" % (p, r): "%s%s" % (p.capitalize(), r.upper()) for p, *_ in FAMILIES
+                 for r in [x[0] for x in ROLES] + [x[0] for x in DATE_ROLES]})
 
 
 def layout_consts():
@@ -225,22 +236,27 @@ def build_ayah_fonts(folder, k, L):
 
 
 AR_DIGITS = "٠١٢٣٤٥٦٧٨٩"
-AR_SMALL_PX = 11  # at 280 px
+AR_SMALL_PX = 12  # at 280 px (11 was hard to read on the watch)
+# prayer names in the cartouches (setting PrayerNames): glyphs "N".."R"
+PRAYERS_AR = ["الفجر", "الظهر", "العصر", "المغرب", "العشاء"]
 
 
 def build_arabic_small_font(folder, k):
     """Small Arabic font assembled at runtime: glyph "0".."9" = Eastern Arabic digits, "A".."L" =
-    Hijri month names, "M" = the AH suffix, "a".."j" = Arabic (Western) digits. Every glyph is
+    Hijri month names, "M" = the AH suffix, "a".."j" = Arabic (Western) digits, "N".."R" = the
+    prayer names Fajr, Dhuhr, Asr, Maghrib, Isha. Every glyph is
     shaped with HarfBuzz and placed on a
     common baseline."""
     data = json.load(open(os.path.join(ROOT, "tools", "ayat.json")))
-    size = max(8, int(AR_SMALL_PX * k))
+    # the two smallest screens lose 1 px: the wide Hijri date would touch the gauges
+    size = max(8, int(AR_SMALL_PX * k) - (1 if k < 0.9 else 0))
     font = amiri(size)
     ascent, descent = font.getmetrics()
     items = [(str(i), AR_DIGITS[i]) for i in range(10)]
     items += [(chr(ord("A") + i), m) for i, m in enumerate(data["hijri_months_ar"])]
     items += [("M", data["hijri_suffix_ar"])]
     items += [(chr(ord("a") + i), str(i)) for i in range(10)]   # Arabic (Western) digits, same typeface
+    items += [(chr(ord("N") + i), n) for i, n in enumerate(PRAYERS_AR)]
     glyphs = []
     widths = {}
     for code, text in items:
@@ -249,7 +265,7 @@ def build_arabic_small_font(folder, k):
         img = arabic_image((w + 2, h + 2), (1 - bbox[0], 1 - bbox[1]), text, size, anchor="ls")
         glyphs.append((ord(code), img, -1, ascent + bbox[1] - 1, w + (1 if code.isdigit() or code.islower() else 2)))
         widths[code] = w
-    glyphs.append((32, None, 0, 0, max(3, int(round(size * 0.3)))))
+    glyphs.append((32, None, 0, 0, max(2, int(round(size * 0.22)))))
     pack_and_write(folder, "ar_small", glyphs, ascent + descent, ascent, size, "Amiri-Bold (pre-shaped Arabic pieces)")
     return {"px": size, "widths": widths}
 

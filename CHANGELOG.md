@@ -3,7 +3,12 @@
 All dates 2026-10-29. Nothing has been compiled with the Connect IQ SDK yet; see
 `docs/RELEASE_CHECKLIST.md`.
 
-## Unreleased — preview 0.8
+## Unreleased — preview 0.9
+* Date block in a lighter weight (Barlow Semi Condensed Medium), month without the year.
+* Hijri date larger (12 px at 280 px instead of 11) and in the text colour.
+* Prayer names in Arabic in the cartouches (setting *Prayer names*: Arabic / Latin script).
+
+## Preview 0.8
 * Per-prayer adjustment (−30…+30 min for Fajr, Dhuhr, Asr, Maghrib, Isha) in the settings and the
   watch menu (Prayers), to match a mosque timetable; unit test `testPrayerAdjustment`.
 

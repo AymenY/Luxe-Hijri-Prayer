@@ -347,6 +347,12 @@
     <setting propertyKey="@Properties.AyahInc39" title="@Strings.S_AyahInc39">
         <settingConfig type="boolean" />
     </setting>
+    <setting propertyKey="@Properties.PrayerNames" title="@Strings.S_PrayerNames">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.S_PrayerNames_0</listEntry>
+            <listEntry value="1">@Strings.S_PrayerNames_1</listEntry>
+        </settingConfig>
+    </setting>
     <setting propertyKey="@Properties.CalcMethod" title="@Strings.S_CalcMethod">
         <settingConfig type="list">
             <listEntry value="0">@Strings.S_CalcMethod_0</listEntry>
