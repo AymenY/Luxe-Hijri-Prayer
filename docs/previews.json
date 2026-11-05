@@ -208,6 +208,14 @@
   "next_prayer": "Dhuhr"
  },
  {
+  "file": "previews/size-466.png",
+  "title": "466 x 466 px (AMOLED, full colour)",
+  "size": 466,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
   "file": "previews/aod-390.png",
   "title": "AMOLED always-on, 390 px",
   "lit_pixels": "0.7 %"
