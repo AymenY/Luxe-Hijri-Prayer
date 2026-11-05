@@ -1,11 +1,17 @@
 # Luxe Hijri Prayer
 
 Luxury analog-digital Connect IQ **watch face** with Islamic prayer times, written in Monkey C,
-for **round colour Garmin watches** with Connect IQ 4 or later — 70 models, MIP and AMOLED,
-218 to 466 px: fēnix 7 / 7 Pro / 8 / 8 Pro / 9 / 9 Pro / E, epix 2 / Pro, tactix 7 AMOLED / 8,
-quatix 7 / 8, Enduro 3 / 4, Forerunner 165 / 170 / 255 / 265 / 570 / 70 / 955 / 965 / 970,
-Venu 2 / 3 / 4, vívoactive 5 / 6, MARQ 2 / 3, Instinct 3 AMOLED / Crossover AMOLED, D2 Mach 1 / 2,
-D2 Air X10, Descent G2 / Mk3, Approach S50 / S70 / S72.
+for **round colour Garmin watches** — 121 models, MIP and AMOLED, 218 to 466 px:
+
+* **HD dial** (Connect IQ 4+, 70 models): fēnix 7 / 7 Pro / 8 / 8 Pro / 9 / 9 Pro / E, epix 2 / Pro,
+  tactix 7 AMOLED / 8, quatix 7 / 8, Enduro 3 / 4, Forerunner 165 / 170 / 255 / 265 / 570 / 70 /
+  955 / 965 / 970, Venu 2 / 3 / 4, vívoactive 5 / 6, MARQ 2 / 3, Instinct 3 AMOLED / Crossover
+  AMOLED, D2 Mach 1 / 2, D2 Air X10, Descent G2 / Mk3, Approach S50 / S70 / S72.
+* **Vector dial** (Connect IQ 3, 51 models): fēnix 5 / 5 Plus / 6 / 6 Pro / Chronos, Forerunner
+  245 / 645 / 745 / 935 / 945, MARQ (Gen 1), Venu, vívoactive 3 / 4, Enduro, Descent Mk1 / Mk2,
+  D2 Charlie / Delta / Air, Approach S62, vívolife and the Legacy editions. Same functions, with
+  the vector backgrounds instead of the HD images (their 96–128 KB of app memory cannot hold them),
+  Arabic dial numerals only, and the seconds hand after a wrist raise.
 
 ![Styles (reference renders)](docs/previews/overview-styles.png)
 

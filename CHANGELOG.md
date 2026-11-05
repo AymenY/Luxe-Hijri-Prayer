@@ -7,6 +7,10 @@ Remaining release steps: `docs/RELEASE_CHECKLIST.md`.
   with the owner's permanent key (GitHub secret `CIQ_DEVELOPER_KEY`, key file deleted after
   each job), development notes removed.
 * Hijri date with Arabic numerals by default.
+* Vector variant for 51 Connect IQ 3 watches (fēnix 5 / 6, Forerunner 245 / 645 / 745 / 935 /
+  945, MARQ Gen 1, Venu, vívoactive 3 / 4…): no HD images or buffers, selected per device in
+  `monkey.jungle`; string resources reduced from 646 to 219 (Connect IQ 3 limit about 254); the
+  per-prayer adjustments are numbers (settings renamed AdjustFajr…AdjustIsha). 121 models.
 * 70 watch models from the SDK catalogue (was 33): fēnix 8 Pro, fēnix 9 / 9 Pro / E, Enduro 4,
   Forerunner 170 / 570 / 70 / 970, Venu 4, vívoactive 6, MARQ 3, Instinct AMOLED, D2 Mach 2,
   Descent Mk3 / G2, Approach S50 / S70 / S72; new 466 px resource set (fēnix 9 Pro 51 mm).

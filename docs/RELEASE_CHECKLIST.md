@@ -8,8 +8,8 @@ Legend: ✅ done · ⬜ to do by the owner (needs the SDK simulator, the watch o
 * ✅ Algorithms validated against independent libraries — `python3 tools/validate_calculations.py`
   (prayer times, sunrise/sunset, Hijri calendar, Moon phase)
 * ✅ Layout validated for 9 screen sizes (218–466 px), 3 font families, EN/FR — `python3 tools/check_layout.py`
-* ✅ Compiles without errors with Connect IQ SDK 9.3.0 (GitHub Actions, mode `all`): all 70 listed
-  watch models and the unit-test build
+* ✅ Compiles without errors with Connect IQ SDK 9.3.0 (GitHub Actions, mode `all`): all 121 listed
+  watch models (70 HD, 51 vector) and the unit-test build
 * ✅ Runs on a fēnix 7X Pro (sideloaded): dial, gauges, prayers, verse, Moon, daylight ring
 * ✅ No network access, one permission (SensorHistory), settings validated with fallbacks
 * ✅ Store texts EN/FR and privacy statement — `docs/STORE.md`
@@ -22,7 +22,11 @@ Legend: ✅ done · ⬜ to do by the owner (needs the SDK simulator, the watch o
   with mode `iq` (the Store package)
 * ⬜ On the watch: watch face → Customise opens the settings menu; change a few settings
 * ⬜ Simulator (SDK on a computer): unit tests `monkeydo bin/LuxeHijriPrayer-tests.prg fenix7xpro -t`
-  (7 tests); *File → View Memory* on the largest AMOLED (454 px) and on fr255s (218 px)
+  (7 tests); *File → View Memory* on the largest AMOLED (454 / 466 px) and on fr255s (218 px)
+* ⬜ **Simulator, Connect IQ 3 vector variant: *File → View Memory* on a 96 KB watch (fenix6s,
+  fr245, vivoactive3) and on fenix6 (112 KB), with every background and the settings menu.**
+  Not measured yet. If a model runs out of memory, remove it from `manifest.xml` (or lower the
+  minimum to the 112 / 128 / 512 KB models) before submitting.
 * ⬜ Simulator: *File → View Watchface Diagnostics* — partial update below the power budget (MIP),
   no burn-in warning (AMOLED always-on)
 * ⬜ Real screenshots (simulator *File → Save Screenshot*, or the watch) to replace `store/screenshot-*.png`
