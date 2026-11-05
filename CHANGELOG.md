@@ -1,9 +1,14 @@
 # Changelog
 
-All dates 2026-10-29. Nothing has been compiled with the Connect IQ SDK yet; see
-`docs/RELEASE_CHECKLIST.md`.
+Remaining release steps: `docs/RELEASE_CHECKLIST.md`.
 
-## Unreleased — preview 0.9
+## 1.0.0 — release candidate (2026-11-05)
+* Store preparation: listing and privacy texts (EN/FR), release checklist, Store package signed
+  with the owner's permanent key (GitHub secret `CIQ_DEVELOPER_KEY`, key file deleted after
+  each job), development notes removed.
+* Hijri date with Arabic numerals by default.
+
+## Preview 0.9
 * Date block in a lighter weight (Barlow Semi Condensed Medium), month without the year.
 * Hijri date larger (12 px at 280 px instead of 11) and in the text colour.
 * Prayer names in Arabic in the cartouches (setting *Prayer names*: Arabic / Latin script).

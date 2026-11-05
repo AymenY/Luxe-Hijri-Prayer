@@ -37,7 +37,9 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     hidden var mBgOps as Array? = null;
     hidden var mFrameOps as Array? = null;
     hidden var mDial = null;        // HD static layer (BitmapResource) or null
-    hidden var mNums = null;        // the four numeral bitmaps (12, 3, 6, 9) of the HD dial, or null
+    hidden var mNums = null;
+    hidden var mMoon as Array? = null;   // MoonPhase.at() result, recomputed every 10 minutes
+    hidden var mMoonSlot as Number = -1;        // the four numeral bitmaps (12, 3, 6, 9) of the HD dial, or null
 
     hidden var mFontNum;
     hidden var mFontL;
@@ -730,7 +732,11 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     // drawn row by row (a crescent is not convex); a ring for the age of the lunation and the
     // illuminated fraction below.
     hidden function drawMoon(dc as Graphics.Dc, x as Number, y as Number, now as Number) as Void {
-        var mp = MoonPhase.at(now);
+        if (now / 600 != mMoonSlot || mMoon == null) {
+            mMoon = MoonPhase.at(now);
+            mMoonSlot = now / 600;
+        }
+        var mp = mMoon as Array;
         var k = mp[0] as Double;
         var s = (mp[1] as Boolean) ? 1.0 : -1.0;
         var sweep = (360.0 * (mp[2] as Double) / MoonPhase.SYNODIC).toNumber();

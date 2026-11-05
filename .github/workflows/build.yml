@@ -4,8 +4,9 @@
 #   secrets   GARMIN_USERNAME, GARMIN_PASSWORD   your Garmin account (device files need a login)
 #   variable  CIQ_ACCEPT_LICENSE = yes           set it only after reading and accepting the
 #                                                Connect IQ SDK license agreement
-# The developer key is generated for each run: the .prg files are for testing (sideload or
-# simulator). Store uploads must be signed with your own permanent key on your machine.
+# Signing: with the secret CIQ_DEVELOPER_KEY (your permanent key, base64 of the .der file) the
+# builds are signed with it, which the Store package (mode iq) requires. Without it, test builds
+# are signed with a temporary key generated for the run.
 name: Build
 
 on:
@@ -80,10 +81,22 @@ jobs:
           echo "Devices not found in the catalogue:${missing:- none}"
           echo "Installed device files:"
           ls "$HOME/.Garmin/ConnectIQ/Devices" | tr '\n' ' '; echo
-      - name: Temporary developer key
+      - name: Developer key (secret CIQ_DEVELOPER_KEY, else a temporary key for test builds)
+        env:
+          CIQ_DEVELOPER_KEY: ${{ secrets.CIQ_DEVELOPER_KEY }}
         run: |
-          openssl genrsa -out "$RUNNER_TEMP/key.pem" 4096
-          openssl pkcs8 -topk8 -inform PEM -outform DER -in "$RUNNER_TEMP/key.pem" -out "$RUNNER_TEMP/key.der" -nocrypt
+          umask 077
+          if [ -n "$CIQ_DEVELOPER_KEY" ]; then
+            echo "$CIQ_DEVELOPER_KEY" | base64 -d > "$RUNNER_TEMP/key.der"
+            echo "Signing with the owner's developer key"
+          elif [ "$MODE" = "iq" ]; then
+            echo "::error::The Store package needs your permanent developer key: add the secret CIQ_DEVELOPER_KEY (see README)"
+            exit 1
+          else
+            openssl genrsa -out "$RUNNER_TEMP/key.pem" 4096 2> /dev/null
+            openssl pkcs8 -topk8 -inform PEM -outform DER -in "$RUNNER_TEMP/key.pem" -out "$RUNNER_TEMP/key.der" -nocrypt
+            echo "Signing with a temporary key (test builds only)"
+          fi
       - name: Compile watch face
         run: tools/ci_build.sh "$RUNNER_TEMP/key.der" "$MODE"
       - name: Compile unit tests
@@ -98,3 +111,6 @@ jobs:
             bin/*.prg
             bin/*.iq
             bin/logs/
+      - name: Delete the key files
+        if: always()
+        run: rm -f "$RUNNER_TEMP/key.der" "$RUNNER_TEMP/key.pem"

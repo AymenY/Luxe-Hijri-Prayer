@@ -1,96 +1,112 @@
-# Connect IQ Store listing (draft)
+# Connect IQ Store listing
 
-Status: **not submitted.** The app has not been compiled yet (see `AUDIT.md`), so no `.iq`
-package exists. Artwork in `store/` consists of reference renders and must be replaced by real
-simulator/device screenshots before submission (the Store requires genuine screenshots).
+Status: **ready for review, not submitted.** The Store package (`.iq`) must be built with the
+owner's permanent developer key (README, “Store package”). Screenshots in `store/` are reference
+renders and must be replaced by real simulator or device screenshots before submission.
 
 * App type: Watch face
-* Supported devices: round colour watches with Connect IQ 4+ (fēnix 7 / 7 Pro / 8, epix 2 / Pro,
-  Enduro 3, Forerunner 165 / 255 / 265 / 955 / 965, Venu 2 / 3, vívoactive 5, MARQ 2); final list
-  from `tools/update_products.py`
+* Supported devices: round colour watches with Connect IQ 4+ listed in `manifest.xml` (fēnix 7 /
+  7 Pro / 8, epix 2 / Pro, Enduro 3, Forerunner 165 / 255 / 265 / 955 / 965, Venu 2 / 3,
+  vívoactive 5, MARQ 2)
 * Languages: English, French
 * Price: free (suggested)
 * Category: Watch faces
+* Permission: *Sensor history* (Body Battery and stress)
 
 ## English
 
 **Title:** Luxe Hijri Prayer
 
-**Short description:** Luxury analog watch face with prayer times, countdown and Hijri date.
+**Short description:** Luxury analog watch face with prayer times, Hijri date, Moon and Quran verse.
 
 **Description:**
 
-Luxe Hijri Prayer is an analog-digital watch face inspired by fine mechanical watches and
-Islamic geometric art, designed for round Garmin displays (MIP and AMOLED).
+Luxe Hijri Prayer is an analog watch face inspired by fine watchmaking and Islamic art, for
+round Garmin displays (MIP and AMOLED).
 
-* Real analog clock with gold dauphine hands and a long seconds hand
-* Next prayer with a live countdown, and the following prayer with its time (Fajr, Dhuhr, Asr, Maghrib, Isha)
-* Sunrise and sunset times
-* Gregorian date and Hijri date in Arabic script, with a −2…+2 day correction
-* Four configurable gauges: steps, heart rate, calories, battery, distance, floors, Body Battery, stress, and a 24 h daylight / darkness ring
-* Six style presets: Luxury Blue, Royal Gold, Emerald Night, Burgundy Royale, Ice Silver, Stealth
-* Four backgrounds: mosque and crescent, Islamic geometric pattern, black marble, night sky
-* A complete Quranic verse in Arabic, changing every hour (39 short verses to choose from), a fixed verse or none
-* Fully customisable: fonts, text, accent and seconds colours, hand styles, gauge sources and colours, Arabic or Latin Hijri date
-* Mosque night scene under a pointed Islamic arch; burn-in safe always-on mode on AMOLED watches
-* 14 calculation methods (Tunisia, MWL, ISNA, Egypt, Umm al-Qura, Karachi, Gulf, Kuwait,
-  Qatar, Singapore, Turkey, France UOIF, Algeria, Morocco), standard or Hanafi Asr,
-  high-latitude rules
+* Next prayer with a live countdown, and the following prayer with its time
+* Prayer names in Arabic or Latin script; 14 calculation methods, standard or Hanafi Asr,
+  high-latitude rules, and a per-prayer adjustment (±30 min) to match your mosque
+* Prayer times follow your position automatically (the watch's last GPS position) or a location
+  you enter
+* Hijri date in Arabic (Arabic or Indian digits) or in Latin script, with a ±2 day correction
+* Moon dial: tonight's Moon, the age of the lunar month and the illuminated fraction
+* 24-hour daylight / darkness ring with dawn and dusk, and the time left until sunset or sunrise
+* A complete Quranic verse in Arabic, changing every hour (39 short verses), a fixed verse or none
+* Four configurable complications: steps, heart rate, calories, battery, distance, floors,
+  Body Battery, stress, active minutes, Moon, daylight
+* Six styles, four backgrounds (mosque illustration, Islamic geometry, black marble, night sky),
+  three fonts, Arabic or Indian dial numerals, hand styles and colours
+* Settings on the watch (watch face → Customise) and in Garmin Connect
+* Burn-in-safe always-on mode on AMOLED watches; seconds hand in low power on MIP watches
 
-Set your latitude and longitude in the watch-face settings (default: Djerba, Tunisia). Prayer
-times are calculated astronomically on the watch and can differ by a few minutes from your
-local mosque timetable. The Hijri date is a calculated (tabular) calendar and may differ by a
-day from local moon sighting; use the correction setting to align it.
+Prayer times are calculated astronomically on the watch and can differ by a few minutes from a
+mosque timetable; use the adjustment settings to align them. The Hijri date is a calculated
+(tabular) calendar and may differ by a day from local moon sighting; use the correction setting.
 
-No weather, temperature, altitude or compass data is shown, by design.
+No weather, temperature, altitude or compass data is shown.
 
-**Privacy:** the watch face works entirely offline. It does not collect, store or transmit any
-personal data. The coordinates you enter are stored only in the watch-face settings on your
-watch and in Garmin Connect. Permission used: *Sensor history* (to display Body Battery and stress).
+**Privacy:** the watch face works entirely offline. It does not collect or transmit any personal
+data and makes no network requests. Your position is used only on the watch to compute prayer
+times; it is stored in the watch-face settings on your watch (and in Garmin Connect if you edit
+the settings there). Permission used: *Sensor history* (to display Body Battery and stress).
 
 ## Français
 
 **Titre :** Luxe Hijri Prayer
 
-**Description courte :** Cadran analogique de luxe avec heures de prière, compte à rebours et date hégirienne.
+**Description courte :** Cadran analogique de luxe : heures de prière, date hégirienne, lune et verset.
 
 **Description :**
 
-Luxe Hijri Prayer est un cadran analogique-numérique inspiré de la haute horlogerie et de l'art
-géométrique islamique, conçu pour les écrans ronds Garmin (MIP et AMOLED).
+Luxe Hijri Prayer est un cadran analogique inspiré de la haute horlogerie et de l'art islamique,
+pour les écrans ronds Garmin (MIP et AMOLED).
 
-* Véritable horloge analogique, aiguilles dauphine dorées et longue trotteuse
-* Prochaine prière avec compte à rebours, et la prière suivante avec son heure (Fajr, Dhohr, Asr, Maghrib, Icha)
-* Heures du lever et du coucher du soleil
-* Date grégorienne et date hégirienne en écriture arabe, avec correction de −2 à +2 jours
-* Quatre jauges configurables : pas, fréquence cardiaque, calories, batterie, distance, étages, Body Battery, stress, et un anneau lumière / obscurité sur 24 h
-* Six styles : Luxury Blue, Royal Gold, Emerald Night, Burgundy Royale, Ice Silver, Stealth
-* Quatre arrière-plans : mosquée et croissant, motif géométrique islamique, marbre noir, ciel nocturne
-* Un verset complet du Coran en arabe, qui change chaque heure (39 versets courts au choix), un verset fixe ou aucun
-* Entièrement personnalisable : polices, couleurs du texte, d'accent et de la trotteuse, styles d'aiguilles, données et couleurs des jauges, date hégirienne en arabe ou en latin
-* Scène nocturne de mosquée sous un arc islamique ; mode toujours allumé protégé contre le marquage sur les montres AMOLED
-* 14 méthodes de calcul (Tunisie, Ligue islamique mondiale, ISNA, Égypte, Umm al-Qura, Karachi,
-  Golfe, Koweït, Qatar, Singapour, Turquie, France UOIF, Algérie, Maroc), Asr standard ou
-  hanafite, règles des hautes latitudes
+* Prochaine prière avec compte à rebours, et la prière suivante avec son heure
+* Noms des prières en arabe ou en écriture latine ; 14 méthodes de calcul, Asr standard ou
+  hanafite, règles des hautes latitudes, et un ajustement par prière (±30 min) pour coller à
+  l'horaire de votre mosquée
+* Les heures suivent automatiquement votre position (dernière position GPS de la montre) ou une
+  position saisie
+* Date hégirienne en arabe (chiffres arabes ou indiens) ou en écriture latine, correction ±2 jours
+* Cadran lunaire : la Lune de ce soir, l'âge du mois lunaire et la fraction éclairée
+* Anneau lumière / obscurité sur 24 h avec aube et crépuscule, et le temps restant avant le
+  coucher ou le lever du soleil
+* Un verset complet du Coran en arabe, qui change chaque heure (39 versets courts), un verset
+  fixe ou aucun
+* Quatre complications configurables : pas, fréquence cardiaque, calories, batterie, distance,
+  étages, Body Battery, stress, minutes intensives, lune, lumière du jour
+* Six styles, quatre arrière-plans (illustration de mosquée, géométrie islamique, marbre noir,
+  ciel nocturne), trois polices, chiffres du cadran arabes ou indiens, styles et couleurs d'aiguilles
+* Réglages sur la montre (cadran → Personnaliser) et dans Garmin Connect
+* Mode toujours allumé protégé contre le marquage sur AMOLED ; trotteuse en basse consommation sur MIP
 
-Indiquez votre latitude et votre longitude dans les réglages du cadran (par défaut : Djerba,
-Tunisie). Les heures de prière sont calculées astronomiquement sur la montre et peuvent différer
-de quelques minutes du calendrier de votre mosquée. La date hégirienne est un calendrier calculé
-(tabulaire) qui peut différer d'un jour de l'observation locale du croissant ; utilisez le
-réglage de correction pour l'ajuster.
+Les heures de prière sont calculées astronomiquement sur la montre et peuvent différer de
+quelques minutes de l'horaire d'une mosquée ; les réglages d'ajustement permettent de les
+aligner. La date hégirienne est un calendrier calculé (tabulaire) qui peut différer d'un jour de
+l'observation locale du croissant ; utilisez le réglage de correction.
 
-Aucune donnée météo, température, altitude ou boussole n'est affichée, volontairement.
+Aucune donnée météo, température, altitude ou boussole n'est affichée.
 
-**Confidentialité :** le cadran fonctionne entièrement hors ligne. Il ne collecte, ne stocke et
-ne transmet aucune donnée personnelle. Les coordonnées saisies restent dans les réglages du
-cadran (montre et Garmin Connect). Autorisation utilisée : *historique des capteurs* (pour Body
-Battery et stress).
+**Confidentialité :** le cadran fonctionne entièrement hors ligne. Il ne collecte ni ne transmet
+aucune donnée personnelle et n'effectue aucune requête réseau. Votre position sert uniquement,
+sur la montre, au calcul des heures de prière ; elle est enregistrée dans les réglages du cadran
+(sur la montre, et dans Garmin Connect si vous y modifiez les réglages). Autorisation utilisée :
+*historique des capteurs* (Body Battery et stress).
 
 ## Artwork
 
 | File | Content | Status |
 |---|---|---|
-| `resources/drawables/launcher_icon.png` | 40 × 40 launcher icon (crescent and star) | generated; the compiler rescales it if the device expects another size |
-| `store/store-icon-512.png` | 512 × 512 store icon | reference render — check the size requested by the submission form |
-| `store/hero-1440x720.png` | hero banner with three styles | reference render |
-| `store/screenshot-1..6.png` | the six styles at 280 × 280 (one per device size is also expected by the Store) | **reference renders — replace with simulator screenshots** |
+| `resources/drawables/launcher_icon.png` | launcher icon (crescent and star) | generated; the compiler rescales it per device |
+| `store/store-icon-512.png` | 512 × 512 store icon | artwork, ready |
+| `store/hero-1440x720.png` | hero banner | reference render, optional |
+| `store/screenshot-*.png` | screenshots | **reference renders — replace with simulator or device screenshots** |
+
+## Rights to check before submission
+
+* Background illustration `tools/art-src/mosque-night.png`: supplied by the owner; publishing it
+  requires the rights to it.
+* Fonts: SIL Open Font License 1.1 (licences in `tools/fonts-src/`), compatible with distribution.
+* Quranic text: Tanzil (CC BY 3.0, unmodified text); credit Tanzil in the Store description if
+  required by the licence ("Quran text: Tanzil.net").

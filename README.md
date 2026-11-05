@@ -7,10 +7,10 @@ Forerunner 165 / 255 / 265 / 955 / 965, Venu 2 / 3, vívoactive 5, MARQ 2 — MI
 
 ![Styles (reference renders)](docs/previews/overview-styles.png)
 
-> **Status.** The watch face compiles with Connect IQ SDK 9.3.0 (GitHub Actions, 8 preview
-> devices) and has run on a real fēnix 7X Pro. It is not published. Images in `docs/previews/`
+> **Status.** Release candidate 1.0. The watch face compiles with Connect IQ SDK 9.3.0 and runs
+> on a fēnix 7X Pro. It is not yet published on the Connect IQ Store. Images in `docs/previews/`
 > are **reference renders** from a Python mirror of the drawing code (same layout, fonts,
-> colours, vector art), **not** simulator or device screenshots. See [`docs/AUDIT.md`](docs/AUDIT.md) and
+> colours), **not** simulator or device screenshots. See
 > [`docs/RELEASE_CHECKLIST.md`](docs/RELEASE_CHECKLIST.md).
 
 ## Design
@@ -127,7 +127,7 @@ resources/                      strings, settings, properties, 280-px fonts, vec
 resources-round-WxH/            fonts and HD dials for the other screen sizes
 resources-fre/                  French strings
 tools/                          asset build, validation, layout check, previews, device list
-docs/                           audit, calculations, Ayat, store texts, checklist, previews
+docs/                           calculations, Ayat, store texts, checklist, previews
 store/                          store artwork (reference renders)
 ```
 
@@ -144,8 +144,24 @@ store/                          store artwork (reference renders)
    (`fr255s`, `fenix7s`, `fenix7`, `fenix7xpro`, `venu2s`, `fr165`, `epix2pro47mm`,
    `epix2pro51mm` in preview mode), the unit-test build and the compiler logs.
 
-The `.prg` files are signed with a temporary key: they are for the simulator or sideloading
-(`GARMIN/APPS/`), not for the Store. The static checks (no SDK) run on every push as well.
+Without the secret below, the `.prg` files are signed with a temporary key: they are for the
+simulator or sideloading (`GARMIN/APPS/`). The static checks (no SDK) run on every push as well.
+
+### Store package
+
+The Store requires every version of the app to be signed with **the same** developer key.
+
+1. Create the key once, on your computer, and keep a backup outside the repository. On Windows,
+   the easiest is VS Code with the *Monkey C* extension: *Ctrl+Shift+P → Monkey C: Generate a
+   Developer Key* (it writes `developer_key.der`). Or with OpenSSL (step 3 of the next section).
+2. Encode it and copy it (PowerShell):
+   `[Convert]::ToBase64String([IO.File]::ReadAllBytes("C:\chemin\developer_key.der")) | Set-Clipboard`
+3. Repository *Settings → Secrets and variables → Actions → New repository secret*:
+   name `CIQ_DEVELOPER_KEY`, value = the pasted text. It is encrypted, never shown in the logs,
+   and the key file is deleted from the runner at the end of each job.
+4. *Actions → Build → Run workflow*, mode `iq`: the artifact contains `LuxeHijriPrayer.iq`, ready
+   to upload at <https://apps.garmin.com/developer/>. Without the secret the `iq` build stops
+   with an error instead of producing a package signed with a throw-away key.
 
 ## Build and run (needs the Connect IQ SDK)
 
@@ -196,7 +212,6 @@ keep them in sync when changing `source/`.
 
 ## Documentation
 
-* [Audit report](docs/AUDIT.md) — starting point, environment limits, design decisions
 * [Calculations](docs/CALCULATIONS.md) — prayer method, Hijri convention, limitations
 * [Ayah selection](docs/AYAT.md) — verified Arabic text, sources, French translation
 * [Validation report](docs/validation-report.md) · [Layout report](docs/layout-report.md)
