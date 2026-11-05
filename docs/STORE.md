@@ -37,7 +37,8 @@ round Garmin displays (MIP and AMOLED).
 * A complete Quranic verse in Arabic, changing every hour (39 short verses), a fixed verse or none
 * Four configurable complications: steps, heart rate, calories, battery, distance, floors,
   Body Battery, stress, active minutes, Moon, daylight
-* Seven styles (including Scarlet Noir: black, red and white), four backgrounds (mosque illustration, Islamic geometry, black marble, night sky),
+* Nine styles (including Scarlet Noir: black, red and white, and two high-contrast styles readable
+  without the backlight, Ember Gold and Oasis Gold), four backgrounds (mosque illustration, Islamic geometry, black marble, night sky),
   three fonts, Arabic or Indian dial numerals, hand styles and colours
 * Settings on the watch (watch face → Customise) and in Garmin Connect
 * Burn-in-safe always-on mode on AMOLED watches; seconds hand in low power on MIP watches
@@ -78,7 +79,8 @@ pour les écrans ronds Garmin (MIP et AMOLED).
   fixe ou aucun
 * Quatre complications configurables : pas, fréquence cardiaque, calories, batterie, distance,
   étages, Body Battery, stress, minutes intensives, lune, lumière du jour
-* Sept styles (dont Scarlet Noir : noir, rouge et blanc), quatre arrière-plans (illustration de mosquée, géométrie islamique, marbre noir,
+* Neuf styles (dont Scarlet Noir : noir, rouge et blanc, et deux styles à contraste élevé lisibles
+  sans rétroéclairage, Ember Gold et Oasis Gold), quatre arrière-plans (illustration de mosquée, géométrie islamique, marbre noir,
   ciel nocturne), trois polices, chiffres du cadran arabes ou indiens, styles et couleurs d'aiguilles
 * Réglages sur la montre (cadran → Personnaliser) et dans Garmin Connect
 * Mode toujours allumé protégé contre le marquage sur AMOLED ; trotteuse en basse consommation sur MIP

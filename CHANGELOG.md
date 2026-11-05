@@ -4,6 +4,10 @@ Remaining release steps: `docs/RELEASE_CHECKLIST.md`.
 
 ## 1.0.0 — release candidate (2026-11-05)
 * New style **Scarlet Noir** (black, red and white).
+* Two high-contrast styles readable without the backlight on MIP screens: **Ember Gold** (black,
+  white, red, orange, gold) and **Oasis Gold** (black, white, blue, green, gold). Flat colours
+  taken from the 64-colour palette, no gradient, glow or dithering.
+* Black marble background: plain stone slab, without the arch window and the rosette.
 * MIP watches: blues made purer before the palette conversion (Luxury Blue looked green on the
   fēnix 7X Pro); black marble with bold gold and quartz veins; night sky with a Milky Way and
   larger stars (both backgrounds were nearly empty on MIP screens).

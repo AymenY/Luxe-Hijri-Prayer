@@ -56,6 +56,22 @@
   "next_prayer": "Dhuhr"
  },
  {
+  "file": "previews/style-8-ember-gold.png",
+  "title": "Style Ember Gold, background Mosque, 280 px",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/style-9-oasis-gold.png",
+  "title": "Style Oasis Gold, background Mosque, 280 px",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
   "file": "previews/background-mosque-luxury-blue.png",
   "title": "Background mosque, style Luxury Blue",
   "size": 280,

@@ -9,6 +9,8 @@
             <listEntry value="4">@Strings.S_StylePreset_4</listEntry>
             <listEntry value="5">@Strings.S_StylePreset_5</listEntry>
             <listEntry value="6">@Strings.S_StylePreset_6</listEntry>
+            <listEntry value="7">@Strings.S_StylePreset_7</listEntry>
+            <listEntry value="8">@Strings.S_StylePreset_8</listEntry>
         </settingConfig>
     </setting>
     <setting propertyKey="@Properties.Background" title="@Strings.S_Background">

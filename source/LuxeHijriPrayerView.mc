@@ -168,7 +168,9 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
                    Rez.Drawables.Dial30, Rez.Drawables.Dial31, Rez.Drawables.Dial32, Rez.Drawables.Dial33,
                    Rez.Drawables.Dial40, Rez.Drawables.Dial41, Rez.Drawables.Dial42, Rez.Drawables.Dial43,
                    Rez.Drawables.Dial50, Rez.Drawables.Dial51, Rez.Drawables.Dial52, Rez.Drawables.Dial53,
-                   Rez.Drawables.Dial60, Rez.Drawables.Dial61, Rez.Drawables.Dial62, Rez.Drawables.Dial63];
+                   Rez.Drawables.Dial60, Rez.Drawables.Dial61, Rez.Drawables.Dial62, Rez.Drawables.Dial63,
+                   Rez.Drawables.Dial70, Rez.Drawables.Dial71, Rez.Drawables.Dial72, Rez.Drawables.Dial73,
+                   Rez.Drawables.Dial80, Rez.Drawables.Dial81, Rez.Drawables.Dial82, Rez.Drawables.Dial83];
         try {
             return WatchUi.loadResource(ids[st * 4 + bg]);
         } catch (e) {
@@ -202,7 +204,11 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
                    Rez.Drawables.Num500, Rez.Drawables.Num501, Rez.Drawables.Num502, Rez.Drawables.Num503,
                    Rez.Drawables.Num510, Rez.Drawables.Num511, Rez.Drawables.Num512, Rez.Drawables.Num513,
                    Rez.Drawables.Num600, Rez.Drawables.Num601, Rez.Drawables.Num602, Rez.Drawables.Num603,
-                   Rez.Drawables.Num610, Rez.Drawables.Num611, Rez.Drawables.Num612, Rez.Drawables.Num613];
+                   Rez.Drawables.Num610, Rez.Drawables.Num611, Rez.Drawables.Num612, Rez.Drawables.Num613,
+                   Rez.Drawables.Num700, Rez.Drawables.Num701, Rez.Drawables.Num702, Rez.Drawables.Num703,
+                   Rez.Drawables.Num710, Rez.Drawables.Num711, Rez.Drawables.Num712, Rez.Drawables.Num713,
+                   Rez.Drawables.Num800, Rez.Drawables.Num801, Rez.Drawables.Num802, Rez.Drawables.Num803,
+                   Rez.Drawables.Num810, Rez.Drawables.Num811, Rez.Drawables.Num812, Rez.Drawables.Num813];
         try {
             var out = [];
             for (var q = 0; q < 4; q++) {

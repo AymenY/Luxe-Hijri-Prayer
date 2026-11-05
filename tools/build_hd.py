@@ -29,8 +29,13 @@ def folder(size):
     return os.path.join(ROOT, "hd", str(size), "drawables")
 
 
+def exact(size, s):
+    """High-contrast styles on MIP sizes: palette-exact PNG, no dithering (render_hd.flat_finish)."""
+    return size < render_hd.AMOLED_FROM and render_hd.is_flat(s)
+
+
 def fname(size, s, b):
-    return "dial_%d_%d.jpg" % (s, b)
+    return "dial_%d_%d.%s" % (s, b, "png" if exact(size, s) else "jpg")
 
 
 def num_name(s, d, q):
@@ -42,6 +47,8 @@ def sprite_job(args):
     size, s = args
     total = 0
     for (d, q), img in render_hd.numeral_sprites(size, s).items():
+        if exact(size, s):
+            img = render_hd.flat_finish(img)
         path = os.path.join(folder(size), num_name(s, d, q))
         img.save(path, optimize=True)
         total += os.path.getsize(path)
@@ -53,9 +60,12 @@ def job(args):
         return sprite_job(args)
     size, s, b = args
     img = render_hd.render(size, s, BGS[b])
+    path = os.path.join(folder(size), fname(size, s, b))
+    if exact(size, s):
+        render_hd.flat_finish(img).convert("RGB").save(path, optimize=True)
+        return path, os.path.getsize(path)
     if size < render_hd.AMOLED_FROM:
         img = render_hd.mip_grade(img)
-    path = os.path.join(folder(size), fname(size, s, b))
     img.convert("RGB").save(path, "JPEG", quality=90, optimize=True, subsampling=0)
     return path, os.path.getsize(path)
 
@@ -68,6 +78,8 @@ def write_xml(size):
         for b in range(len(BGS)):
             if amoled:
                 lines.append('    <bitmap id="Dial%d%d" filename="%s" packingFormat="jpg" />' % (s, b, fname(size, s, b)))
+            elif exact(size, s):
+                lines.append('    <bitmap id="Dial%d%d" filename="%s" dithering="none" />' % (s, b, fname(size, s, b)))
             else:
                 lines.append('    <bitmap id="Dial%d%d" filename="%s" dithering="floyd_steinberg" />'
                              % (s, b, fname(size, s, b)))
@@ -75,7 +87,7 @@ def write_xml(size):
     for s in range(NSTYLES):
         for d in range(2):
             for q in range(4):
-                extra = '' if amoled else ' dithering="floyd_steinberg"'
+                extra = '' if amoled else (' dithering="none"' if exact(size, s) else ' dithering="floyd_steinberg"')
                 lines.append('    <bitmap id="Num%d%d%d" filename="%s"%s />' % (s, d, q, num_name(s, d, q), extra))
     lines.append("</drawables>")
     with open(os.path.join(folder(size), "drawables.xml"), "w") as fh:

@@ -6,7 +6,7 @@ module MenuTable {
     function groups() as Array {
         return [
             [Rez.Strings.MG_Appearance, [
-                ["StylePreset", Rez.Strings.S_StylePreset, [Rez.Strings.S_StylePreset_0, Rez.Strings.S_StylePreset_1, Rez.Strings.S_StylePreset_2, Rez.Strings.S_StylePreset_3, Rez.Strings.S_StylePreset_4, Rez.Strings.S_StylePreset_5, Rez.Strings.S_StylePreset_6]],
+                ["StylePreset", Rez.Strings.S_StylePreset, [Rez.Strings.S_StylePreset_0, Rez.Strings.S_StylePreset_1, Rez.Strings.S_StylePreset_2, Rez.Strings.S_StylePreset_3, Rez.Strings.S_StylePreset_4, Rez.Strings.S_StylePreset_5, Rez.Strings.S_StylePreset_6, Rez.Strings.S_StylePreset_7, Rez.Strings.S_StylePreset_8]],
                 ["Background", Rez.Strings.S_Background, [Rez.Strings.S_Background_0, Rez.Strings.S_Background_1, Rez.Strings.S_Background_2, Rez.Strings.S_Background_3]],
                 ["DialDigits", Rez.Strings.S_DialDigits, [Rez.Strings.S_DialDigits_0, Rez.Strings.S_DialDigits_1]],
                 ["FontFamily", Rez.Strings.S_FontFamily, [Rez.Strings.S_FontFamily_0, Rez.Strings.S_FontFamily_1, Rez.Strings.S_FontFamily_2]],

@@ -51,7 +51,7 @@ def _themes():
 
 PRESETS, MULTICOLOR, SOURCE_COLORS, COLOUR_CHOICES, TEXT_CHOICES, HAND_CHOICES = _themes()
 FAMILIES = ["luxe", "classic", "sport"]
-PRESET_NAMES = ["Luxury Blue", "Royal Gold", "Emerald Night", "Burgundy Royale", "Ice Silver", "Stealth", "Scarlet Noir"]
+PRESET_NAMES = ["Luxury Blue", "Royal Gold", "Emerald Night", "Burgundy Royale", "Ice Silver", "Stealth", "Scarlet Noir", "Ember Gold", "Oasis Gold"]
 BACKGROUNDS = ["bg_mosque", "bg_geometric", "bg_marble", "bg_night"]
 RESOLUTIONS = [218, 240, 260, 280, 360, 390, 416, 454, 466]
 

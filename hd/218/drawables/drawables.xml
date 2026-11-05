@@ -28,6 +28,14 @@
     <bitmap id="Dial61" filename="dial_6_1.jpg" dithering="floyd_steinberg" />
     <bitmap id="Dial62" filename="dial_6_2.jpg" dithering="floyd_steinberg" />
     <bitmap id="Dial63" filename="dial_6_3.jpg" dithering="floyd_steinberg" />
+    <bitmap id="Dial70" filename="dial_7_0.png" dithering="none" />
+    <bitmap id="Dial71" filename="dial_7_1.png" dithering="none" />
+    <bitmap id="Dial72" filename="dial_7_2.png" dithering="none" />
+    <bitmap id="Dial73" filename="dial_7_3.png" dithering="none" />
+    <bitmap id="Dial80" filename="dial_8_0.png" dithering="none" />
+    <bitmap id="Dial81" filename="dial_8_1.png" dithering="none" />
+    <bitmap id="Dial82" filename="dial_8_2.png" dithering="none" />
+    <bitmap id="Dial83" filename="dial_8_3.png" dithering="none" />
     <!-- numerals 12 / 3 / 6 / 9: NumSDQ = style S, digits D (0 Arabic, 1 Indian), position Q -->
     <bitmap id="Num000" filename="num_0_0_0.png" dithering="floyd_steinberg" />
     <bitmap id="Num001" filename="num_0_0_1.png" dithering="floyd_steinberg" />
@@ -85,4 +93,20 @@
     <bitmap id="Num611" filename="num_6_1_1.png" dithering="floyd_steinberg" />
     <bitmap id="Num612" filename="num_6_1_2.png" dithering="floyd_steinberg" />
     <bitmap id="Num613" filename="num_6_1_3.png" dithering="floyd_steinberg" />
+    <bitmap id="Num700" filename="num_7_0_0.png" dithering="none" />
+    <bitmap id="Num701" filename="num_7_0_1.png" dithering="none" />
+    <bitmap id="Num702" filename="num_7_0_2.png" dithering="none" />
+    <bitmap id="Num703" filename="num_7_0_3.png" dithering="none" />
+    <bitmap id="Num710" filename="num_7_1_0.png" dithering="none" />
+    <bitmap id="Num711" filename="num_7_1_1.png" dithering="none" />
+    <bitmap id="Num712" filename="num_7_1_2.png" dithering="none" />
+    <bitmap id="Num713" filename="num_7_1_3.png" dithering="none" />
+    <bitmap id="Num800" filename="num_8_0_0.png" dithering="none" />
+    <bitmap id="Num801" filename="num_8_0_1.png" dithering="none" />
+    <bitmap id="Num802" filename="num_8_0_2.png" dithering="none" />
+    <bitmap id="Num803" filename="num_8_0_3.png" dithering="none" />
+    <bitmap id="Num810" filename="num_8_1_0.png" dithering="none" />
+    <bitmap id="Num811" filename="num_8_1_1.png" dithering="none" />
+    <bitmap id="Num812" filename="num_8_1_2.png" dithering="none" />
+    <bitmap id="Num813" filename="num_8_1_3.png" dithering="none" />
 </drawables>

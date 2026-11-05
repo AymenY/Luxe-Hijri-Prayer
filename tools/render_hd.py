@@ -70,6 +70,16 @@ STYLES = [
          metal=("#ffffff", "#c9c9ce", "#55585e"), glow="#ff1a1a", tick="#ffffff",
          sky=("#030000", "#4a0508"), pattern="#5a0a10", recess=("#160204", "#000000"), track="#4a0a0e",
          panel=("#1a0306", "#050001")),
+    # High-contrast styles, readable without the backlight on MIP screens: flat colours taken
+    # from the 64-colour palette, no gradient, glow or dithering (see flat_finish)
+    dict(name="ember-gold", flat=True, base=("#000000", "#000000"), ring=("#000000", "#000000"),
+         metal=("#ffaa00", "#ffaa00", "#ffaa00"), glow="#000000", tick="#ffffff",
+         sky=("#000000", "#000000"), pattern="#550000", recess=("#000000", "#000000"), track="#550000",
+         panel=("#000000", "#000000"), vein="#aa0000"),
+    dict(name="oasis-gold", flat=True, base=("#000000", "#000000"), ring=("#000000", "#000000"),
+         metal=("#ffaa00", "#ffaa00", "#ffaa00"), glow="#000000", tick="#ffffff",
+         sky=("#000000", "#000000"), pattern="#000055", recess=("#000000", "#000000"), track="#005500",
+         panel=("#000000", "#000000"), vein="#005500"),
 ]
 BACKGROUNDS = ["mosque", "geometric", "marble", "night"]
 
@@ -79,6 +89,7 @@ class Art:
 
     def __init__(self, size):
         self.size = size
+        self.flat = False         # high-contrast styles: no glows (Art.add is ignored unless forced)
         self.n = size * SS
         self.k = size / 280.0 * SS
         self.rgb = np.zeros((self.n, self.n, 3))
@@ -105,8 +116,10 @@ class Art:
         col = color if isinstance(color, np.ndarray) and color.ndim == 3 else np.broadcast_to(color, self.rgb.shape)
         self.rgb = self.rgb * (1 - a) + col * a
 
-    def add(self, color, m, amount=1.0):
+    def add(self, color, m, amount=1.0, force=False):
         """Additive light (glows)."""
+        if self.flat and not force:
+            return
         self.rgb = np.clip(self.rgb + np.clip(m * amount, 0, 1)[..., None] * color, 0, 1)
 
     def radial(self, cx, cy, r, c0, c1, power=1.0):
@@ -200,7 +213,27 @@ def lattice_mask(art, step, r, width=0.6):
     return art.mask(draw)
 
 
+def flat_pattern(art, st, bg):
+    """Backgrounds of the high-contrast styles: sparse line art in one dark palette colour."""
+    pat = hexc(st["pattern"])
+    if bg == "geometric":
+        art.paint(pat, lattice_mask(art, 28, 9, 1.2))
+    elif bg == "marble":
+        f = art.fractal(11, 6, 70)
+        veins = np.abs(np.sin((art.x * 0.035 + art.y * 0.022 + f * 7.5) * math.pi))
+        art.paint(hexc(st["vein"]), (veins < 0.06).astype(np.float64))
+        g = art.fractal(29, 5, 45)
+        quartz = np.abs(np.sin((art.x * 0.05 - art.y * 0.03 + g * 6) * math.pi))
+        art.paint(hexc(st["vein"]) * 0.5 + pat * 0.5, ((quartz < 0.04) & (g > 0.45)).astype(np.float64))
+    elif bg == "night":
+        stars(art, 260, 31, st, big=0, size=1.0)
+    else:
+        art.paint(pat, lattice_mask(art, 34, 11, 1.2))
+
+
 def layer_pattern(art, st, bg):
+    if art.flat:
+        return flat_pattern(art, st, bg)
     pat = hexc(st["pattern"])
     if bg == "mosque":
         m = lattice_mask(art, 34, 11)
@@ -259,7 +292,7 @@ def stars(art, count, seed, st, big=6, region=None, size=0.35):
             if i < big:
                 glow[cy, cx] = 1.0
     core = art.blur(m, size) * (9 if size <= 0.35 else 9 * (size / 0.35) ** 2)
-    art.add(np.array([1.0, 0.98, 0.92]), core, 1.0)
+    art.add(np.array([1.0, 0.98, 0.92]), core, 1.0, force=True)
     halo = art.blur(glow, 2.2) * 120
     art.add(hexc(st["glow"]) * 0.6, halo, 1.0)
     return m
@@ -280,10 +313,6 @@ def arch_window(art, st, bg):
     elif bg == "geometric":
         stars(art, 140, 9, st, big=3, region=lambda x, y: inside(x, y) and y < 175)
         rosette(art, st, 140, 165)
-    elif bg == "marble":
-        layer_pattern(art, st, "marble")
-        art.rgb *= 0.8
-        rosette(art, st, 140, 162, simple=True)
     else:
         stars(art, 320, 13, st, big=8, region=inside)
         crescent(art, st, 152, 160, 20)
@@ -407,8 +436,9 @@ def chapter_ring(art, st):
                 a = i * math.pi / 30
                 p0 = (140 + L["TICK_R_IN"] * math.sin(a), 140 - L["TICK_R_IN"] * math.cos(a))
                 p1 = (140 + L["TICK_R_OUT"] * math.sin(a), 140 - L["TICK_R_OUT"] * math.cos(a))
-                d.line([(u(p0[0]), u(p0[1])), (u(p1[0]), u(p1[1]))], fill=255, width=max(1, int(u(1.0))))
-    art.paint(tick, art.mask(ticks), 0.9)
+                d.line([(u(p0[0]), u(p0[1])), (u(p1[0]), u(p1[1]))], fill=255,
+                       width=max(1, int(u(1.6 if art.flat else 1.0))))
+    art.paint(tick, art.mask(ticks), 1.0 if art.flat else 0.9)
 
 
 def rot(pts, a):
@@ -455,7 +485,7 @@ def numeral_sprites(size, style_index):
     """{(indian, q): RGBA image} of the bevelled metal numerals, centred on their dial position."""
     st = STYLES[style_index]
     art = Art(size)
-    dark = hexc(st["metal"][2]) * 0.35
+    dark = np.zeros(3) if st.get("flat") else hexc(st["metal"][2]) * 0.35
     out = {}
     for indian in (0, 1):
         font = numeral_font(art, indian)
@@ -470,7 +500,7 @@ def numeral_sprites(size, style_index):
             shadow = np.clip(np.roll(m, (SS, SS), (0, 1)) - m, 0, 1)
             body = art.metal(cy - 11, cy + 11, st["metal"])
             hi = np.clip(m - np.roll(m, SS, 0), 0, 1)
-            body = np.clip(body + hi[..., None] * 0.35, 0, 1)
+            body = np.clip(body + hi[..., None] * (0 if st.get("flat") else 0.35), 0, 1)
             alpha = np.clip(m + shadow, 0, 1)
             rgb = (body * m[..., None] + dark * shadow[..., None]) / np.maximum(alpha, 1e-6)[..., None]
             rgba = np.dstack([np.clip(rgb, 0, 1), alpha])
@@ -585,6 +615,8 @@ GRADES = [
     (("#020814", "#1b3a63", "#b8d4ee"), "#e8eef5"),                         # Ice Silver
     (("#040506", "#24282d", "#a9b0b8"), "#e6e8ea"),                         # Stealth
     (("#040000", "#3c060c", "#d9d9de"), "#ff4040"),                         # Scarlet Noir (red lights)
+    (("#000000", "#2a0000", "#aa0000"), "#ffaa00"),                         # Ember Gold
+    (("#000000", "#00002a", "#0055aa"), "#ffaa00"),                         # Oasis Gold
 ]
 
 
@@ -625,6 +657,7 @@ def legibility_shadows(art):
 def render(size, style_index, bg):
     st = STYLES[style_index]
     art = Art(size)
+    art.flat = bool(st.get("flat"))
     if bg == "mosque":
         layer_illustration(art, style_index)
         legibility_shadows(art)
@@ -634,7 +667,8 @@ def render(size, style_index, bg):
         # soft vignette towards the bezel
         vig = np.clip((np.hypot(art.x - 140, art.y - 140) - 70) / 60.0, 0, 1) ** 2
         art.rgb *= (1 - 0.35 * vig)[..., None]
-        arch_window(art, st, bg)
+        if bg != "marble":      # the marble is a plain stone slab: no window, no geometric shapes
+            arch_window(art, st, bg)
     chapter_ring(art, st)
     gauge_recesses(art, st)
     cartouches(art, st)
@@ -669,9 +703,27 @@ def mip_grade(img):
     return Image.fromarray(np.clip(a, 0, 255).astype(np.uint8), "RGB")
 
 
+def is_flat(style_index):
+    return bool(STYLES[style_index].get("flat"))
+
+
+def flat_finish(img):
+    """High-contrast styles on MIP: every pixel snapped to the nearest colour of the 64-colour
+    palette, without dithering, so edges stay sharp and nothing is left for the compiler to dither."""
+    rgba = img.convert("RGBA")
+    a = np.asarray(rgba, dtype=np.int32)
+    flat = a[..., :3].reshape(-1, 1, 3)
+    d = ((flat - MIP.astype(np.int32)[None, :, :]) ** 2).sum(axis=2)
+    snapped = MIP[d.argmin(axis=1)].reshape(a.shape[0], a.shape[1], 3)
+    out = np.dstack([snapped, a[..., 3].astype(np.uint8)])
+    return Image.fromarray(out.astype(np.uint8), "RGBA").convert(img.mode if img.mode in ("RGB", "RGBA") else "RGB")
+
+
 def render_for_device(size, style_index, bg):
     img = render(size, style_index, bg)
-    return to_mip(img) if size < AMOLED_FROM else img
+    if size >= AMOLED_FROM:
+        return img
+    return flat_finish(img) if is_flat(style_index) else to_mip(mip_grade(img))
 
 
 if __name__ == "__main__":
