@@ -313,9 +313,8 @@ class Face:
     @staticmethod
     def load_dial(preset, bg, size):
         """HD static dial (tools/build_hd.py) if it has been generated, else None (vector fallback)."""
-        base = "resources" if size == BASE else "resources-round-%dx%d" % (size, size)
         for ext in ("png", "jpg"):
-            path = os.path.join(ROOT, base, "drawables", "dial_%d_%d.%s" % (preset, bg, ext))
+            path = os.path.join(ROOT, "hd", str(size), "drawables", "dial_%d_%d.%s" % (preset, bg, ext))
             if os.path.exists(path):
                 return Image.open(path).convert("RGB")
         return None
@@ -323,8 +322,8 @@ class Face:
     @staticmethod
     def load_numerals(preset, digits, size):
         """Numeral bitmaps 12 / 3 / 6 / 9 (tools/build_hd.py), or None."""
-        base = "resources" if size == BASE else "resources-round-%dx%d" % (size, size)
-        paths = [os.path.join(ROOT, base, "drawables", "num_%d_%d_%d.png" % (preset, digits, q)) for q in range(4)]
+        paths = [os.path.join(ROOT, "hd", str(size), "drawables", "num_%d_%d_%d.png" % (preset, digits, q))
+                 for q in range(4)]
         if not all(os.path.exists(f) for f in paths):
             return None
         return [Image.open(f).convert("RGBA") for f in paths]

@@ -12,7 +12,8 @@ A device is selected when its compiler.json says:
     this project (218 ... 466 px),
   * more than 1 bit per pixel (colour; monochrome Instinct models are excluded),
   * watch faces are supported,
-  * Connect IQ 4.0 or newer (the manifest's minApiLevel).
+  * Connect IQ 3.0 or newer (the manifest's minApiLevel). Connect IQ 4+ watches get the HD dial,
+    older ones the vector dial; --write also regenerates the device lines of monkey.jungle.
 Fields that are missing in a device file are reported; such devices are skipped unless
 --include-unknown is given. Check the result in the SDK's device list before publishing.
 """
@@ -24,7 +25,8 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SIZES = {218, 240, 260, 280, 360, 390, 416, 454, 466}
-MIN_CIQ = (4, 0, 0)
+MIN_CIQ = (3, 0, 0)
+HD_CIQ = (4, 0, 0)    # from this version on the watch gets the HD dial (hd/<size>/, (:hd) code)
 
 
 def device_dirs():
@@ -88,6 +90,7 @@ def main():
     if base is None:
         sys.exit("Connect IQ device folder not found (set CIQ_DEVICES=/path/to/Devices).")
     selected = []
+    info = {}
     for cfg_path in sorted(glob.glob(os.path.join(base, "*", "compiler.json"))):
         dev = os.path.basename(os.path.dirname(cfg_path))
         cfg = json.load(open(cfg_path))
@@ -106,9 +109,14 @@ def main():
                 "yes" if ok else ", ".join(reasons + ["missing " + u for u in unknown])))
             if ok:
                 selected.append(dev)
+                info[dev] = (res.get("width"), max(vers) >= HD_CIQ if vers else False)
             continue
         if ok or (include_unknown and not reasons):
             selected.append(dev)
+            res = cfg.get("resolution") or {}
+            vers = [version(p.get("connectIQVersion")) for p in cfg.get("partNumbers", [])
+                    if isinstance(p, dict) and p.get("connectIQVersion")]
+            info[dev] = (res.get("width"), max(vers) >= HD_CIQ if vers else False)
             print("  + %-24s %s" % (dev, cfg.get("displayName", "")))
         elif unknown:
             print("  ? %-24s missing %s" % (dev, ", ".join(unknown)))
@@ -120,7 +128,12 @@ def main():
     print("%d devices selected" % len(selected))
     if write:
         open(man_path, "w").write(new)
-        print("manifest.xml updated")
+        jpath = os.path.join(ROOT, "monkey.jungle")
+        head = open(jpath).read().split("base.excludeAnnotations = lite")[0] + "base.excludeAnnotations = lite\n\n"
+        hd = ["%s.resourcePath = $(%s.resourcePath);hd/%s" % (d, d, info[d][0]) for d in selected if info[d][1]]
+        lite = ["%s.excludeAnnotations = hd" % d for d in selected if not info[d][1]]
+        open(jpath, "w").write(head + "\n".join(hd) + "\n\n" + "\n".join(lite) + "\n")
+        print("manifest.xml and monkey.jungle updated (%d HD, %d vector)" % (len(hd), len(lite)))
 
 
 if __name__ == "__main__":

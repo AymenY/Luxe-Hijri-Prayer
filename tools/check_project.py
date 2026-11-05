@@ -52,7 +52,9 @@ def main():
 
     # ---- resources
     res = {"Strings": {}, "Fonts": {}, "JsonData": {}, "Drawables": {}, "Properties": {}}
-    for path in glob.glob(os.path.join(ROOT, "resources", "**", "*.xml"), recursive=True):
+    # base resources and the HD dials (hd/280 stands for every hd/<size>: same ids in each)
+    for path in glob.glob(os.path.join(ROOT, "resources", "**", "*.xml"), recursive=True) + \
+            [os.path.join(ROOT, "hd", "280", "drawables", "drawables.xml")]:
         root = parse(path)
         if root is None:
             continue
@@ -254,7 +256,7 @@ def main():
     # ---- HD dials: 24 per screen size (style x background), same ids in every folder
     dial_ids = {"Dial%d%d" % (st, bg) for st in range(n_presets) for bg in range(4)}
     dial_ids |= {"Num%d%d%d" % (st, d, q) for st in range(n_presets) for d in range(2) for q in range(4)}
-    for dd in [os.path.join(ROOT, "resources", "drawables")] + sorted(glob.glob(os.path.join(ROOT, "resources-round-*", "drawables"))):
+    for dd in sorted(glob.glob(os.path.join(ROOT, "hd", "*", "drawables"))):
         xml = os.path.join(dd, "drawables.xml")
         if not os.path.exists(xml):
             errors.append("%s: drawables.xml missing (run tools/build_hd.py)" % rel(dd))

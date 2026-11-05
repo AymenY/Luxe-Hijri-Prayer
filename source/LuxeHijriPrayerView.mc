@@ -100,10 +100,13 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         mFontNum = WatchUi.loadResource(Rez.Fonts.LuxeNum);
         mFontAr = WatchUi.loadResource(Rez.Fonts.ArSmall);
         loadFonts();
-        if (mDial == null) {
+        // Connect IQ 3: no off-screen buffers, their memory would count against the app (96 KB on
+        // some watches); the dial is drawn directly and the seconds hand shows after a wrist raise.
+        var buffers = Graphics has :createBufferedBitmap;
+        if (mDial == null && buffers) {
             mStaticRef = createBuffer(dc.getWidth(), dc.getHeight());
         }
-        if (!mBurnIn) {
+        if (!mBurnIn && buffers) {
             mFrameRef = createBuffer(dc.getWidth(), dc.getHeight());
         }
         mStaticDirty = true;
@@ -155,6 +158,9 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     }
 
     // HD dial for style s and background b; null if it cannot be loaded (e.g. out of memory).
+    // (:hd) code is built for Connect IQ 4+ watches, which get the HD images (monkey.jungle);
+    // the (:lite) versions below are built for Connect IQ 3 watches: vector dial, no images.
+    (:hd)
     hidden function loadDial(st as Number, bg as Number) {
         var ids = [Rez.Drawables.Dial00, Rez.Drawables.Dial01, Rez.Drawables.Dial02, Rez.Drawables.Dial03,
                    Rez.Drawables.Dial10, Rez.Drawables.Dial11, Rez.Drawables.Dial12, Rez.Drawables.Dial13,
@@ -169,7 +175,18 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         }
     }
 
+    (:lite)
+    hidden function loadDial(st as Number, bg as Number) {
+        return null;
+    }
+
+    (:lite)
+    hidden function loadNumerals(st as Number, d as Number) {
+        return null;
+    }
+
     // Numerals 12 / 3 / 6 / 9 of style st in Arabic (d = 0) or Indian (d = 1) digits; null on failure.
+    (:hd)
     hidden function loadNumerals(st as Number, d as Number) {
         var ids = [Rez.Drawables.Num000, Rez.Drawables.Num001, Rez.Drawables.Num002, Rez.Drawables.Num003,
                    Rez.Drawables.Num010, Rez.Drawables.Num011, Rez.Drawables.Num012, Rez.Drawables.Num013,
@@ -333,7 +350,7 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         setAntiAlias(target);
 
         var dial = mDial;
-        if (dial == null && mStaticRef == null) {
+        if (dial == null && mStaticRef == null && (Graphics has :createBufferedBitmap)) {
             // HD dial unavailable (e.g. after a settings change): vector static layer instead
             mStaticRef = createBuffer(dc.getWidth(), dc.getHeight());
             mStaticDirty = true;

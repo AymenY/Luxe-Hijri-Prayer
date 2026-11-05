@@ -17,7 +17,7 @@ cd "$(dirname "$0")/.."
 mkdir -p bin/logs
 
 # one device per screen size / display type (see docs/RELEASE_CHECKLIST.md)
-PREVIEW="fr255s fenix7s fenix7 fenix7xpro venu2s fr165 epix2pro47mm epix2pro51mm fenix9pro51mm"
+PREVIEW="fr255s fenix7s fenix7 fenix7xpro venu2s fr165 epix2pro47mm epix2pro51mm fenix9pro51mm fenix6xpro fenix6s venu"
 ALL=$(grep -o 'iq:product id="[^"]*"' manifest.xml | sed 's/.*id="\([^"]*\)"/\1/')
 
 failed=0
