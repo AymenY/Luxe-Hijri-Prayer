@@ -97,9 +97,12 @@ def main():
             res = cfg.get("resolution") or {}
             vers = [version(p.get("connectIQVersion")) for p in cfg.get("partNumbers", [])
                     if isinstance(p, dict) and p.get("connectIQVersion")]
-            print("| %s | %s | %sx%s | %s | %s | %s | %s |" % (
+            mem = [t.get("memoryLimit") for t in cfg.get("appTypes", [])
+                   if isinstance(t, dict) and str(t.get("type", "")).lower() == "watchface"]
+            print("| %s | %s | %sx%s | %s | %s | %s | %s | %s |" % (
                 dev, cfg.get("displayName", ""), res.get("width"), res.get("height"), cfg.get("displayType"),
                 cfg.get("bitsPerPixel"), ".".join(map(str, max(vers))) if vers else "?",
+                "%s KB" % (mem[0] // 1024) if mem and mem[0] else "?",
                 "yes" if ok else ", ".join(reasons + ["missing " + u for u in unknown])))
             if ok:
                 selected.append(dev)

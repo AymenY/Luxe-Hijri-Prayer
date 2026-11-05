@@ -88,9 +88,8 @@ jobs:
             for d in $(awk '{print $1}' "$RUNNER_TEMP/devices.txt" | grep -E '^[a-z0-9_]+$' | grep -v '^NAME$' | sort -u); do
               (cd "$RUNNER_TEMP" && connect-iq-sdk-manager device download -d "$d" > /dev/null 2>&1) || true
             done
-            echo "compiler.json keys (fenix7xpro):"
-            python3 -c "import json,os;d=json.load(open(os.path.expanduser('~/.Garmin/ConnectIQ/Devices/fenix7xpro/compiler.json')));print(sorted(d.keys()));print({k:d[k] for k in d if 'shape' in k.lower() or 'display' in k.lower() or 'screen' in k.lower()})"
-            echo "| id | name | size | shape | bits/px | CIQ | selected |"
+            python3 -c "import json,os;d=json.load(open(os.path.expanduser('~/.Garmin/ConnectIQ/Devices/fenix6/compiler.json')));print('fenix6 appTypes:', d.get('appTypes'))"
+            echo "| id | name | size | display | bits/px | CIQ | watch face memory | selected |"
             python3 tools/update_products.py --report
           fi
           echo "Installed device files:"
