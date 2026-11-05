@@ -794,7 +794,7 @@ class Face:
         dc.setColor(c[T["GOLD"]], -1)
         dc.setColor(self.text, -1)
         if s.get("hijri_arabic", True):
-            ar = (lambda n: str(n)) if s.get("hijri_digits", 1) == 1 else \
+            ar = (lambda n: str(n)) if s.get("hijri_digits", 0) == 1 else \
                 (lambda n: "".join(chr(ord(ch) - 48 + 97) for ch in str(n)))   # mirror of arDigits
             dc.drawText(p(140), p(L.HIJRI_Y) + (1 if self.k < 0.8 else 0), self.f_ar, "M %s %s %s" % (ar(hy), chr(ord("A") + hm - 1), ar(hd)),
                         CENTER | VCENTER)

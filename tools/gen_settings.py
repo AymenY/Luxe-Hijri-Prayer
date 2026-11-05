@@ -70,7 +70,7 @@ def settings():
          [("One colour per data type", "Une couleur par type de donnée"), ("Accent colour", "Couleur d'accent"), ("Text colour", "Couleur du texte")]),
         ("HijriScript", "number", 0, (F + "Hijri date script", FF + "écriture de la date hégirienne"),
          [("Arabic", "Arabe"), ("Latin", "Latine")]),
-        ("HijriDigits", "number", 1, (F + "Hijri date digits (Arabic script)", FF + "chiffres de la date hégirienne (écriture arabe)"),
+        ("HijriDigits", "number", 0, (F + "Hijri date digits (Arabic script)", FF + "chiffres de la date hégirienne (écriture arabe)"),
          [("Arabic numerals (1 2 3)", "Chiffres arabes (1 2 3)"), ("Indian numerals (Eastern Arabic)", "Chiffres indiens (arabe oriental)")]),
         ("HijriCorrection", "number", 2, (F + "Hijri date correction", FF + "correction de la date hégirienne"),
          [("-2 days", "-2 jours"), ("-1 day", "-1 jour"), ("0 days", "0 jour"), ("+1 day", "+1 jour"), ("+2 days", "+2 jours")]),

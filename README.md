@@ -79,7 +79,7 @@ The settings and the watch menu are generated from `tools/gen_settings.py` (Engl
 | Appearance | Seconds hand / colour | Always, only after wrist raise, hidden / preset + 7 colours |
 | Data fields | Gauges 1–4 | Steps, heart rate, calories, battery, distance, floors, Body Battery, stress, active minutes (week), none, daylight / darkness (24 h), Moon phase; default steps, heart rate, Moon, daylight |
 | Data fields | Gauge colours | One colour per data type, accent colour, text colour |
-| Faith & calendar | Hijri date script / digits / correction | Arabic, Latin / Indian, Arabic digits / −2…+2 days (0) |
+| Faith & calendar | Hijri date script / digits / correction | Arabic, Latin / Arabic (1 2 3), Indian digits / −2…+2 days (0) |
 | Faith & calendar | Ayah | Hourly rotation (ticked verses), fixed verse, hidden |
 | Faith & calendar | Fixed verse + 39 “Rotation” check boxes | Ash-Sharh 94:5; all ticked |
 | Faith & calendar | Prayer method, Asr, high-latitude rule | Tunisia 18°/18°, standard, middle of the night |
