@@ -43,14 +43,14 @@
     </setting>
     <setting propertyKey="@Properties.AccentColor" title="@Strings.S_AccentColor">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.S_AccentColor_0</listEntry>
+            <listEntry value="0">@Strings.S_TextColor_0</listEntry>
             <listEntry value="1">@Strings.S_AccentColor_1</listEntry>
             <listEntry value="2">@Strings.S_AccentColor_2</listEntry>
-            <listEntry value="3">@Strings.S_AccentColor_3</listEntry>
+            <listEntry value="3">@Strings.S_TextColor_3</listEntry>
             <listEntry value="4">@Strings.S_AccentColor_4</listEntry>
             <listEntry value="5">@Strings.S_AccentColor_5</listEntry>
             <listEntry value="6">@Strings.S_AccentColor_6</listEntry>
-            <listEntry value="7">@Strings.S_AccentColor_7</listEntry>
+            <listEntry value="7">@Strings.S_TextColor_1</listEntry>
         </settingConfig>
     </setting>
     <setting propertyKey="@Properties.HandStyle" title="@Strings.S_HandStyle">
@@ -62,10 +62,10 @@
     </setting>
     <setting propertyKey="@Properties.HandColor" title="@Strings.S_HandColor">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.S_HandColor_0</listEntry>
-            <listEntry value="1">@Strings.S_HandColor_1</listEntry>
+            <listEntry value="0">@Strings.S_TextColor_0</listEntry>
+            <listEntry value="1">@Strings.S_TextColor_3</listEntry>
             <listEntry value="2">@Strings.S_HandColor_2</listEntry>
-            <listEntry value="3">@Strings.S_HandColor_3</listEntry>
+            <listEntry value="3">@Strings.S_TextColor_4</listEntry>
             <listEntry value="4">@Strings.S_HandColor_4</listEntry>
         </settingConfig>
     </setting>
@@ -78,14 +78,14 @@
     </setting>
     <setting propertyKey="@Properties.SecondsColor" title="@Strings.S_SecondsColor">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.S_SecondsColor_0</listEntry>
-            <listEntry value="1">@Strings.S_SecondsColor_1</listEntry>
-            <listEntry value="2">@Strings.S_SecondsColor_2</listEntry>
-            <listEntry value="3">@Strings.S_SecondsColor_3</listEntry>
-            <listEntry value="4">@Strings.S_SecondsColor_4</listEntry>
-            <listEntry value="5">@Strings.S_SecondsColor_5</listEntry>
-            <listEntry value="6">@Strings.S_SecondsColor_6</listEntry>
-            <listEntry value="7">@Strings.S_SecondsColor_7</listEntry>
+            <listEntry value="0">@Strings.S_TextColor_0</listEntry>
+            <listEntry value="1">@Strings.S_AccentColor_1</listEntry>
+            <listEntry value="2">@Strings.S_AccentColor_2</listEntry>
+            <listEntry value="3">@Strings.S_TextColor_3</listEntry>
+            <listEntry value="4">@Strings.S_AccentColor_4</listEntry>
+            <listEntry value="5">@Strings.S_AccentColor_5</listEntry>
+            <listEntry value="6">@Strings.S_AccentColor_6</listEntry>
+            <listEntry value="7">@Strings.S_TextColor_1</listEntry>
         </settingConfig>
     </setting>
     <setting propertyKey="@Properties.Gauge1" title="@Strings.S_Gauge1">
@@ -106,50 +106,50 @@
     </setting>
     <setting propertyKey="@Properties.Gauge2" title="@Strings.S_Gauge2">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.S_Gauge2_0</listEntry>
-            <listEntry value="1">@Strings.S_Gauge2_1</listEntry>
-            <listEntry value="2">@Strings.S_Gauge2_2</listEntry>
-            <listEntry value="3">@Strings.S_Gauge2_3</listEntry>
-            <listEntry value="4">@Strings.S_Gauge2_4</listEntry>
-            <listEntry value="5">@Strings.S_Gauge2_5</listEntry>
-            <listEntry value="6">@Strings.S_Gauge2_6</listEntry>
-            <listEntry value="7">@Strings.S_Gauge2_7</listEntry>
-            <listEntry value="8">@Strings.S_Gauge2_8</listEntry>
-            <listEntry value="9">@Strings.S_Gauge2_9</listEntry>
-            <listEntry value="10">@Strings.S_Gauge2_10</listEntry>
-            <listEntry value="11">@Strings.S_Gauge2_11</listEntry>
+            <listEntry value="0">@Strings.S_Gauge1_0</listEntry>
+            <listEntry value="1">@Strings.S_Gauge1_1</listEntry>
+            <listEntry value="2">@Strings.S_Gauge1_2</listEntry>
+            <listEntry value="3">@Strings.S_Gauge1_3</listEntry>
+            <listEntry value="4">@Strings.S_Gauge1_4</listEntry>
+            <listEntry value="5">@Strings.S_Gauge1_5</listEntry>
+            <listEntry value="6">@Strings.S_Gauge1_6</listEntry>
+            <listEntry value="7">@Strings.S_Gauge1_7</listEntry>
+            <listEntry value="8">@Strings.S_Gauge1_8</listEntry>
+            <listEntry value="9">@Strings.S_Gauge1_9</listEntry>
+            <listEntry value="10">@Strings.S_Gauge1_10</listEntry>
+            <listEntry value="11">@Strings.S_Gauge1_11</listEntry>
         </settingConfig>
     </setting>
     <setting propertyKey="@Properties.Gauge3" title="@Strings.S_Gauge3">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.S_Gauge3_0</listEntry>
-            <listEntry value="1">@Strings.S_Gauge3_1</listEntry>
-            <listEntry value="2">@Strings.S_Gauge3_2</listEntry>
-            <listEntry value="3">@Strings.S_Gauge3_3</listEntry>
-            <listEntry value="4">@Strings.S_Gauge3_4</listEntry>
-            <listEntry value="5">@Strings.S_Gauge3_5</listEntry>
-            <listEntry value="6">@Strings.S_Gauge3_6</listEntry>
-            <listEntry value="7">@Strings.S_Gauge3_7</listEntry>
-            <listEntry value="8">@Strings.S_Gauge3_8</listEntry>
-            <listEntry value="9">@Strings.S_Gauge3_9</listEntry>
-            <listEntry value="10">@Strings.S_Gauge3_10</listEntry>
-            <listEntry value="11">@Strings.S_Gauge3_11</listEntry>
+            <listEntry value="0">@Strings.S_Gauge1_0</listEntry>
+            <listEntry value="1">@Strings.S_Gauge1_1</listEntry>
+            <listEntry value="2">@Strings.S_Gauge1_2</listEntry>
+            <listEntry value="3">@Strings.S_Gauge1_3</listEntry>
+            <listEntry value="4">@Strings.S_Gauge1_4</listEntry>
+            <listEntry value="5">@Strings.S_Gauge1_5</listEntry>
+            <listEntry value="6">@Strings.S_Gauge1_6</listEntry>
+            <listEntry value="7">@Strings.S_Gauge1_7</listEntry>
+            <listEntry value="8">@Strings.S_Gauge1_8</listEntry>
+            <listEntry value="9">@Strings.S_Gauge1_9</listEntry>
+            <listEntry value="10">@Strings.S_Gauge1_10</listEntry>
+            <listEntry value="11">@Strings.S_Gauge1_11</listEntry>
         </settingConfig>
     </setting>
     <setting propertyKey="@Properties.Gauge4" title="@Strings.S_Gauge4">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.S_Gauge4_0</listEntry>
-            <listEntry value="1">@Strings.S_Gauge4_1</listEntry>
-            <listEntry value="2">@Strings.S_Gauge4_2</listEntry>
-            <listEntry value="3">@Strings.S_Gauge4_3</listEntry>
-            <listEntry value="4">@Strings.S_Gauge4_4</listEntry>
-            <listEntry value="5">@Strings.S_Gauge4_5</listEntry>
-            <listEntry value="6">@Strings.S_Gauge4_6</listEntry>
-            <listEntry value="7">@Strings.S_Gauge4_7</listEntry>
-            <listEntry value="8">@Strings.S_Gauge4_8</listEntry>
-            <listEntry value="9">@Strings.S_Gauge4_9</listEntry>
-            <listEntry value="10">@Strings.S_Gauge4_10</listEntry>
-            <listEntry value="11">@Strings.S_Gauge4_11</listEntry>
+            <listEntry value="0">@Strings.S_Gauge1_0</listEntry>
+            <listEntry value="1">@Strings.S_Gauge1_1</listEntry>
+            <listEntry value="2">@Strings.S_Gauge1_2</listEntry>
+            <listEntry value="3">@Strings.S_Gauge1_3</listEntry>
+            <listEntry value="4">@Strings.S_Gauge1_4</listEntry>
+            <listEntry value="5">@Strings.S_Gauge1_5</listEntry>
+            <listEntry value="6">@Strings.S_Gauge1_6</listEntry>
+            <listEntry value="7">@Strings.S_Gauge1_7</listEntry>
+            <listEntry value="8">@Strings.S_Gauge1_8</listEntry>
+            <listEntry value="9">@Strings.S_Gauge1_9</listEntry>
+            <listEntry value="10">@Strings.S_Gauge1_10</listEntry>
+            <listEntry value="11">@Strings.S_Gauge1_11</listEntry>
         </settingConfig>
     </setting>
     <setting propertyKey="@Properties.GaugeColors" title="@Strings.S_GaugeColors">
@@ -168,7 +168,7 @@
     <setting propertyKey="@Properties.HijriDigits" title="@Strings.S_HijriDigits">
         <settingConfig type="list">
             <listEntry value="0">@Strings.S_HijriDigits_0</listEntry>
-            <listEntry value="1">@Strings.S_HijriDigits_1</listEntry>
+            <listEntry value="1">@Strings.S_DialDigits_1</listEntry>
         </settingConfig>
     </setting>
     <setting propertyKey="@Properties.HijriCorrection" title="@Strings.S_HijriCorrection">
@@ -230,126 +230,126 @@
             <listEntry value="38">@Strings.S_AyahFixed_38</listEntry>
         </settingConfig>
     </setting>
-    <setting propertyKey="@Properties.AyahInc01" title="@Strings.S_AyahInc01">
+    <setting propertyKey="@Properties.AyahInc01" title="@Strings.S_AyahFixed_0">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc02" title="@Strings.S_AyahInc02">
+    <setting propertyKey="@Properties.AyahInc02" title="@Strings.S_AyahFixed_1">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc03" title="@Strings.S_AyahInc03">
+    <setting propertyKey="@Properties.AyahInc03" title="@Strings.S_AyahFixed_2">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc04" title="@Strings.S_AyahInc04">
+    <setting propertyKey="@Properties.AyahInc04" title="@Strings.S_AyahFixed_3">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc05" title="@Strings.S_AyahInc05">
+    <setting propertyKey="@Properties.AyahInc05" title="@Strings.S_AyahFixed_4">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc06" title="@Strings.S_AyahInc06">
+    <setting propertyKey="@Properties.AyahInc06" title="@Strings.S_AyahFixed_5">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc07" title="@Strings.S_AyahInc07">
+    <setting propertyKey="@Properties.AyahInc07" title="@Strings.S_AyahFixed_6">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc08" title="@Strings.S_AyahInc08">
+    <setting propertyKey="@Properties.AyahInc08" title="@Strings.S_AyahFixed_7">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc09" title="@Strings.S_AyahInc09">
+    <setting propertyKey="@Properties.AyahInc09" title="@Strings.S_AyahFixed_8">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc10" title="@Strings.S_AyahInc10">
+    <setting propertyKey="@Properties.AyahInc10" title="@Strings.S_AyahFixed_9">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc11" title="@Strings.S_AyahInc11">
+    <setting propertyKey="@Properties.AyahInc11" title="@Strings.S_AyahFixed_10">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc12" title="@Strings.S_AyahInc12">
+    <setting propertyKey="@Properties.AyahInc12" title="@Strings.S_AyahFixed_11">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc13" title="@Strings.S_AyahInc13">
+    <setting propertyKey="@Properties.AyahInc13" title="@Strings.S_AyahFixed_12">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc14" title="@Strings.S_AyahInc14">
+    <setting propertyKey="@Properties.AyahInc14" title="@Strings.S_AyahFixed_13">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc15" title="@Strings.S_AyahInc15">
+    <setting propertyKey="@Properties.AyahInc15" title="@Strings.S_AyahFixed_14">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc16" title="@Strings.S_AyahInc16">
+    <setting propertyKey="@Properties.AyahInc16" title="@Strings.S_AyahFixed_15">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc17" title="@Strings.S_AyahInc17">
+    <setting propertyKey="@Properties.AyahInc17" title="@Strings.S_AyahFixed_16">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc18" title="@Strings.S_AyahInc18">
+    <setting propertyKey="@Properties.AyahInc18" title="@Strings.S_AyahFixed_17">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc19" title="@Strings.S_AyahInc19">
+    <setting propertyKey="@Properties.AyahInc19" title="@Strings.S_AyahFixed_18">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc20" title="@Strings.S_AyahInc20">
+    <setting propertyKey="@Properties.AyahInc20" title="@Strings.S_AyahFixed_19">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc21" title="@Strings.S_AyahInc21">
+    <setting propertyKey="@Properties.AyahInc21" title="@Strings.S_AyahFixed_20">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc22" title="@Strings.S_AyahInc22">
+    <setting propertyKey="@Properties.AyahInc22" title="@Strings.S_AyahFixed_21">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc23" title="@Strings.S_AyahInc23">
+    <setting propertyKey="@Properties.AyahInc23" title="@Strings.S_AyahFixed_22">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc24" title="@Strings.S_AyahInc24">
+    <setting propertyKey="@Properties.AyahInc24" title="@Strings.S_AyahFixed_23">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc25" title="@Strings.S_AyahInc25">
+    <setting propertyKey="@Properties.AyahInc25" title="@Strings.S_AyahFixed_24">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc26" title="@Strings.S_AyahInc26">
+    <setting propertyKey="@Properties.AyahInc26" title="@Strings.S_AyahFixed_25">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc27" title="@Strings.S_AyahInc27">
+    <setting propertyKey="@Properties.AyahInc27" title="@Strings.S_AyahFixed_26">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc28" title="@Strings.S_AyahInc28">
+    <setting propertyKey="@Properties.AyahInc28" title="@Strings.S_AyahFixed_27">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc29" title="@Strings.S_AyahInc29">
+    <setting propertyKey="@Properties.AyahInc29" title="@Strings.S_AyahFixed_28">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc30" title="@Strings.S_AyahInc30">
+    <setting propertyKey="@Properties.AyahInc30" title="@Strings.S_AyahFixed_29">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc31" title="@Strings.S_AyahInc31">
+    <setting propertyKey="@Properties.AyahInc31" title="@Strings.S_AyahFixed_30">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc32" title="@Strings.S_AyahInc32">
+    <setting propertyKey="@Properties.AyahInc32" title="@Strings.S_AyahFixed_31">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc33" title="@Strings.S_AyahInc33">
+    <setting propertyKey="@Properties.AyahInc33" title="@Strings.S_AyahFixed_32">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc34" title="@Strings.S_AyahInc34">
+    <setting propertyKey="@Properties.AyahInc34" title="@Strings.S_AyahFixed_33">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc35" title="@Strings.S_AyahInc35">
+    <setting propertyKey="@Properties.AyahInc35" title="@Strings.S_AyahFixed_34">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc36" title="@Strings.S_AyahInc36">
+    <setting propertyKey="@Properties.AyahInc36" title="@Strings.S_AyahFixed_35">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc37" title="@Strings.S_AyahInc37">
+    <setting propertyKey="@Properties.AyahInc37" title="@Strings.S_AyahFixed_36">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc38" title="@Strings.S_AyahInc38">
+    <setting propertyKey="@Properties.AyahInc38" title="@Strings.S_AyahFixed_37">
         <settingConfig type="boolean" />
     </setting>
-    <setting propertyKey="@Properties.AyahInc39" title="@Strings.S_AyahInc39">
+    <setting propertyKey="@Properties.AyahInc39" title="@Strings.S_AyahFixed_38">
         <settingConfig type="boolean" />
     </setting>
     <setting propertyKey="@Properties.PrayerNames" title="@Strings.S_PrayerNames">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.S_PrayerNames_0</listEntry>
+            <listEntry value="0">@Strings.S_HijriScript_0</listEntry>
             <listEntry value="1">@Strings.S_PrayerNames_1</listEntry>
         </settingConfig>
     </setting>
@@ -385,330 +385,20 @@
             <listEntry value="3">@Strings.S_HighLatRule_3</listEntry>
         </settingConfig>
     </setting>
-    <setting propertyKey="@Properties.AdjFajr" title="@Strings.S_AdjFajr">
-        <settingConfig type="list">
-            <listEntry value="0">@Strings.S_AdjFajr_0</listEntry>
-            <listEntry value="1">@Strings.S_AdjFajr_1</listEntry>
-            <listEntry value="2">@Strings.S_AdjFajr_2</listEntry>
-            <listEntry value="3">@Strings.S_AdjFajr_3</listEntry>
-            <listEntry value="4">@Strings.S_AdjFajr_4</listEntry>
-            <listEntry value="5">@Strings.S_AdjFajr_5</listEntry>
-            <listEntry value="6">@Strings.S_AdjFajr_6</listEntry>
-            <listEntry value="7">@Strings.S_AdjFajr_7</listEntry>
-            <listEntry value="8">@Strings.S_AdjFajr_8</listEntry>
-            <listEntry value="9">@Strings.S_AdjFajr_9</listEntry>
-            <listEntry value="10">@Strings.S_AdjFajr_10</listEntry>
-            <listEntry value="11">@Strings.S_AdjFajr_11</listEntry>
-            <listEntry value="12">@Strings.S_AdjFajr_12</listEntry>
-            <listEntry value="13">@Strings.S_AdjFajr_13</listEntry>
-            <listEntry value="14">@Strings.S_AdjFajr_14</listEntry>
-            <listEntry value="15">@Strings.S_AdjFajr_15</listEntry>
-            <listEntry value="16">@Strings.S_AdjFajr_16</listEntry>
-            <listEntry value="17">@Strings.S_AdjFajr_17</listEntry>
-            <listEntry value="18">@Strings.S_AdjFajr_18</listEntry>
-            <listEntry value="19">@Strings.S_AdjFajr_19</listEntry>
-            <listEntry value="20">@Strings.S_AdjFajr_20</listEntry>
-            <listEntry value="21">@Strings.S_AdjFajr_21</listEntry>
-            <listEntry value="22">@Strings.S_AdjFajr_22</listEntry>
-            <listEntry value="23">@Strings.S_AdjFajr_23</listEntry>
-            <listEntry value="24">@Strings.S_AdjFajr_24</listEntry>
-            <listEntry value="25">@Strings.S_AdjFajr_25</listEntry>
-            <listEntry value="26">@Strings.S_AdjFajr_26</listEntry>
-            <listEntry value="27">@Strings.S_AdjFajr_27</listEntry>
-            <listEntry value="28">@Strings.S_AdjFajr_28</listEntry>
-            <listEntry value="29">@Strings.S_AdjFajr_29</listEntry>
-            <listEntry value="30">@Strings.S_AdjFajr_30</listEntry>
-            <listEntry value="31">@Strings.S_AdjFajr_31</listEntry>
-            <listEntry value="32">@Strings.S_AdjFajr_32</listEntry>
-            <listEntry value="33">@Strings.S_AdjFajr_33</listEntry>
-            <listEntry value="34">@Strings.S_AdjFajr_34</listEntry>
-            <listEntry value="35">@Strings.S_AdjFajr_35</listEntry>
-            <listEntry value="36">@Strings.S_AdjFajr_36</listEntry>
-            <listEntry value="37">@Strings.S_AdjFajr_37</listEntry>
-            <listEntry value="38">@Strings.S_AdjFajr_38</listEntry>
-            <listEntry value="39">@Strings.S_AdjFajr_39</listEntry>
-            <listEntry value="40">@Strings.S_AdjFajr_40</listEntry>
-            <listEntry value="41">@Strings.S_AdjFajr_41</listEntry>
-            <listEntry value="42">@Strings.S_AdjFajr_42</listEntry>
-            <listEntry value="43">@Strings.S_AdjFajr_43</listEntry>
-            <listEntry value="44">@Strings.S_AdjFajr_44</listEntry>
-            <listEntry value="45">@Strings.S_AdjFajr_45</listEntry>
-            <listEntry value="46">@Strings.S_AdjFajr_46</listEntry>
-            <listEntry value="47">@Strings.S_AdjFajr_47</listEntry>
-            <listEntry value="48">@Strings.S_AdjFajr_48</listEntry>
-            <listEntry value="49">@Strings.S_AdjFajr_49</listEntry>
-            <listEntry value="50">@Strings.S_AdjFajr_50</listEntry>
-            <listEntry value="51">@Strings.S_AdjFajr_51</listEntry>
-            <listEntry value="52">@Strings.S_AdjFajr_52</listEntry>
-            <listEntry value="53">@Strings.S_AdjFajr_53</listEntry>
-            <listEntry value="54">@Strings.S_AdjFajr_54</listEntry>
-            <listEntry value="55">@Strings.S_AdjFajr_55</listEntry>
-            <listEntry value="56">@Strings.S_AdjFajr_56</listEntry>
-            <listEntry value="57">@Strings.S_AdjFajr_57</listEntry>
-            <listEntry value="58">@Strings.S_AdjFajr_58</listEntry>
-            <listEntry value="59">@Strings.S_AdjFajr_59</listEntry>
-            <listEntry value="60">@Strings.S_AdjFajr_60</listEntry>
-        </settingConfig>
+    <setting propertyKey="@Properties.AdjustFajr" title="@Strings.S_AdjustFajr">
+        <settingConfig type="numeric" min="-30" max="30" />
     </setting>
-    <setting propertyKey="@Properties.AdjDhuhr" title="@Strings.S_AdjDhuhr">
-        <settingConfig type="list">
-            <listEntry value="0">@Strings.S_AdjDhuhr_0</listEntry>
-            <listEntry value="1">@Strings.S_AdjDhuhr_1</listEntry>
-            <listEntry value="2">@Strings.S_AdjDhuhr_2</listEntry>
-            <listEntry value="3">@Strings.S_AdjDhuhr_3</listEntry>
-            <listEntry value="4">@Strings.S_AdjDhuhr_4</listEntry>
-            <listEntry value="5">@Strings.S_AdjDhuhr_5</listEntry>
-            <listEntry value="6">@Strings.S_AdjDhuhr_6</listEntry>
-            <listEntry value="7">@Strings.S_AdjDhuhr_7</listEntry>
-            <listEntry value="8">@Strings.S_AdjDhuhr_8</listEntry>
-            <listEntry value="9">@Strings.S_AdjDhuhr_9</listEntry>
-            <listEntry value="10">@Strings.S_AdjDhuhr_10</listEntry>
-            <listEntry value="11">@Strings.S_AdjDhuhr_11</listEntry>
-            <listEntry value="12">@Strings.S_AdjDhuhr_12</listEntry>
-            <listEntry value="13">@Strings.S_AdjDhuhr_13</listEntry>
-            <listEntry value="14">@Strings.S_AdjDhuhr_14</listEntry>
-            <listEntry value="15">@Strings.S_AdjDhuhr_15</listEntry>
-            <listEntry value="16">@Strings.S_AdjDhuhr_16</listEntry>
-            <listEntry value="17">@Strings.S_AdjDhuhr_17</listEntry>
-            <listEntry value="18">@Strings.S_AdjDhuhr_18</listEntry>
-            <listEntry value="19">@Strings.S_AdjDhuhr_19</listEntry>
-            <listEntry value="20">@Strings.S_AdjDhuhr_20</listEntry>
-            <listEntry value="21">@Strings.S_AdjDhuhr_21</listEntry>
-            <listEntry value="22">@Strings.S_AdjDhuhr_22</listEntry>
-            <listEntry value="23">@Strings.S_AdjDhuhr_23</listEntry>
-            <listEntry value="24">@Strings.S_AdjDhuhr_24</listEntry>
-            <listEntry value="25">@Strings.S_AdjDhuhr_25</listEntry>
-            <listEntry value="26">@Strings.S_AdjDhuhr_26</listEntry>
-            <listEntry value="27">@Strings.S_AdjDhuhr_27</listEntry>
-            <listEntry value="28">@Strings.S_AdjDhuhr_28</listEntry>
-            <listEntry value="29">@Strings.S_AdjDhuhr_29</listEntry>
-            <listEntry value="30">@Strings.S_AdjDhuhr_30</listEntry>
-            <listEntry value="31">@Strings.S_AdjDhuhr_31</listEntry>
-            <listEntry value="32">@Strings.S_AdjDhuhr_32</listEntry>
-            <listEntry value="33">@Strings.S_AdjDhuhr_33</listEntry>
-            <listEntry value="34">@Strings.S_AdjDhuhr_34</listEntry>
-            <listEntry value="35">@Strings.S_AdjDhuhr_35</listEntry>
-            <listEntry value="36">@Strings.S_AdjDhuhr_36</listEntry>
-            <listEntry value="37">@Strings.S_AdjDhuhr_37</listEntry>
-            <listEntry value="38">@Strings.S_AdjDhuhr_38</listEntry>
-            <listEntry value="39">@Strings.S_AdjDhuhr_39</listEntry>
-            <listEntry value="40">@Strings.S_AdjDhuhr_40</listEntry>
-            <listEntry value="41">@Strings.S_AdjDhuhr_41</listEntry>
-            <listEntry value="42">@Strings.S_AdjDhuhr_42</listEntry>
-            <listEntry value="43">@Strings.S_AdjDhuhr_43</listEntry>
-            <listEntry value="44">@Strings.S_AdjDhuhr_44</listEntry>
-            <listEntry value="45">@Strings.S_AdjDhuhr_45</listEntry>
-            <listEntry value="46">@Strings.S_AdjDhuhr_46</listEntry>
-            <listEntry value="47">@Strings.S_AdjDhuhr_47</listEntry>
-            <listEntry value="48">@Strings.S_AdjDhuhr_48</listEntry>
-            <listEntry value="49">@Strings.S_AdjDhuhr_49</listEntry>
-            <listEntry value="50">@Strings.S_AdjDhuhr_50</listEntry>
-            <listEntry value="51">@Strings.S_AdjDhuhr_51</listEntry>
-            <listEntry value="52">@Strings.S_AdjDhuhr_52</listEntry>
-            <listEntry value="53">@Strings.S_AdjDhuhr_53</listEntry>
-            <listEntry value="54">@Strings.S_AdjDhuhr_54</listEntry>
-            <listEntry value="55">@Strings.S_AdjDhuhr_55</listEntry>
-            <listEntry value="56">@Strings.S_AdjDhuhr_56</listEntry>
-            <listEntry value="57">@Strings.S_AdjDhuhr_57</listEntry>
-            <listEntry value="58">@Strings.S_AdjDhuhr_58</listEntry>
-            <listEntry value="59">@Strings.S_AdjDhuhr_59</listEntry>
-            <listEntry value="60">@Strings.S_AdjDhuhr_60</listEntry>
-        </settingConfig>
+    <setting propertyKey="@Properties.AdjustDhuhr" title="@Strings.S_AdjustDhuhr">
+        <settingConfig type="numeric" min="-30" max="30" />
     </setting>
-    <setting propertyKey="@Properties.AdjAsr" title="@Strings.S_AdjAsr">
-        <settingConfig type="list">
-            <listEntry value="0">@Strings.S_AdjAsr_0</listEntry>
-            <listEntry value="1">@Strings.S_AdjAsr_1</listEntry>
-            <listEntry value="2">@Strings.S_AdjAsr_2</listEntry>
-            <listEntry value="3">@Strings.S_AdjAsr_3</listEntry>
-            <listEntry value="4">@Strings.S_AdjAsr_4</listEntry>
-            <listEntry value="5">@Strings.S_AdjAsr_5</listEntry>
-            <listEntry value="6">@Strings.S_AdjAsr_6</listEntry>
-            <listEntry value="7">@Strings.S_AdjAsr_7</listEntry>
-            <listEntry value="8">@Strings.S_AdjAsr_8</listEntry>
-            <listEntry value="9">@Strings.S_AdjAsr_9</listEntry>
-            <listEntry value="10">@Strings.S_AdjAsr_10</listEntry>
-            <listEntry value="11">@Strings.S_AdjAsr_11</listEntry>
-            <listEntry value="12">@Strings.S_AdjAsr_12</listEntry>
-            <listEntry value="13">@Strings.S_AdjAsr_13</listEntry>
-            <listEntry value="14">@Strings.S_AdjAsr_14</listEntry>
-            <listEntry value="15">@Strings.S_AdjAsr_15</listEntry>
-            <listEntry value="16">@Strings.S_AdjAsr_16</listEntry>
-            <listEntry value="17">@Strings.S_AdjAsr_17</listEntry>
-            <listEntry value="18">@Strings.S_AdjAsr_18</listEntry>
-            <listEntry value="19">@Strings.S_AdjAsr_19</listEntry>
-            <listEntry value="20">@Strings.S_AdjAsr_20</listEntry>
-            <listEntry value="21">@Strings.S_AdjAsr_21</listEntry>
-            <listEntry value="22">@Strings.S_AdjAsr_22</listEntry>
-            <listEntry value="23">@Strings.S_AdjAsr_23</listEntry>
-            <listEntry value="24">@Strings.S_AdjAsr_24</listEntry>
-            <listEntry value="25">@Strings.S_AdjAsr_25</listEntry>
-            <listEntry value="26">@Strings.S_AdjAsr_26</listEntry>
-            <listEntry value="27">@Strings.S_AdjAsr_27</listEntry>
-            <listEntry value="28">@Strings.S_AdjAsr_28</listEntry>
-            <listEntry value="29">@Strings.S_AdjAsr_29</listEntry>
-            <listEntry value="30">@Strings.S_AdjAsr_30</listEntry>
-            <listEntry value="31">@Strings.S_AdjAsr_31</listEntry>
-            <listEntry value="32">@Strings.S_AdjAsr_32</listEntry>
-            <listEntry value="33">@Strings.S_AdjAsr_33</listEntry>
-            <listEntry value="34">@Strings.S_AdjAsr_34</listEntry>
-            <listEntry value="35">@Strings.S_AdjAsr_35</listEntry>
-            <listEntry value="36">@Strings.S_AdjAsr_36</listEntry>
-            <listEntry value="37">@Strings.S_AdjAsr_37</listEntry>
-            <listEntry value="38">@Strings.S_AdjAsr_38</listEntry>
-            <listEntry value="39">@Strings.S_AdjAsr_39</listEntry>
-            <listEntry value="40">@Strings.S_AdjAsr_40</listEntry>
-            <listEntry value="41">@Strings.S_AdjAsr_41</listEntry>
-            <listEntry value="42">@Strings.S_AdjAsr_42</listEntry>
-            <listEntry value="43">@Strings.S_AdjAsr_43</listEntry>
-            <listEntry value="44">@Strings.S_AdjAsr_44</listEntry>
-            <listEntry value="45">@Strings.S_AdjAsr_45</listEntry>
-            <listEntry value="46">@Strings.S_AdjAsr_46</listEntry>
-            <listEntry value="47">@Strings.S_AdjAsr_47</listEntry>
-            <listEntry value="48">@Strings.S_AdjAsr_48</listEntry>
-            <listEntry value="49">@Strings.S_AdjAsr_49</listEntry>
-            <listEntry value="50">@Strings.S_AdjAsr_50</listEntry>
-            <listEntry value="51">@Strings.S_AdjAsr_51</listEntry>
-            <listEntry value="52">@Strings.S_AdjAsr_52</listEntry>
-            <listEntry value="53">@Strings.S_AdjAsr_53</listEntry>
-            <listEntry value="54">@Strings.S_AdjAsr_54</listEntry>
-            <listEntry value="55">@Strings.S_AdjAsr_55</listEntry>
-            <listEntry value="56">@Strings.S_AdjAsr_56</listEntry>
-            <listEntry value="57">@Strings.S_AdjAsr_57</listEntry>
-            <listEntry value="58">@Strings.S_AdjAsr_58</listEntry>
-            <listEntry value="59">@Strings.S_AdjAsr_59</listEntry>
-            <listEntry value="60">@Strings.S_AdjAsr_60</listEntry>
-        </settingConfig>
+    <setting propertyKey="@Properties.AdjustAsr" title="@Strings.S_AdjustAsr">
+        <settingConfig type="numeric" min="-30" max="30" />
     </setting>
-    <setting propertyKey="@Properties.AdjMaghrib" title="@Strings.S_AdjMaghrib">
-        <settingConfig type="list">
-            <listEntry value="0">@Strings.S_AdjMaghrib_0</listEntry>
-            <listEntry value="1">@Strings.S_AdjMaghrib_1</listEntry>
-            <listEntry value="2">@Strings.S_AdjMaghrib_2</listEntry>
-            <listEntry value="3">@Strings.S_AdjMaghrib_3</listEntry>
-            <listEntry value="4">@Strings.S_AdjMaghrib_4</listEntry>
-            <listEntry value="5">@Strings.S_AdjMaghrib_5</listEntry>
-            <listEntry value="6">@Strings.S_AdjMaghrib_6</listEntry>
-            <listEntry value="7">@Strings.S_AdjMaghrib_7</listEntry>
-            <listEntry value="8">@Strings.S_AdjMaghrib_8</listEntry>
-            <listEntry value="9">@Strings.S_AdjMaghrib_9</listEntry>
-            <listEntry value="10">@Strings.S_AdjMaghrib_10</listEntry>
-            <listEntry value="11">@Strings.S_AdjMaghrib_11</listEntry>
-            <listEntry value="12">@Strings.S_AdjMaghrib_12</listEntry>
-            <listEntry value="13">@Strings.S_AdjMaghrib_13</listEntry>
-            <listEntry value="14">@Strings.S_AdjMaghrib_14</listEntry>
-            <listEntry value="15">@Strings.S_AdjMaghrib_15</listEntry>
-            <listEntry value="16">@Strings.S_AdjMaghrib_16</listEntry>
-            <listEntry value="17">@Strings.S_AdjMaghrib_17</listEntry>
-            <listEntry value="18">@Strings.S_AdjMaghrib_18</listEntry>
-            <listEntry value="19">@Strings.S_AdjMaghrib_19</listEntry>
-            <listEntry value="20">@Strings.S_AdjMaghrib_20</listEntry>
-            <listEntry value="21">@Strings.S_AdjMaghrib_21</listEntry>
-            <listEntry value="22">@Strings.S_AdjMaghrib_22</listEntry>
-            <listEntry value="23">@Strings.S_AdjMaghrib_23</listEntry>
-            <listEntry value="24">@Strings.S_AdjMaghrib_24</listEntry>
-            <listEntry value="25">@Strings.S_AdjMaghrib_25</listEntry>
-            <listEntry value="26">@Strings.S_AdjMaghrib_26</listEntry>
-            <listEntry value="27">@Strings.S_AdjMaghrib_27</listEntry>
-            <listEntry value="28">@Strings.S_AdjMaghrib_28</listEntry>
-            <listEntry value="29">@Strings.S_AdjMaghrib_29</listEntry>
-            <listEntry value="30">@Strings.S_AdjMaghrib_30</listEntry>
-            <listEntry value="31">@Strings.S_AdjMaghrib_31</listEntry>
-            <listEntry value="32">@Strings.S_AdjMaghrib_32</listEntry>
-            <listEntry value="33">@Strings.S_AdjMaghrib_33</listEntry>
-            <listEntry value="34">@Strings.S_AdjMaghrib_34</listEntry>
-            <listEntry value="35">@Strings.S_AdjMaghrib_35</listEntry>
-            <listEntry value="36">@Strings.S_AdjMaghrib_36</listEntry>
-            <listEntry value="37">@Strings.S_AdjMaghrib_37</listEntry>
-            <listEntry value="38">@Strings.S_AdjMaghrib_38</listEntry>
-            <listEntry value="39">@Strings.S_AdjMaghrib_39</listEntry>
-            <listEntry value="40">@Strings.S_AdjMaghrib_40</listEntry>
-            <listEntry value="41">@Strings.S_AdjMaghrib_41</listEntry>
-            <listEntry value="42">@Strings.S_AdjMaghrib_42</listEntry>
-            <listEntry value="43">@Strings.S_AdjMaghrib_43</listEntry>
-            <listEntry value="44">@Strings.S_AdjMaghrib_44</listEntry>
-            <listEntry value="45">@Strings.S_AdjMaghrib_45</listEntry>
-            <listEntry value="46">@Strings.S_AdjMaghrib_46</listEntry>
-            <listEntry value="47">@Strings.S_AdjMaghrib_47</listEntry>
-            <listEntry value="48">@Strings.S_AdjMaghrib_48</listEntry>
-            <listEntry value="49">@Strings.S_AdjMaghrib_49</listEntry>
-            <listEntry value="50">@Strings.S_AdjMaghrib_50</listEntry>
-            <listEntry value="51">@Strings.S_AdjMaghrib_51</listEntry>
-            <listEntry value="52">@Strings.S_AdjMaghrib_52</listEntry>
-            <listEntry value="53">@Strings.S_AdjMaghrib_53</listEntry>
-            <listEntry value="54">@Strings.S_AdjMaghrib_54</listEntry>
-            <listEntry value="55">@Strings.S_AdjMaghrib_55</listEntry>
-            <listEntry value="56">@Strings.S_AdjMaghrib_56</listEntry>
-            <listEntry value="57">@Strings.S_AdjMaghrib_57</listEntry>
-            <listEntry value="58">@Strings.S_AdjMaghrib_58</listEntry>
-            <listEntry value="59">@Strings.S_AdjMaghrib_59</listEntry>
-            <listEntry value="60">@Strings.S_AdjMaghrib_60</listEntry>
-        </settingConfig>
+    <setting propertyKey="@Properties.AdjustMaghrib" title="@Strings.S_AdjustMaghrib">
+        <settingConfig type="numeric" min="-30" max="30" />
     </setting>
-    <setting propertyKey="@Properties.AdjIsha" title="@Strings.S_AdjIsha">
-        <settingConfig type="list">
-            <listEntry value="0">@Strings.S_AdjIsha_0</listEntry>
-            <listEntry value="1">@Strings.S_AdjIsha_1</listEntry>
-            <listEntry value="2">@Strings.S_AdjIsha_2</listEntry>
-            <listEntry value="3">@Strings.S_AdjIsha_3</listEntry>
-            <listEntry value="4">@Strings.S_AdjIsha_4</listEntry>
-            <listEntry value="5">@Strings.S_AdjIsha_5</listEntry>
-            <listEntry value="6">@Strings.S_AdjIsha_6</listEntry>
-            <listEntry value="7">@Strings.S_AdjIsha_7</listEntry>
-            <listEntry value="8">@Strings.S_AdjIsha_8</listEntry>
-            <listEntry value="9">@Strings.S_AdjIsha_9</listEntry>
-            <listEntry value="10">@Strings.S_AdjIsha_10</listEntry>
-            <listEntry value="11">@Strings.S_AdjIsha_11</listEntry>
-            <listEntry value="12">@Strings.S_AdjIsha_12</listEntry>
-            <listEntry value="13">@Strings.S_AdjIsha_13</listEntry>
-            <listEntry value="14">@Strings.S_AdjIsha_14</listEntry>
-            <listEntry value="15">@Strings.S_AdjIsha_15</listEntry>
-            <listEntry value="16">@Strings.S_AdjIsha_16</listEntry>
-            <listEntry value="17">@Strings.S_AdjIsha_17</listEntry>
-            <listEntry value="18">@Strings.S_AdjIsha_18</listEntry>
-            <listEntry value="19">@Strings.S_AdjIsha_19</listEntry>
-            <listEntry value="20">@Strings.S_AdjIsha_20</listEntry>
-            <listEntry value="21">@Strings.S_AdjIsha_21</listEntry>
-            <listEntry value="22">@Strings.S_AdjIsha_22</listEntry>
-            <listEntry value="23">@Strings.S_AdjIsha_23</listEntry>
-            <listEntry value="24">@Strings.S_AdjIsha_24</listEntry>
-            <listEntry value="25">@Strings.S_AdjIsha_25</listEntry>
-            <listEntry value="26">@Strings.S_AdjIsha_26</listEntry>
-            <listEntry value="27">@Strings.S_AdjIsha_27</listEntry>
-            <listEntry value="28">@Strings.S_AdjIsha_28</listEntry>
-            <listEntry value="29">@Strings.S_AdjIsha_29</listEntry>
-            <listEntry value="30">@Strings.S_AdjIsha_30</listEntry>
-            <listEntry value="31">@Strings.S_AdjIsha_31</listEntry>
-            <listEntry value="32">@Strings.S_AdjIsha_32</listEntry>
-            <listEntry value="33">@Strings.S_AdjIsha_33</listEntry>
-            <listEntry value="34">@Strings.S_AdjIsha_34</listEntry>
-            <listEntry value="35">@Strings.S_AdjIsha_35</listEntry>
-            <listEntry value="36">@Strings.S_AdjIsha_36</listEntry>
-            <listEntry value="37">@Strings.S_AdjIsha_37</listEntry>
-            <listEntry value="38">@Strings.S_AdjIsha_38</listEntry>
-            <listEntry value="39">@Strings.S_AdjIsha_39</listEntry>
-            <listEntry value="40">@Strings.S_AdjIsha_40</listEntry>
-            <listEntry value="41">@Strings.S_AdjIsha_41</listEntry>
-            <listEntry value="42">@Strings.S_AdjIsha_42</listEntry>
-            <listEntry value="43">@Strings.S_AdjIsha_43</listEntry>
-            <listEntry value="44">@Strings.S_AdjIsha_44</listEntry>
-            <listEntry value="45">@Strings.S_AdjIsha_45</listEntry>
-            <listEntry value="46">@Strings.S_AdjIsha_46</listEntry>
-            <listEntry value="47">@Strings.S_AdjIsha_47</listEntry>
-            <listEntry value="48">@Strings.S_AdjIsha_48</listEntry>
-            <listEntry value="49">@Strings.S_AdjIsha_49</listEntry>
-            <listEntry value="50">@Strings.S_AdjIsha_50</listEntry>
-            <listEntry value="51">@Strings.S_AdjIsha_51</listEntry>
-            <listEntry value="52">@Strings.S_AdjIsha_52</listEntry>
-            <listEntry value="53">@Strings.S_AdjIsha_53</listEntry>
-            <listEntry value="54">@Strings.S_AdjIsha_54</listEntry>
-            <listEntry value="55">@Strings.S_AdjIsha_55</listEntry>
-            <listEntry value="56">@Strings.S_AdjIsha_56</listEntry>
-            <listEntry value="57">@Strings.S_AdjIsha_57</listEntry>
-            <listEntry value="58">@Strings.S_AdjIsha_58</listEntry>
-            <listEntry value="59">@Strings.S_AdjIsha_59</listEntry>
-            <listEntry value="60">@Strings.S_AdjIsha_60</listEntry>
-        </settingConfig>
+    <setting propertyKey="@Properties.AdjustIsha" title="@Strings.S_AdjustIsha">
+        <settingConfig type="numeric" min="-30" max="30" />
     </setting>
     <setting propertyKey="@Properties.LocationMode" title="@Strings.S_LocationMode">
         <settingConfig type="list">

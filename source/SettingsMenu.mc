@@ -17,6 +17,10 @@ module SettingsMenu {
         return menu;
     }
 
+    function minutes(m as Number) as String {
+        return (m > 0 ? "+" : "") + m.toString() + " min";
+    }
+
     function text(id) as String {
         return WatchUi.loadResource(id) as String;
     }
@@ -55,6 +59,9 @@ module SettingsMenu {
         var opts = item[2];
         if (opts == null) {
             return null;
+        }
+        if (opts instanceof String) {           // "minutes": -30..+30
+            return minutes(current(item[0] as String));
         }
         var o = opts as Array;
         var cur = current(item[0] as String);
@@ -116,6 +123,14 @@ class LuxeGroupDelegate extends WatchUi.Menu2InputDelegate {
                 item.setSubLabel((deg[0] as Double).format("%.4f") + ", " + (deg[1] as Double).format("%.4f"));
             }
             WatchUi.requestUpdate();
+        } else if (it[2] instanceof String) {
+            // minutes -30..+30; the item id is the value
+            var menu = new WatchUi.Menu2({:title => SettingsMenu.text(it[1])});
+            for (var m = -30; m <= 30; m++) {
+                menu.addItem(new WatchUi.MenuItem(SettingsMenu.minutes(m), null, m, null));
+            }
+            menu.setFocus(SettingsMenu.current(key) + 30);
+            WatchUi.pushView(menu, new LuxeOptionDelegate(it, item), WatchUi.SLIDE_LEFT);
         } else {
             var opts = it[2] as Array;
             var menu = new WatchUi.Menu2({:title => SettingsMenu.text(it[1])});

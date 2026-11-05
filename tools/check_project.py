@@ -117,9 +117,14 @@ def main():
         if "SensorHistory" in allsrc and "SensorHistory" not in perms:
             errors.append("manifest: SensorHistory used but permission not declared")
 
+    # Connect IQ 3 watches accept at most about 250 members per Rez module
+    if len(res["Strings"]) > 250:
+        errors.append("%d string resources: Connect IQ 3 watches allow about 250 (Rez.Strings)" % len(res["Strings"]))
+    notes.append("%d string resources (Connect IQ 3 limit: about 250)" % len(res["Strings"]))
+
     # ---- settings
     sroot = parse(os.path.join(ROOT, "resources", "settings", "settings.xml"))
-    lists = {}
+    lists, numerics = {}, set()
     for st in sroot.iter("setting"):
         key = st.get("propertyKey", "").replace("@Properties.", "")
         if key not in res["Properties"]:
@@ -128,6 +133,8 @@ def main():
         if title not in res["Strings"]:
             errors.append("settings: unknown title string %s" % title)
         cfg = st.find("settingConfig")
+        if cfg.get("type") == "numeric":
+            numerics.add(key)
         if cfg.get("type") == "list":
             vals = []
             for le in cfg.iter("listEntry"):
@@ -145,7 +152,7 @@ def main():
         looped = re.match(r"(AyahInc)\d\d$", key)        # read in a loop: "AyahInc" + i.format("%02d")
         if '"%s"' % key not in allsrc and not (looped and '"%s"' % looped.group(1) in allsrc):
             errors.append("property %s declared but never read" % key)
-        if key not in lists and res["Properties"][key][0] == "number":
+        if key not in lists and key not in numerics and res["Properties"][key][0] == "number":
             errors.append("property %s has no setting" % key)
     n_ayat = len(json.load(open(os.path.join(ROOT, "tools", "ayat.json")))["ayat"])
     if len([k for k in res["Properties"] if k.startswith("AyahInc")]) != n_ayat:

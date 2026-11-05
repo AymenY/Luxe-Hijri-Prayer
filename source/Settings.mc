@@ -76,9 +76,9 @@ class LuxeSettings {
         method = readList("CalcMethod", PrayerTimes.METHODS.size() - 1, 0);
         asrFactor = readList("AsrMethod", 1, 0) + 1;
         highLat = readList("HighLatRule", 3, 1);
-        // adjustments: list index 0..60 = -30..+30 minutes
-        adjust = [readList("AdjFajr", 60, 30) - 30, readList("AdjDhuhr", 60, 30) - 30, readList("AdjAsr", 60, 30) - 30,
-                  readList("AdjMaghrib", 60, 30) - 30, readList("AdjIsha", 60, 30) - 30];
+        // adjustments in minutes, -30..+30
+        adjust = [readMinutes("AdjustFajr"), readMinutes("AdjustDhuhr"), readMinutes("AdjustAsr"),
+                  readMinutes("AdjustMaghrib"), readMinutes("AdjustIsha")];
         latitude = readDegrees("Latitude", 90.0d, 33.8754d);
         longitude = readDegrees("Longitude", 180.0d, 10.8575d);
         // 0/0 (the Gulf of Guinea) is what an empty numeric field turns into: treat it as
@@ -123,6 +123,15 @@ class LuxeSettings {
             return v;
         }
         return def;
+    }
+
+    // Whole minutes in -30..+30 (0 when missing or out of range).
+    hidden function readMinutes(key as String) as Number {
+        var v = readNumeric(key);
+        if (v == null || v < -30.0d || v > 30.0d) {
+            return 0;
+        }
+        return Math.round(v).toNumber();
     }
 
     // List index in 0..max, or the default.
