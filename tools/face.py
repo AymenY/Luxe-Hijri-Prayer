@@ -845,11 +845,12 @@ class Face:
         if s.get("hijri_arabic", True):
             ar = (lambda n: str(n)) if s.get("hijri_digits", 0) == 1 else \
                 (lambda n: "".join(chr(ord(ch) - 48 + 97) for ch in str(n)))   # mirror of arDigits
-            dc.drawText(p(140), p(L.HIJRI_Y) + (1 if self.k < 0.8 else 0), self.f_ar, "M %s %s %s" % (ar(hy), chr(ord("A") + hm - 1), ar(hd)),
-                        CENTER | VCENTER)
+            # two lines (mirror of drawLive): "day month", then "year AH"
+            dc.drawText(p(140), p(L.HIJRI_Y), self.f_ar, "%s %s" % (chr(ord("A") + hm - 1), ar(hd)), CENTER | VCENTER)
+            dc.drawText(p(140), p(L.HIJRI_Y2), self.f_ar, "M %s" % ar(hy), CENTER | VCENTER)
         else:
-            dc.drawText(p(140), p(L.HIJRI_Y) + (1 if self.k < 0.8 else 0), self.f_xs, "%d %s %d %s" % (hd, self.str["Hijri%d" % hm], hy,
-                                                                         self.str["HijriSuffix"]), CENTER | VCENTER)
+            dc.drawText(p(140), p(L.HIJRI_Y), self.f_s, "%d %s" % (hd, self.str["Hijri%d" % hm]), CENTER | VCENTER)
+            dc.drawText(p(140), p(L.HIJRI_Y2), self.f_s, "%d %s" % (hy, self.str["HijriSuffix"]), CENTER | VCENTER)
         nxt = self.draw_prayers(dc, now, watch_offset)
         g = s["gauges"]
         for (x, yy), src in zip(self.gauge_centres(), g):

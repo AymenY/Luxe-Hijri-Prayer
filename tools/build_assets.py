@@ -127,13 +127,43 @@ def pack_and_write(folder, name, glyphs, line_height, base, size, face):
         fh.write("\n".join(lines) + "\n")
 
 
-def build_latin_font(folder, name, ttf, size, chars, weight=None):
+# Digits 0-9 of every font come from IBM Plex Sans Condensed (SIL OFL): its 6 and 9 have straight
+# open tails and its 5 a distinct angle, so 5 / 6 / 8 / 9 stay apart on 64-colour MIP screens
+# (owner feedback: with Barlow, 6, 8 and 9 — and sometimes 5 and 6 — looked alike on the watch).
+# Bold for the large roles (20 px and more at 280 px), SemiBold below; the digit height of each
+# font is kept so the layout does not change.
+DIGITS = "0123456789"
+DIGIT_TTF = {True: "IBMPlexSansCondensed-Bold.ttf", False: "IBMPlexSansCondensed-SemiBold.ttf"}
+DIGIT_BOLD_FROM = 20
+
+
+def digit_font(font, size, k):
+    """Plex font whose "8" is as tall as the "8" of `font` (pixel size `size` at scale k)."""
+    target = font.getbbox("8")[3] - font.getbbox("8")[1]
+    ttf = DIGIT_TTF[size / k >= DIGIT_BOLD_FROM - 0.5]
+    best = None
+    for px in range(max(6, int(size * 0.6)), int(size * 1.6) + 1):
+        f = ImageFont.truetype(os.path.join(FONT_SRC, ttf), px)
+        h = f.getbbox("8")[3] - f.getbbox("8")[1]
+        if best is None or abs(h - target) < abs(best[1] - target):
+            best = (f, h)
+    return best[0]
+
+
+def build_latin_font(folder, name, ttf, size, chars, weight=None, k=1.0):
     font = ImageFont.truetype(os.path.join(FONT_SRC, ttf), size)
     if weight is not None:
         font.set_variation_by_axes([weight])
     ascent, descent = font.getmetrics()
+    dfont = digit_font(font, size, k) if any(c in DIGITS for c in chars) else None
     glyphs = []
     for ch in chars:
+        if dfont is not None and ch in DIGITS:
+            bbox = dfont.getbbox(ch, anchor="ls")          # relative to the baseline
+            img = Image.new("L", (bbox[2] - bbox[0], bbox[3] - bbox[1]), 0)
+            ImageDraw.Draw(img).text((-bbox[0], -bbox[1]), ch, font=dfont, fill=255, anchor="ls")
+            glyphs.append((ord(ch), img, bbox[0], ascent + bbox[1], int(round(dfont.getlength(ch)))))
+            continue
         adv = int(round(font.getlength(ch)))
         bbox = font.getbbox(ch)
         if ch == " " or bbox[2] <= bbox[0]:
@@ -251,7 +281,8 @@ def build_ayah_fonts(folder, k, L):
 
 
 AR_DIGITS = "٠١٢٣٤٥٦٧٨٩"
-AR_SMALL_PX = 12  # at 280 px (11 was hard to read on the watch)
+AR_SMALL_PX = 14  # at 280 px (11 was hard to read on the watch; 12 still small for the Hijri date)
+DIGIT_AR_SCALE = 1.0   # IBM Plex digits in ArSmall: pixel size relative to the Amiri size
 # prayer names in the cartouches (setting PrayerNames): glyphs "N".."R"
 PRAYERS_AR = ["الفجر", "الظهر", "العصر", "المغرب", "العشاء", "الجمعة"]   # "S": Jumu'ah (Friday)
 
@@ -270,11 +301,21 @@ def build_arabic_small_font(folder, k):
     items = [(str(i), AR_DIGITS[i]) for i in range(10)]
     items += [(chr(ord("A") + i), m) for i, m in enumerate(data["hijri_months_ar"])]
     items += [("M", data["hijri_suffix_ar"])]
-    items += [(chr(ord("a") + i), str(i)) for i in range(10)]   # Arabic (Western) digits, same typeface
+    items += [(chr(ord("a") + i), str(i)) for i in range(10)]   # Arabic (Western) digits: IBM Plex, see DIGITS
     items += [(chr(ord("N") + i), n) for i, n in enumerate(PRAYERS_AR)]
     glyphs = []
     widths = {}
+    # Western digits in IBM Plex SemiBold, a little taller than the Arabic letters' x-height
+    dfont = ImageFont.truetype(os.path.join(FONT_SRC, DIGIT_TTF[False]), max(8, int(round(size * DIGIT_AR_SCALE))))
     for code, text in items:
+        if code.islower():
+            bbox = dfont.getbbox(text, anchor="ls")
+            w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
+            img = Image.new("L", (w, h), 0)
+            ImageDraw.Draw(img).text((-bbox[0], -bbox[1]), text, font=dfont, fill=255, anchor="ls")
+            glyphs.append((ord(code), img, 0, ascent + bbox[1], w + 1))
+            widths[code] = w
+            continue
         bbox = font.getbbox(text, direction="rtl", language="ar", anchor="ls")
         w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
         img = arabic_image((w + 2, h + 2), (1 - bbox[0], 1 - bbox[1]), text, size, anchor="ls")
@@ -308,7 +349,7 @@ def build_font_sets():
             if f.endswith((".fnt", ".png")):
                 os.remove(os.path.join(folder, f))
         CRISP = size < CRISP_BELOW
-        fonts = [build_latin_font(folder, n, t, max(9, int(s * k)), c, w) for n, t, s, c, w in FONTS]
+        fonts = [build_latin_font(folder, n, t, max(9, int(s * k)), c, w, k) for n, t, s, c, w in FONTS]
         ayah = build_ayah_fonts(folder, k, L)
         arabic = build_arabic_small_font(folder, k)
         write_fonts_xml(folder)

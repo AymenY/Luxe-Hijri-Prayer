@@ -591,21 +591,20 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         dc.drawText(p(140), p(Layout.DAY_NAME_Y), mFontDXS, mDays[CivilDate.dayOfWeek(day)], vc);
         dc.drawText(p(140), p(Layout.DAY_NUM_Y), mFontDL, ymd[2].toString(), vc);
         dc.drawText(p(140), p(Layout.MONTH_Y), mFontDXS, mMonths[ymd[1] - 1], vc);
-        // Hijri date in Arabic. The ArSmall font maps "0".."9" to Eastern Arabic digits, "A".."L"
-        // to the month names and "M" to the AH suffix; written left to right on screen this
-        // reads, right to left, "day month year AH" (numbers keep their left-to-right order).
+        // Hijri date on two lines: day and month, then the year and AH. The ArSmall font maps
+        // "0".."9" to Eastern Arabic digits, "a".."j" to Arabic (Western) digits, "A".."L" to the
+        // month names and "M" to the AH suffix; written left to right on screen each line reads,
+        // right to left, "day month" and "year AH" (numbers keep their left-to-right order).
         // (or in Latin script when the user prefers it)
         var h = HijriCalendar.forEpochDay(day, mSettings.hijriCorrection);
-        // 218 px: 1 px lower, clear of the upper gauges (the font cannot get smaller there)
-        var hy = p(Layout.HIJRI_Y) + (mK < 0.8 ? 1 : 0);
         dc.setColor(mText, Graphics.COLOR_TRANSPARENT);
         if (mSettings.hijriArabic) {
             var month = (('A' as Char).toNumber() + h[1] - 1).toChar().toString();
-            dc.drawText(p(140), hy, mFontAr,
-                        "M " + arDigits(h[0]) + " " + month + " " + arDigits(h[2]), vc);
+            dc.drawText(p(140), p(Layout.HIJRI_Y), mFontAr, month + " " + arDigits(h[2]), vc);
+            dc.drawText(p(140), p(Layout.HIJRI_Y2), mFontAr, "M " + arDigits(h[0]), vc);
         } else {
-            dc.drawText(p(140), hy, mFontXS,
-                        h[2].toString() + " " + mHijriMonths[h[1] - 1] + " " + h[0].toString() + " " + mHijriSuffix, vc);
+            dc.drawText(p(140), p(Layout.HIJRI_Y), mFontS, h[2].toString() + " " + mHijriMonths[h[1] - 1], vc);
+            dc.drawText(p(140), p(Layout.HIJRI_Y2), mFontS, h[0].toString() + " " + mHijriSuffix, vc);
         }
 
         // prayers first: they bring the schedule up to date for the daylight ring

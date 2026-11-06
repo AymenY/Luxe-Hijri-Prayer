@@ -4,6 +4,11 @@ Remaining release steps: `docs/RELEASE_CHECKLIST.md`.
 
 ## 1.0.0 — release candidate (2026-11-05)
 * New style **Scarlet Noir** (black, red and white).
+* Digits everywhere in **IBM Plex Sans Condensed** (owner feedback: with Barlow, 6, 8 and 9 — and
+  sometimes 5 and 6 — looked alike on the fenix 7X Pro): text fonts of the three families, the
+  Western digits of the Hijri date and the 12 / 3 / 6 / 9 numerals; same digit height, layout unchanged.
+* Hijri date on two lines (day and month, then the year and AH) and larger: Arabic pieces 14 px
+  at 280 px (was 12), Latin script in the small text font (was the extra-small one).
 * **Friday**: Dhuhr becomes Jumu'ah (الجمعة) at a fixed time, 12:30 by default (setting
   Jumu'ah time, HHMM, 0 = computed Dhuhr). From 00:00 until Asr the Friday dial is shown: Sidi Bou
   Said blue wrought iron with forged lyres, a few sprigs of jasmine and geranium, gold hour ring,

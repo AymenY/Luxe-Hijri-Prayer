@@ -27,7 +27,7 @@ Based on the approved concept image:
 
 * gold 12 / 3 / 6 / 9 numerals, two-tone gold indices, light minute track
 * gold baton hands with light lume inserts, long blue seconds hand with hollow counterweight
-* date block under 12 (day, large date, month and year) and the Hijri date
+* date block under 12 (day, large date, month) and the Hijri date on two lines (day and month, then the year)
 * sunrise (left) and sunset (right)
 * the default background is the owner's night illustration of a mosque (`tools/art-src/`),
   colour-graded for each style; the other backgrounds are rendered procedurally
@@ -81,7 +81,7 @@ The settings and the watch menu are generated from `tools/gen_settings.py` (Engl
 | Appearance | Style | Luxury Blue, Royal Gold, Emerald Night, Burgundy Royale, Ice Silver, Stealth, Scarlet Noir (black, red, white), Ember Gold and Oasis Gold (high contrast) |
 | Appearance | Background | Mosque at night (illustration), Islamic geometric pattern, Black marble, Night sky |
 | Appearance | Dial numerals | Arabic (12 3 6 9), Indian (Eastern Arabic) |
-| Appearance | Font | Modern (Barlow), Classic (Cinzel + Barlow), Sport (Rajdhani) |
+| Appearance | Font | Modern (Barlow), Classic (Cinzel + Barlow), Sport (Rajdhani); digits always in IBM Plex Sans Condensed (distinct 5 / 6 / 8 / 9) |
 | Appearance | Text colour | Preset, white, cream, gold, silver, ice blue |
 | Appearance | Accent colour (countdown, gauges) | Preset, red, orange, gold, green, cyan, blue, white |
 | Appearance | Hands / hands colour | Baton with lume, Dauphine, Sword / preset, gold, rose gold, silver, bronze |
@@ -231,7 +231,8 @@ keep them in sync when changing `source/`.
 ## Licences
 
 Code: © the author. Background illustration `tools/art-src/mosque-night.png`: supplied by the
-owner. Fonts: Barlow Semi Condensed (Bold, SemiBold, Medium), Cinzel, Rajdhani and Amiri, SIL Open Font License 1.1
+owner. Fonts: Barlow Semi Condensed (Bold, SemiBold, Medium), Cinzel, Rajdhani, IBM Plex Sans Condensed (digits)
+and Amiri, SIL Open Font License 1.1
 (`tools/fonts-src/OFL-*.txt`); the bitmap fonts in `resources*/fonts/` are derived from them.
 Arabic text: Tanzil (CC BY 3.0, unmodified text). French translation: M. Hamidullah via Tanzil
 (documentation only).

@@ -23,7 +23,8 @@ module Layout {
     const DAY_NAME_Y = 57;
     const DAY_NUM_Y = 75;
     const MONTH_Y = 93;
-    const HIJRI_Y = 112;
+    const HIJRI_Y = 113;         // Hijri date, line 1: day and month
+    const HIJRI_Y2 = 129;        // line 2: year and AH
 
     // Gauges: upper pair (steps / heart rate) and side pair (calories / battery)
     const GAUGE_UP_DX = 56;

@@ -107,11 +107,13 @@ def check_size(size, report):
         ck.add("daynum-" + lang, ck.text_box("luxe_dl", "28", p(140), p(L.DAY_NUM_Y)))
         ck.add("month-" + lang, ck.text_box("luxe_dxs", widest("luxe_dxs", size, [s["Month%d" % m] for m in range(1, 13)]),
                                             p(140), p(L.MONTH_Y)))
-        # Arabic pieces (language independent): widest Hijri date
-        ck.add("hijri", ck.text_box("ar_small", widest("ar_small", size, ["M 1448 %s 30" % chr(ord("A") + m)
-                                                                          for m in range(12)]), p(140), p(L.HIJRI_Y) + (1 if ck.k < 0.8 else 0)))
-        ck.add("hijri_latin-" + lang, ck.text_box("luxe_xs", widest("luxe_xs", size, [
-            "30 %s 1448 %s" % (s["Hijri%d" % m], s["HijriSuffix"]) for m in range(1, 13)]), p(140), p(L.HIJRI_Y) + (1 if ck.k < 0.8 else 0)))
+        # Arabic pieces (language independent): widest Hijri date, on two lines
+        ck.add("hijri", ck.text_box("ar_small", widest("ar_small", size, ["%s 30" % chr(ord("A") + m) for m in range(12)]),
+                                    p(140), p(L.HIJRI_Y)))
+        ck.add("hijri_year", ck.text_box("ar_small", "M 1448", p(140), p(L.HIJRI_Y2)))
+        ck.add("hijri_latin-" + lang, ck.text_box("luxe_s", widest("luxe_s", size, [
+            "30 %s" % s["Hijri%d" % m] for m in range(1, 13)]), p(140), p(L.HIJRI_Y)))
+        ck.add("hijri_latin_year-" + lang, ck.text_box("luxe_s", "1448 %s" % s["HijriSuffix"], p(140), p(L.HIJRI_Y2)))
         # battery line under the verse: icon (20 units with its gap) then "100%"
         tb = ck.text_box("luxe_s", "100%", p(140) + p(10), p(L.BATT_Y))
         bb = (tb[0] - p(20), min(tb[1], p(L.BATT_Y) - p(4)), tb[2], max(tb[3], p(L.BATT_Y) + p(5)))

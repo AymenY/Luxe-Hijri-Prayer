@@ -469,11 +469,19 @@ NUMERALS = [("12", "\u0661\u0662", 0), ("3", "\u0663", 90), ("6", "\u0666", 180)
 SPRITE_HALF = 18   # half size of a numeral bitmap, dial units
 
 
+# Western numerals in IBM Plex Sans Condensed Bold (distinct 6 / 9, see build_assets.DIGITS), as
+# tall as the former Barlow numerals (27 units)
+NUMERAL_TTF = "IBMPlexSansCondensed-Bold.ttf"
+NUMERAL_SCALE = (lambda b, p: (b[3] - b[1]) / float(p[3] - p[1]))(
+    ImageFont.truetype(os.path.join(FONT_SRC, "BarlowSemiCondensed-Bold.ttf"), 270).getbbox("12"),
+    ImageFont.truetype(os.path.join(FONT_SRC, NUMERAL_TTF), 270).getbbox("12"))
+
+
 def numeral_font(art, indian):
     if not indian:
-        return ImageFont.truetype(os.path.join(FONT_SRC, "BarlowSemiCondensed-Bold.ttf"), int(art.u(27)))
+        return ImageFont.truetype(os.path.join(FONT_SRC, NUMERAL_TTF), int(art.u(27 * NUMERAL_SCALE)))
     # Amiri digits are small for their em size: match the height of the Western "12"
-    ref = ImageFont.truetype(os.path.join(FONT_SRC, "BarlowSemiCondensed-Bold.ttf"), 270).getbbox("12")
+    ref = ImageFont.truetype(os.path.join(FONT_SRC, NUMERAL_TTF), int(270 * NUMERAL_SCALE)).getbbox("12")
     size = 270
     f = ImageFont.truetype(os.path.join(FONT_SRC, "Amiri-Bold.ttf"), size)
     b = f.getbbox("\u0662\u0663")
@@ -647,7 +655,7 @@ def legibility_shadows(art):
     """Soft, shapeless shadows under the live texts so they stay readable over the illustration."""
     for (x0, y0, x1, y1, r, alpha) in [
             (112, 44, 168, 100, 8, 0.55),                    # date block
-            (66, 101, 214, 125, 6, 0.85),                    # Hijri date (darker: busy minarets behind)
+            (72, 100, 208, 136, 7, 0.85),                    # Hijri date, 2 lines (darker: busy minarets behind)
             (24, 88, 72, 120, 7, 0.5), (208, 88, 256, 120, 7, 0.5),   # sunrise / sunset
             (66, 204, 214, L["BATT_Y"] + 10, 8, 0.75)]:  # Ayah
         m = art.mask(lambda d, u, b=(x0, y0, x1, y1): d.ellipse([u(b[0]), u(b[1]), u(b[2]), u(b[3])], fill=255))
