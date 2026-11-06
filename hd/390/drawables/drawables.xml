@@ -36,6 +36,7 @@
     <bitmap id="Dial81" filename="dial_8_1.jpg" packingFormat="jpg" />
     <bitmap id="Dial82" filename="dial_8_2.jpg" packingFormat="jpg" />
     <bitmap id="Dial83" filename="dial_8_3.jpg" packingFormat="jpg" />
+    <bitmap id="DialFri" filename="dial_fri.jpg" packingFormat="jpg" />
     <!-- numerals 12 / 3 / 6 / 9: NumSDQ = style S, digits D (0 Arabic, 1 Indian), position Q -->
     <bitmap id="Num000" filename="num_0_0_0.png" />
     <bitmap id="Num001" filename="num_0_0_1.png" />

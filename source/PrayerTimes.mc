@@ -188,6 +188,7 @@ class PrayerSchedule {
     var asrFactor as Number = 1;
     var highLat as Number = 1;
     var adjust as Array<Number> = [0, 0, 0, 0, 0];   // minutes added to Fajr, Dhuhr, Asr, Maghrib, Isha
+    var jumuah as Number = -1;                        // Friday: Dhuhr replaced by Jumu'ah at this local minute
 
     hidden var mKey as String = "";
     hidden var mDay as Number = 0;
@@ -213,6 +214,17 @@ class PrayerSchedule {
         mKey = "";
     }
 
+    // Jumu'ah time in minutes after local midnight (-1: keep the computed Dhuhr on Fridays).
+    function setJumuah(minutes as Number) as Void {
+        jumuah = minutes;
+        mKey = "";
+    }
+
+    // True when the Dhuhr of day `dayIndex` (0 = today) is the Friday Jumu'ah.
+    function isJumuah(dayIndex as Number) as Boolean {
+        return jumuah >= 0 && CivilDate.dayOfWeek(mDay + dayIndex) == 5;
+    }
+
     // Recomputes today, tomorrow and the day after (for polar edge cases) when needed.
     function update(nowUtc as Number, offsetSeconds as Number) as Void {
         var day = CivilDate.localEpochDay(nowUtc, offsetSeconds);
@@ -233,6 +245,10 @@ class PrayerSchedule {
                 if (times[i] != null && adjust[k] != 0) {
                     times[i] = (times[i] as Numeric) + adjust[k] / 60.0d;
                 }
+            }
+            // Friday: Jumu'ah at the fixed time chosen by the user (no adjustment)
+            if (jumuah >= 0 && CivilDate.dayOfWeek(day + d) == 5) {
+                times[PrayerTimes.DHUHR] = jumuah / 60.0d;
             }
             mDays.add(times);
         }

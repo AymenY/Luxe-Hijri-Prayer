@@ -29,6 +29,9 @@ round Garmin displays (MIP and AMOLED).
 * Next prayer with a live countdown, and the following prayer with its time
 * Prayer names in Arabic or Latin script; 14 calculation methods, standard or Hanafi Asr,
   high-latitude rules, and a per-prayer adjustment (±30 min) to match your mosque
+* Friday: Dhuhr becomes Jumu'ah at a fixed time (12:30 by default, adjustable), and from 00:00
+  until Asr a festive Friday dial — Sidi Bou Said blue wrought iron, jasmine and geranium, gold
+  hour ring — with the greeting "Jumu'ah Mubarakah" in place of the verse (can be turned off)
 * Prayer times follow your position automatically (the watch's last GPS position) or a location
   you enter
 * Hijri date in Arabic (Arabic or Indian digits) or in Latin script, with a ±2 day correction
@@ -69,6 +72,9 @@ pour les écrans ronds Garmin (MIP et AMOLED).
 * Noms des prières en arabe ou en écriture latine ; 14 méthodes de calcul, Asr standard ou
   hanafite, règles des hautes latitudes, et un ajustement par prière (±30 min) pour coller à
   l'horaire de votre mosquée
+* Vendredi : le Dhohr devient la Jumu'a à heure fixe (12:30 par défaut, réglable) et, de 00:00
+  jusqu'à l'Asr, un cadran festif — fer forgé bleu de Sidi Bou Saïd, jasmin et géranium, cercle
+  des heures doré — avec le vœu « Jumu'a Mubaraka » à la place du verset (désactivable)
 * Les heures suivent automatiquement votre position (dernière position GPS de la montre) ou une
   position saisie
 * Date hégirienne en arabe (chiffres arabes ou indiens) ou en écriture latine, correction ±2 jours

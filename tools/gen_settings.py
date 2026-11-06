@@ -101,6 +101,11 @@ def settings():
         out.append((key, "number", 0, (F + "Adjustment " + en + " (minutes)", FF + "ajustement " + fr + " (minutes)"),
                     (-30, 30)))
     out += [
+        # Friday: Jumu'ah replaces Dhuhr at a fixed time (HHMM, 0 = the computed Dhuhr), and the
+        # festive Friday dial with the "Jumu'ah Mubarakah" greeting is shown from 00:00 until Asr
+        ("JumuahTime", "number", 1230, (F + "Jumu'ah time (e.g. 1230)", FF + "heure de la Jumu'a (ex. 1230)"), (0, 1500)),
+        ("FridayDesign", "number", 0, (F + "Friday design (until Asr)", FF + "design du vendredi (jusqu'à l'Asr)"),
+         [("On", "Activé"), ("Off", "Désactivé")]),
         ("LocationMode", "number", 0, (F + "Location for prayer times", FF + "position pour les prières"),
          [("Automatic (watch GPS position)", "Automatique (position GPS de la montre)"),
           ("Manual (latitude / longitude below)", "Manuelle (latitude / longitude ci-dessous)")]),
@@ -137,13 +142,16 @@ MENU = [
         ("HighLatRule", ("High latitudes", "Hautes latitudes")), ("TimeZoneMode", ("Time zone", "Fuseau horaire")),
         ("AdjustFajr", ("Adjust Fajr (min)", "Ajuster Fajr (min)")), ("AdjustDhuhr", ("Adjust Dhuhr (min)", "Ajuster Dhohr (min)")),
         ("AdjustAsr", ("Adjust Asr (min)", "Ajuster Asr (min)")), ("AdjustMaghrib", ("Adjust Maghrib (min)", "Ajuster Maghrib (min)")),
-        ("AdjustIsha", ("Adjust Isha (min)", "Ajuster Icha (min)"))]),
+        ("AdjustIsha", ("Adjust Isha (min)", "Ajuster Icha (min)")),
+        ("JumuahTime", ("Jumu'ah time (e.g. 1230)", "Heure Jumu'a (ex. 1230)")),
+        ("FridayDesign", ("Friday design", "Design du vendredi"))]),
     ("Location", ("Location", "Position"), [
         ("LocationMode", ("Position", "Position")),
         ("#gps", ("Use current position", "Utiliser la position actuelle"))]),
 ]
 MENU_TEXTS = [("M_Title", ("Luxe Hijri Prayer", "Luxe Hijri Prayer")),
-              ("M_GpsNone", ("No position: start a GPS activity first", "Pas de position : lancez d'abord une activité GPS"))]
+              ("M_GpsNone", ("No position: start a GPS activity first", "Pas de position : lancez d'abord une activité GPS")),
+              ("M_JumuahOff", ("Computed Dhuhr", "Dhohr calculé"))]
 
 
 def menu_source(table, option_ids):
@@ -163,6 +171,8 @@ def menu_source(table, option_ids):
                 out.append('                ["%s", Rez.Strings.%s, [%s]],' % (key, sid, ids))
             elif key in minutes:
                 out.append('                ["%s", Rez.Strings.%s, "minutes"],' % (key, sid))
+            elif key == "JumuahTime":
+                out.append('                ["%s", Rez.Strings.%s, "clock"],' % (key, sid))
             else:
                 out.append('                ["%s", Rez.Strings.%s, null],' % (key, sid))
         out.append("            ]]%s" % ("," if gi < len(MENU) - 1 else ""))

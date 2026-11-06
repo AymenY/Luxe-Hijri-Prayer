@@ -37,6 +37,7 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     hidden var mBgOps as Array? = null;
     hidden var mFrameOps as Array? = null;
     hidden var mDial = null;        // HD static layer (BitmapResource) or null
+    hidden var mFriday as Boolean = false;   // Friday dial and greeting shown (00:00 until Asr)
     hidden var mNums = null;
     hidden var mMoon as Array? = null;   // MoonPhase.at() result, recomputed every 10 minutes
     hidden var mMoonSlot as Number = -1;        // the four numeral bitmaps (12, 3, 6, 9) of the HD dial, or null
@@ -63,6 +64,7 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     hidden var mDays as Array<String> = [];
     hidden var mMonths as Array<String> = [];
     hidden var mPrayerNames as Array = [];
+    hidden var mJumuahName as String = "";
     hidden var mLabels as Array<String> = [];
     hidden var mLabelMi as String = "MI";
     hidden var mLabelDay as String = "DAY";
@@ -115,9 +117,10 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     // ------------------------------------------------------------------ settings
     function applySettings() as Void {
         mSettings.load();
-        mColors = Themes.PRESETS[mSettings.preset] as Array<Number>;
         var st = mSettings;
-        mMulticolor = (st.gaugeColors == 0) && (Themes.MULTICOLOR[st.preset] as Boolean);
+        var friday = mFriday && st.fridayDesign;
+        mColors = (friday ? Themes.FRIDAY : Themes.PRESETS[st.preset]) as Array<Number>;
+        mMulticolor = (st.gaugeColors == 0) && (friday || (Themes.MULTICOLOR[st.preset] as Boolean));
         mText = mColors[Themes.TEXT];
         if (st.textColor > 0) {
             mText = Themes.TEXT_CHOICES[st.textColor - 1] as Number;
@@ -130,7 +133,10 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         if (st.secondsColor > 0) {
             mSecColor = Themes.COLOUR_CHOICES[st.secondsColor - 1] as Number;
         }
-        if (st.handColor == 0) {
+        if (st.handColor == 0 && friday) {
+            mHandLight = Themes.FRIDAY_HANDS[0] as Number;
+            mHandDark = Themes.FRIDAY_HANDS[1] as Number;
+        } else if (st.handColor == 0) {
             mHandLight = mColors[Themes.GOLD];
             mHandDark = mColors[Themes.GOLD_DK];
         } else {
@@ -141,10 +147,11 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         loadFonts();
         mDial = null;
         mNums = null;
-        mDial = loadDial(mSettings.preset, mSettings.background);
-        mNums = loadNumerals(mSettings.preset, mSettings.dialDigits);
+        mDial = friday ? loadFridayDial() : loadDial(st.preset, st.background);
+        mNums = loadNumerals(friday ? Themes.FRIDAY_NUMERALS : st.preset, st.dialDigits);
+        mBgOps = null;
         if (mDial == null) {
-            mBgOps = Backgrounds.load(mSettings.background);
+            mBgOps = Backgrounds.load(friday ? Backgrounds.FRIDAY : st.background);
             mFrameOps = Backgrounds.loadFrame();
         } else {
             mBgOps = null;
@@ -154,7 +161,39 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         mSchedule.configure(mSettings.latitude, mSettings.longitude, mSettings.method,
                             mSettings.asrFactor, mSettings.highLat);
         mSchedule.setAdjust(mSettings.adjust);
+        mSchedule.setJumuah(mSettings.jumuah);
         mStaticDirty = true;
+    }
+
+    // Friday from 00:00 (watch time) until Asr; until 15:00 when no prayer time is available.
+    hidden function fridayNow(now as Number, clock as System.ClockTime) as Boolean {
+        var st = mSettings;
+        if (!st.fridayDesign || CivilDate.dayOfWeek(CivilDate.localEpochDay(now, clock.timeZoneOffset)) != 5) {
+            return false;
+        }
+        var asr = null;
+        if (st.locationSet) {
+            mSchedule.update(now, st.tzManual ? st.utcOffsetSeconds : clock.timeZoneOffset);
+            asr = mSchedule.momentOf(0, PrayerTimes.ASR);
+        }
+        if (asr == null) {
+            return (now.toLong() + clock.timeZoneOffset) % 86400 < 15 * 3600;
+        }
+        return now < asr;
+    }
+
+    (:hd)
+    hidden function loadFridayDial() {
+        try {
+            return WatchUi.loadResource(Rez.Drawables.DialFri);
+        } catch (e) {
+            return null;
+        }
+    }
+
+    (:lite)
+    hidden function loadFridayDial() {
+        return null;
     }
 
     // HD dial for style s and background b; null if it cannot be loaded (e.g. out of memory).
@@ -289,6 +328,7 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
                    s(Rez.Strings.Month9), s(Rez.Strings.Month10), s(Rez.Strings.Month11), s(Rez.Strings.Month12)];
         mPrayerNames = [s(Rez.Strings.Prayer0), null, s(Rez.Strings.Prayer2), s(Rez.Strings.Prayer3), null,
                         s(Rez.Strings.Prayer5), s(Rez.Strings.Prayer6)];
+        mJumuahName = s(Rez.Strings.Prayer7);
         mLabels = [s(Rez.Strings.LabelSteps), s(Rez.Strings.LabelHeart), s(Rez.Strings.LabelCalories),
                    s(Rez.Strings.LabelBattery), s(Rez.Strings.LabelKm), s(Rez.Strings.LabelFloors),
                    s(Rez.Strings.LabelBodyBattery), s(Rez.Strings.LabelStress), s(Rez.Strings.LabelActive), ""];
@@ -350,6 +390,12 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         var now = Time.now().value();
         followPosition();
         var clock = System.getClockTime();
+        var friday = fridayNow(now, clock);
+        if (friday != mFriday) {
+            // switch between the Friday dial and the chosen style (loads the other dial image)
+            mFriday = friday;
+            applySettings();
+        }
         if (mSleeping && mBurnIn) {
             drawAlwaysOn(dc, clock);
             return;
@@ -924,20 +970,25 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         if (list.size() > 0) {
             var n = list[0] as Array;
             var secs = ((n[1] as Long) - now).toNumber();
-            drawPanel(dc, p(Layout.CX - Layout.PANEL_DX), true, n[0] as Number, countdown(secs), mAccent);
+            drawPanel(dc, p(Layout.CX - Layout.PANEL_DX), true, n[0] as Number, jumuah(n), countdown(secs), mAccent);
         }
         if (list.size() > 1) {
             var f = list[1] as Array;
-            drawPanel(dc, p(Layout.CX + Layout.PANEL_DX), false, f[0] as Number,
+            drawPanel(dc, p(Layout.CX + Layout.PANEL_DX), false, f[0] as Number, jumuah(f),
                       formatTime(mSchedule.minutes(f[2] as Number, f[0] as Number), is24), mText);
         }
         drawSun(dc, true, mSchedule.minutes(0, PrayerTimes.SUNRISE), is24);
         drawSun(dc, false, mSchedule.minutes(0, PrayerTimes.SUNSET), is24);
     }
 
+    // True when an upcoming prayer [index, moment, day index] is the Friday Jumu'ah.
+    hidden function jumuah(entry as Array) as Boolean {
+        return (entry[0] as Number) == PrayerTimes.DHUHR && mSchedule.isJumuah(entry[2] as Number);
+    }
+
     // Cartouche content: icon on the left, name above value. `next` selects the mosque icon.
-    hidden function drawPanel(dc as Graphics.Dc, cx as Number, next as Boolean, prayer as Number, value as String,
-                              valueColor as Number) as Void {
+    hidden function drawPanel(dc as Graphics.Dc, cx as Number, next as Boolean, prayer as Number, jum as Boolean,
+                              value as String, valueColor as Number) as Void {
         var c = mColors;
         var vc = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
         var x0 = cx - p(Layout.PANEL_W) / 2;
@@ -960,11 +1011,11 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         var tx = x0 + p(20) + (p(Layout.PANEL_W) - p(22)) / 2;
         dc.setColor(mText, Graphics.COLOR_TRANSPARENT);
         if (mSettings.prayerArabic) {
-            // ArSmall glyphs "N".."R": the Arabic names of Fajr, Dhuhr, Asr, Maghrib, Isha
-            var k = [0, -1, 1, 2, -1, 3, 4][prayer] as Number;
+            // ArSmall glyphs "N".."R": the Arabic names of Fajr, Dhuhr, Asr, Maghrib, Isha; "S" Jumu'ah
+            var k = jum ? 5 : [0, -1, 1, 2, -1, 3, 4][prayer] as Number;
             dc.drawText(tx, p(Layout.PANEL_Y0 + 8), mFontAr, (('N' as Char).toNumber() + k).toChar().toString(), vc);
         } else {
-            dc.drawText(tx, p(Layout.PANEL_Y0 + 8), mFontXS, mPrayerNames[prayer] as String, vc);
+            dc.drawText(tx, p(Layout.PANEL_Y0 + 8), mFontXS, jum ? mJumuahName : mPrayerNames[prayer] as String, vc);
         }
         dc.setColor(valueColor, Graphics.COLOR_TRANSPARENT);
         dc.drawText(tx, p(Layout.PANEL_Y0 + 20), mFontS, value, vc);
@@ -1035,6 +1086,16 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     // (the surah and verse number are not shown on the dial). The verse changes every hour (rotation over the verses ticked in
     // the settings) unless a fixed verse is chosen.
     hidden function drawAyah(dc as Graphics.Dc, now as Number, clock as System.ClockTime) as Void {
+        var vc = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
+        if (mFriday) {
+            // Friday until Asr: the greeting "Jumu'ah Mubarakah" (not a verse) in the verse area.
+            // Its 4 glyphs use the free slot 7 of the Ayah4 font (tools/build_assets.py, GREETING).
+            var g = ('A' as Char).toNumber() + 28;
+            dc.setColor(mText, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(p(140), p(Layout.AYAH_Y), ayahFont(4), g.toChar().toString() + (g + 1).toChar().toString()
+                        + (g + 2).toChar().toString() + (g + 3).toChar().toString(), vc);
+            return;
+        }
         var st = mSettings;
         var hour = ((now.toLong() + clock.timeZoneOffset) / 3600).toNumber();
         var idx = AyahPicker.pick(st.ayahMode, st.ayahFixed, st.ayahIncluded, hour);
@@ -1047,7 +1108,6 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         var first = ('A' as Char).toNumber() + 4 * slot;
         var code = first.toChar().toString() + (first + 1).toChar().toString()
                    + (first + 2).toChar().toString() + (first + 3).toChar().toString();
-        var vc = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
         dc.setColor(mColors[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
         dc.drawText(p(140), p(Layout.AYAH_Y), font, code, vc);
     }

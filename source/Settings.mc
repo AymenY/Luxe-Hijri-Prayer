@@ -33,6 +33,8 @@ class LuxeSettings {
     var asrFactor as Number = 1;          // 1 = standard, 2 = Hanafi
     var highLat as Number = 1;
     var adjust as Array<Number> = [0, 0, 0, 0, 0];   // minutes, Fajr Dhuhr Asr Maghrib Isha
+    var jumuah as Number = 750;           // Friday: Jumu'ah at this local minute (12:30); -1 = computed Dhuhr
+    var fridayDesign as Boolean = true;   // Friday dial and greeting from 00:00 until Asr
     var latitude as Double = 33.8754d;
     var longitude as Double = 10.8575d;
     var locationSet as Boolean = true;
@@ -79,6 +81,8 @@ class LuxeSettings {
         // adjustments in minutes, -30..+30
         adjust = [readMinutes("AdjustFajr"), readMinutes("AdjustDhuhr"), readMinutes("AdjustAsr"),
                   readMinutes("AdjustMaghrib"), readMinutes("AdjustIsha")];
+        jumuah = readClock("JumuahTime", 750);
+        fridayDesign = readList("FridayDesign", 1, 0) == 0;
         latitude = readDegrees("Latitude", 90.0d, 33.8754d);
         longitude = readDegrees("Longitude", 180.0d, 10.8575d);
         // 0/0 (the Gulf of Guinea) is what an empty numeric field turns into: treat it as
@@ -132,6 +136,25 @@ class LuxeSettings {
             return 0;
         }
         return Math.round(v).toNumber();
+    }
+
+    // Time of day stored as HHMM (1230 = 12:30) -> minutes after midnight; 0 -> -1 (feature off).
+    // Only 10:00..15:59 is accepted for Jumu'ah; anything else uses the default.
+    hidden function readClock(key as String, def as Number) as Number {
+        var v = readNumeric(key);
+        if (v == null) {
+            return def;
+        }
+        var n = v.toNumber();
+        if (n == 0) {
+            return -1;
+        }
+        var h = n / 100;
+        var m = n % 100;
+        if (h < 10 || h > 15 || m < 0 || m > 59) {
+            return def;
+        }
+        return h * 60 + m;
     }
 
     // List index in 0..max, or the default.

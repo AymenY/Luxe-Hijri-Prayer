@@ -403,6 +403,15 @@
     <setting propertyKey="@Properties.AdjustIsha" title="@Strings.S_AdjustIsha">
         <settingConfig type="numeric" min="-30" max="30" />
     </setting>
+    <setting propertyKey="@Properties.JumuahTime" title="@Strings.S_JumuahTime">
+        <settingConfig type="numeric" min="0" max="1500" />
+    </setting>
+    <setting propertyKey="@Properties.FridayDesign" title="@Strings.S_FridayDesign">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.S_FridayDesign_0</listEntry>
+            <listEntry value="1">@Strings.S_FridayDesign_1</listEntry>
+        </settingConfig>
+    </setting>
     <setting propertyKey="@Properties.LocationMode" title="@Strings.S_LocationMode">
         <settingConfig type="list">
             <listEntry value="0">@Strings.S_LocationMode_0</listEntry>

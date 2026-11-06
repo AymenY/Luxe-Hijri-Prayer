@@ -123,6 +123,13 @@ def main():
     st("state-hijri-latin", "Hijri date in Latin script", settings={"hijri_arabic": False})
     st("state-empty-gauges", "Gauges 3 and 4 set to None, active minutes in gauge 2",
        settings={"gauges": [0, 8, 9, 9]}, sensors={**face.DEFAULT_SENSORS, 8: {"value": 95, "goal": 150}})
+    st("state-friday-morning", "Friday 10:25: Friday dial, Jumu'ah at 12:30, greeting until Asr",
+       now=when(2026, 9, 18, 10, 25, 37))
+    st("state-friday-after-asr", "Friday after Asr: back to the chosen style", now=when(2026, 9, 18, 16, 40, 5))
+    st("state-friday-latin", "Friday, prayer names in Latin script", settings={"prayer_names": 1},
+       now=when(2026, 9, 18, 11, 5, 0))
+    st("state-friday-off", "Friday with the Friday design off (Jumu'ah still at 12:30)",
+       settings={"friday_design": False}, now=when(2026, 9, 18, 10, 25, 37))
     st("state-low-power-no-seconds", "MIP low power, 'Only after wrist raise': no seconds hand", seconds=False)
 
     sheet("overview-styles", presets)

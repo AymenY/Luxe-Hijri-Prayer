@@ -43,6 +43,8 @@ module MenuTable {
                 ["AdjustAsr", Rez.Strings.S_AdjustAsr, "minutes"],
                 ["AdjustMaghrib", Rez.Strings.S_AdjustMaghrib, "minutes"],
                 ["AdjustIsha", Rez.Strings.S_AdjustIsha, "minutes"],
+                ["JumuahTime", Rez.Strings.S_JumuahTime, "clock"],
+                ["FridayDesign", Rez.Strings.S_FridayDesign, [Rez.Strings.S_FridayDesign_0, Rez.Strings.S_FridayDesign_1]],
             ]],
             [Rez.Strings.MG_Location, [
                 ["LocationMode", Rez.Strings.S_LocationMode, [Rez.Strings.S_LocationMode_0, Rez.Strings.S_LocationMode_1]],

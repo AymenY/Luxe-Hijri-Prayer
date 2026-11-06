@@ -10,7 +10,9 @@ All images are stored in full colour (JPEG, quality 90). For AMOLED sizes they a
 JPEG on the device (packingFormat="jpg"). For MIP sizes the Connect IQ compiler converts them
 to the exact palette declared by each device file (64 or more colours, Floyd-Steinberg
 dithering) with its default packing, so no colour depth is assumed here.
-Usage: python3 tools/build_hd.py [size ...]   (default: all sizes; 4 worker processes)
+A Friday dial per size (tools/render_friday.py, id DialFri) is added.
+Usage: python3 tools/build_hd.py [--friday] [size ...]   (default: all sizes; 4 worker processes;
+--friday renders only the Friday dials)
 """
 import multiprocessing as mp
 import os
@@ -18,6 +20,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
 import render_hd  # noqa: E402
+import render_friday  # noqa: E402
 
 ROOT = render_hd.ROOT
 SIZES = [218, 240, 260, 280, 360, 390, 416, 454, 466]
@@ -55,7 +58,21 @@ def sprite_job(args):
     return os.path.join(folder(size), num_name(s, 0, 0)), total
 
 
+FRIDAY = "dial_fri.jpg"     # Friday dial (tools/render_friday.py), id DialFri
+
+
+def friday_job(size):
+    img = render_friday.render(size)
+    if size < render_hd.AMOLED_FROM:
+        img = render_hd.mip_grade(img)
+    path = os.path.join(folder(size), FRIDAY)
+    img.convert("RGB").save(path, "JPEG", quality=90, optimize=True, subsampling=0)
+    return path, os.path.getsize(path)
+
+
 def job(args):
+    if len(args) == 1:
+        return friday_job(args[0])
     if len(args) == 2:
         return sprite_job(args)
     size, s, b = args
@@ -83,6 +100,10 @@ def write_xml(size):
             else:
                 lines.append('    <bitmap id="Dial%d%d" filename="%s" dithering="floyd_steinberg" />'
                              % (s, b, fname(size, s, b)))
+    if amoled:
+        lines.append('    <bitmap id="DialFri" filename="%s" packingFormat="jpg" />' % FRIDAY)
+    else:
+        lines.append('    <bitmap id="DialFri" filename="%s" dithering="floyd_steinberg" />' % FRIDAY)
     lines.append("    <!-- numerals 12 / 3 / 6 / 9: NumSDQ = style S, digits D (0 Arabic, 1 Indian), position Q -->")
     for s in range(NSTYLES):
         for d in range(2):
@@ -95,15 +116,19 @@ def write_xml(size):
 
 
 def main():
-    sizes = [int(a) for a in sys.argv[1:]] or SIZES
+    """build_hd.py [--friday] [size ...]: --friday renders only the Friday dials."""
+    only_friday = "--friday" in sys.argv
+    sizes = [int(a) for a in sys.argv[1:] if not a.startswith("--")] or SIZES
     for size in sizes:
         os.makedirs(folder(size), exist_ok=True)
-        for f in os.listdir(folder(size)):
-            if f.startswith(("dial_", "num_")):
-                os.remove(os.path.join(folder(size), f))
+        if not only_friday:
+            for f in os.listdir(folder(size)):
+                if f.startswith(("dial_", "num_")):
+                    os.remove(os.path.join(folder(size), f))
         write_xml(size)
-    jobs = [(size, s, b) for size in sizes for s in range(NSTYLES) for b in range(len(BGS))]
-    jobs += [(size, s) for size in sizes for s in range(NSTYLES)]
+    jobs = [] if only_friday else [(size, s, b) for size in sizes for s in range(NSTYLES) for b in range(len(BGS))]
+    jobs += [] if only_friday else [(size, s) for size in sizes for s in range(NSTYLES)]
+    jobs += [(size,) for size in sizes]
     total = {}
     with mp.Pool(4) as pool:
         for path, n in pool.imap_unordered(job, jobs):
@@ -111,7 +136,7 @@ def main():
             total[size] = total.get(size, 0) + n
             print("%6d KB  %s" % (n // 1024, os.path.relpath(path, ROOT)), flush=True)
     for size in sorted(total):
-        print("%d px: %d KB for %d dials and their numerals" % (size, total[size] // 1024, NSTYLES * len(BGS)))
+        print("%d px: %d KB written" % (size, total[size] // 1024))
 
 
 if __name__ == "__main__":

@@ -22,7 +22,7 @@ Legend: ✅ done · ⬜ to do by the owner (needs the SDK simulator, the watch o
   with mode `iq` (the Store package)
 * ⬜ On the watch: watch face → Customise opens the settings menu; change a few settings
 * ⬜ Simulator (SDK on a computer): unit tests `monkeydo bin/LuxeHijriPrayer-tests.prg fenix7xpro -t`
-  (7 tests); *File → View Memory* on the largest AMOLED (454 / 466 px) and on fr255s (218 px)
+  (8 tests); *File → View Memory* on the largest AMOLED (454 / 466 px) and on fr255s (218 px)
 * ⬜ **Simulator, Connect IQ 3 vector variant: *File → View Memory* on a 96 KB watch (fenix6s,
   fr245, vivoactive3) and on fenix6 (112 KB), with every background and the settings menu.**
   Not measured yet. If a model runs out of memory, remove it from `manifest.xml` (or lower the

@@ -152,6 +152,10 @@
     <string id="S_AdjustAsr">Ajuster Asr (min)</string>
     <string id="S_AdjustMaghrib">Ajuster Maghrib (min)</string>
     <string id="S_AdjustIsha">Ajuster Icha (min)</string>
+    <string id="S_JumuahTime">Heure Jumu&apos;a (ex. 1230)</string>
+    <string id="S_FridayDesign">Design du vendredi</string>
+    <string id="S_FridayDesign_0">Activé</string>
+    <string id="S_FridayDesign_1">Désactivé</string>
     <string id="S_LocationMode">Position</string>
     <string id="S_LocationMode_0">Automatique (position GPS de la montre)</string>
     <string id="S_LocationMode_1">Manuelle (latitude / longitude ci-dessous)</string>
@@ -170,4 +174,5 @@
     <string id="M_Gps">Utiliser la position actuelle</string>
     <string id="M_Title">Luxe Hijri Prayer</string>
     <string id="M_GpsNone">Pas de position : lancez d&apos;abord une activité GPS</string>
+    <string id="M_JumuahOff">Dhohr calculé</string>
 </strings>

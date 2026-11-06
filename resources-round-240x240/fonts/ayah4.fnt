@@ -1,7 +1,7 @@
 info face="Amiri-Bold (pre-shaped Ayat 4)" size=22 bold=0 italic=0 charset="" unicode=1 stretchH=100 smooth=1 aa=1 padding=0,0,0,0 spacing=1,1 outline=0
-common lineHeight=22 base=22 scaleW=256 scaleH=64 pages=1 packed=0 alphaChnl=0 redChnl=4 greenChnl=4 blueChnl=4
+common lineHeight=22 base=22 scaleW=256 scaleH=128 pages=1 packed=0 alphaChnl=0 redChnl=4 greenChnl=4 blueChnl=4
 page id=0 file="ayah4.png"
-chars count=29
+chars count=33
 char id=65    x=0    y=0    width=13   height=21   xoffset=0    yoffset=0    xadvance=13   page=0  chnl=15
 char id=66    x=14   y=0    width=14   height=21   xoffset=0    yoffset=0    xadvance=14   page=0  chnl=15
 char id=67    x=29   y=0    width=13   height=21   xoffset=0    yoffset=0    xadvance=13   page=0  chnl=15
@@ -30,5 +30,9 @@ char id=89    x=200  y=23   width=8    height=20   xoffset=0    yoffset=1    xad
 char id=90    x=209  y=23   width=9    height=20   xoffset=0    yoffset=1    xadvance=9    page=0  chnl=15
 char id=91    x=219  y=23   width=9    height=20   xoffset=0    yoffset=1    xadvance=9    page=0  chnl=15
 char id=92    x=229  y=23   width=9    height=20   xoffset=0    yoffset=1    xadvance=9    page=0  chnl=15
-char id=32    x=239  y=23   width=0    height=0    xoffset=0    yoffset=0    xadvance=4    page=0  chnl=15
+char id=93    x=0    y=45   width=17   height=22   xoffset=0    yoffset=0    xadvance=17   page=0  chnl=15
+char id=94    x=18   y=45   width=18   height=22   xoffset=0    yoffset=0    xadvance=18   page=0  chnl=15
+char id=95    x=37   y=45   width=18   height=22   xoffset=0    yoffset=0    xadvance=18   page=0  chnl=15
+char id=96    x=56   y=45   width=18   height=22   xoffset=0    yoffset=0    xadvance=18   page=0  chnl=15
+char id=32    x=75   y=45   width=0    height=0    xoffset=0    yoffset=0    xadvance=4    page=0  chnl=15
 kernings count=0

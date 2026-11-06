@@ -50,6 +50,16 @@ def _themes():
 
 
 PRESETS, MULTICOLOR, SOURCE_COLORS, COLOUR_CHOICES, TEXT_CHOICES, HAND_CHOICES = _themes()
+
+
+def _friday():
+    src = open(os.path.join(ROOT, "source", "Themes.mc")).read()
+    hexes = lambda a, b: [int(x, 16) for x in re.findall(r"0x[0-9A-Fa-f]{6}", src[src.index(a):src.index(b)])]
+    return hexes("const FRIDAY =", "const FRIDAY_HANDS"), hexes("const FRIDAY_HANDS", "const FRIDAY_NUMERALS")
+
+
+FRIDAY, FRIDAY_HANDS = _friday()
+FRIDAY_NUMERALS = T["FRIDAY_NUMERALS"]
 FAMILIES = ["luxe", "classic", "sport"]
 PRESET_NAMES = ["Luxury Blue", "Royal Gold", "Emerald Night", "Burgundy Royale", "Ice Silver", "Stealth", "Scarlet Noir", "Ember Gold", "Oasis Gold"]
 BACKGROUNDS = ["bg_mosque", "bg_geometric", "bg_marble", "bg_night"]
@@ -290,25 +300,58 @@ class Face:
         self.s = settings
         self.size = size
         self.k = size / float(BASE)
-        self.c = PRESETS[settings["preset"]]
-        st = settings
-        self.multi = st.get("gauge_colors", 0) == 0 and MULTICOLOR[st["preset"]]
-        self.text = TEXT_CHOICES[st["text_color"] - 1] if st.get("text_color") else self.c[T["TEXT"]]
-        self.accent = COLOUR_CHOICES[st["accent_color"] - 1] if st.get("accent_color") else self.c[T["ACCENT"]]
-        self.sec = COLOUR_CHOICES[st["seconds_color"] - 1] if st.get("seconds_color") else self.c[T["SECONDS"]]
-        hc = HAND_CHOICES[st["hand_color"] - 1] if st.get("hand_color") else [self.c[T["GOLD"]], self.c[T["GOLD_DK"]]]
-        self.hand_light, self.hand_dark = hc
         self.str = strings(lang)
-        load = lambda n: json.load(open(os.path.join(ROOT, "resources", "jsonData", n + ".json")))
-        self.bg_ops = load(BACKGROUNDS[settings["background"]])
-        self.frame_ops = load("frame")
-        self.hd = self.load_dial(settings["preset"], settings["background"], size)
-        self.nums = self.load_numerals(settings["preset"], settings.get("dial_digits", 0), size) if self.hd else None
+        self.lite = settings.get("lite", False)     # Connect IQ 3 watches: vector dial only
+        self.apply(False)
         f = lambda n: font(n, size)
         fam = FAMILIES[settings.get("font_family", 0)]
         self.f_num, self.f_l, self.f_m, self.f_s, self.f_xs, self.f_ar = (
             f("luxe_num"), f(fam + "_l"), f(fam + "_m"), f(fam + "_s"), f(fam + "_xs"), f("ar_small"))
         self.f_dl, self.f_dxs = f(fam + "_dl"), f(fam + "_dxs")
+
+    def apply(self, friday):
+        """Mirror of applySettings(): colours, dial and numerals of the style, or of the Friday dial."""
+        st, size = self.s, self.size
+        self.friday = friday
+        self.c = FRIDAY if friday else PRESETS[st["preset"]]
+        self.multi = st.get("gauge_colors", 0) == 0 and (friday or MULTICOLOR[st["preset"]])
+        self.text = TEXT_CHOICES[st["text_color"] - 1] if st.get("text_color") else self.c[T["TEXT"]]
+        self.accent = COLOUR_CHOICES[st["accent_color"] - 1] if st.get("accent_color") else self.c[T["ACCENT"]]
+        self.sec = COLOUR_CHOICES[st["seconds_color"] - 1] if st.get("seconds_color") else self.c[T["SECONDS"]]
+        if st.get("hand_color"):
+            hc = HAND_CHOICES[st["hand_color"] - 1]
+        else:
+            hc = FRIDAY_HANDS if friday else [self.c[T["GOLD"]], self.c[T["GOLD_DK"]]]
+        self.hand_light, self.hand_dark = hc
+        load = lambda n: json.load(open(os.path.join(ROOT, "resources", "jsonData", n + ".json")))
+        self.bg_ops = load("bg_friday" if friday else BACKGROUNDS[st["background"]])
+        self.frame_ops = load("frame")
+        if self.lite:
+            self.hd = None
+        elif friday:
+            path = os.path.join(ROOT, "hd", str(size), "drawables", "dial_fri.jpg")
+            self.hd = Image.open(path).convert("RGB") if os.path.exists(path) else None
+        else:
+            self.hd = self.load_dial(st["preset"], st["background"], size)
+        numerals = FRIDAY_NUMERALS if friday else st["preset"]
+        self.nums = self.load_numerals(numerals, st.get("dial_digits", 0), size) if self.hd else None
+
+    def friday_now(self, now, watch_offset):
+        """Mirror of fridayNow(): Friday from 00:00 until Asr (15:00 without a location)."""
+        s = self.s
+        if not s.get("friday_design", True) or calc.day_of_week(calc.local_epoch_day(now, watch_offset)) != 5:
+            return False
+        if s["lat"] == 0 and s["lon"] == 0:
+            return (now + watch_offset) % 86400 < 15 * 3600
+        offset = s["utc_offset"] if s.get("tz_manual") else watch_offset
+        day = calc.local_epoch_day(now, offset)
+        asr = calc.moment(day, self.day_times(day, offset / 3600.0)[calc.ASR], offset / 3600.0)
+        if asr is None:
+            return (now + watch_offset) % 86400 < 15 * 3600
+        return now < asr
+
+    def is_jumuah(self, day):
+        return self.s.get("jumuah", 750) >= 0 and calc.day_of_week(day) == 5
 
     @staticmethod
     def load_dial(preset, bg, size):
@@ -540,6 +583,8 @@ class Face:
             adj = s.get("adjust", [0] * 5)[k]
             if t[i] is not None and adj:
                 t[i] += adj / 60.0
+        if self.is_jumuah(day):              # Friday: Jumu'ah at the fixed time
+            t[calc.DHUHR] = self.s.get("jumuah", 750) / 60.0
         return t
 
     # ---- daylight / darkness ring (mirror of drawSunRing, sunArc, ringDeg)
@@ -683,17 +728,17 @@ class Face:
             dc.setColor(self.c[T["PLATE"]], -1); dc.fillCircle(x + p(2), y - p(2), p(4))
             dc.setColor(self.c[T["GOLD"]], -1); dc.fillCircle(x + p(4), y + p(2), 1)
 
-    def draw_panel(self, dc, cx, kind, prayer, value, value_color):
+    def draw_panel(self, dc, cx, kind, prayer, value, value_color, jum=False):
         p = self.p
         x0 = cx - p(L.PANEL_W) // 2
         self.panel_icon(dc, x0 + p(11), p(L.PANEL_Y0 + L.PANEL_H // 2), kind)
         tx = x0 + p(20) + (p(L.PANEL_W) - p(22)) // 2
         dc.setColor(self.text, -1)
         if self.s.get("prayer_names", 0) == 0:   # ArSmall "N".."R"
-            k = [0, -1, 1, 2, -1, 3, 4][prayer]
+            k = 5 if jum else [0, -1, 1, 2, -1, 3, 4][prayer]
             dc.drawText(tx, p(L.PANEL_Y0 + 8), self.f_ar, chr(ord("N") + k), CENTER | VCENTER)
         else:
-            dc.drawText(tx, p(L.PANEL_Y0 + 8), self.f_xs, self.str[PRAYER_NAMES[prayer]], CENTER | VCENTER)
+            dc.drawText(tx, p(L.PANEL_Y0 + 8), self.f_xs, self.str["Prayer7" if jum else PRAYER_NAMES[prayer]], CENTER | VCENTER)
         dc.setColor(value_color, -1)
         dc.drawText(tx, p(L.PANEL_Y0 + 20), self.f_s, value, CENTER | VCENTER)
 
@@ -722,11 +767,13 @@ class Face:
         if found:
             nxt = found[0]
             self.draw_panel(dc, p(140 - L.PANEL_DX), 0, nxt[0],
-                            calc.countdown_text(nxt[1] - now), self.accent)
+                            calc.countdown_text(nxt[1] - now), self.accent,
+                            nxt[0] == calc.DHUHR and self.is_jumuah(day + nxt[2]))
         if len(found) > 1:
             fol = found[1]
             self.draw_panel(dc, p(140 + L.PANEL_DX), 1, fol[0],
-                            format_time(calc.to_minutes(days[fol[2]][fol[0]]), is24), self.text)
+                            format_time(calc.to_minutes(days[fol[2]][fol[0]]), is24), self.text,
+                            fol[0] == calc.DHUHR and self.is_jumuah(day + fol[2]))
         for sgn, idx in ((-1, 1), (1, 4)):
             x = p(140 + sgn * L.SUN_DX)
             self.sun_icon(dc, x, p(L.SUN_ICON_Y), sgn < 0)
@@ -778,6 +825,9 @@ class Face:
 
     def render(self, now, watch_offset, sensors, show_seconds=True, mip=True):
         dc = Dc(self.size, self.size)
+        fri = self.friday_now(now, watch_offset)
+        if fri != self.friday:
+            self.apply(fri)
         c, s, p = self.c, self.s, self.p
         self.draw_static(dc)
         local = now + watch_offset
@@ -812,8 +862,13 @@ class Face:
         # Ayah (mirror of drawAyah), then the battery line when no gauge shows the battery
         idx = ayah_pick(s.get("ayah_mode", 0), s.get("ayah_fixed", 18), s.get("ayah_included", [True] * 39),
                         local // 3600)
-        self.ayah_index = idx
-        if idx >= 0:
+        self.ayah_index = -2 if self.friday else idx
+        if self.friday:
+            # the Friday greeting (not a verse): slot 7 of the Ayah4 font, in the text colour
+            dc.setColor(self.text, -1)
+            dc.drawText(p(140), p(L.AYAH_Y), font("ayah4", self.size), "".join(chr(ord("A") + 28 + j) for j in range(4)),
+                        CENTER | VCENTER)
+        elif idx >= 0:
             fa = font("ayah%d" % (idx // 8), self.size)
             dc.setColor(c[T["GOLD"]], -1)
             dc.drawText(p(140), p(L.AYAH_Y), fa, "".join(chr(ord("A") + 4 * (idx % 8) + j) for j in range(4)),

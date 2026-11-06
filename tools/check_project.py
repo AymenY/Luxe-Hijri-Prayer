@@ -168,7 +168,7 @@ def main():
     n_presets = len(re.findall(r"//\s+[A-Z]\s+\w", themes))
     expect = {
         "StylePreset": n_presets,
-        "Background": len([j for j in res["JsonData"] if j.startswith("Bg")]),
+        "Background": len([j for j in res["JsonData"] if j.startswith("Bg") and j != "BgFriday"]),   # Friday: not a choice
         "Gauge1": 12, "Gauge2": 12, "Gauge3": 12, "Gauge4": 12, "GaugeColors": 3,
         "HijriCorrection": 5, "HijriScript": 2,
         "AyahMode": 3, "AyahFixed": n_ayat,

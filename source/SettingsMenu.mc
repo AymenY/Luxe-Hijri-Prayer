@@ -21,6 +21,14 @@ module SettingsMenu {
         return (m > 0 ? "+" : "") + m.toString() + " min";
     }
 
+    // "12:30" for 1230; the computed Dhuhr for 0
+    function clock(hhmm as Number) as String {
+        if (hhmm <= 0) {
+            return text(Rez.Strings.M_JumuahOff);
+        }
+        return (hhmm / 100).toString() + ":" + (hhmm % 100).format("%02d");
+    }
+
     function text(id) as String {
         return WatchUi.loadResource(id) as String;
     }
@@ -60,8 +68,11 @@ module SettingsMenu {
         if (opts == null) {
             return null;
         }
-        if (opts instanceof String) {           // "minutes": -30..+30
-            return minutes(current(item[0] as String));
+        if (opts instanceof String) {
+            if (opts.equals("clock")) {         // HHMM, 0 = off
+                return clock(current(item[0] as String));
+            }
+            return minutes(current(item[0] as String));   // "minutes": -30..+30
         }
         var o = opts as Array;
         var cur = current(item[0] as String);
@@ -123,6 +134,22 @@ class LuxeGroupDelegate extends WatchUi.Menu2InputDelegate {
                 item.setSubLabel((deg[0] as Double).format("%.4f") + ", " + (deg[1] as Double).format("%.4f"));
             }
             WatchUi.requestUpdate();
+        } else if ("clock".equals(it[2])) {
+            // Jumu'ah: computed Dhuhr, then 11:30..14:30 every 15 minutes; the item id is HHMM
+            var menu = new WatchUi.Menu2({:title => SettingsMenu.text(it[1])});
+            var cur = SettingsMenu.current(key);
+            menu.addItem(new WatchUi.MenuItem(SettingsMenu.clock(0), null, 0, null));
+            var focus = 0;
+            for (var i = 0; i <= 12; i++) {
+                var m = 690 + 15 * i;
+                var hhmm = (m / 60) * 100 + m % 60;
+                menu.addItem(new WatchUi.MenuItem(SettingsMenu.clock(hhmm), null, hhmm, null));
+                if (hhmm == cur) {
+                    focus = i + 1;
+                }
+            }
+            menu.setFocus(focus);
+            WatchUi.pushView(menu, new LuxeOptionDelegate(it, item), WatchUi.SLIDE_LEFT);
         } else if (it[2] instanceof String) {
             // minutes -30..+30; the item id is the value
             var menu = new WatchUi.Menu2({:title => SettingsMenu.text(it[1])});

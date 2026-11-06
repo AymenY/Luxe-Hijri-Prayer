@@ -4,6 +4,11 @@ Remaining release steps: `docs/RELEASE_CHECKLIST.md`.
 
 ## 1.0.0 — release candidate (2026-11-05)
 * New style **Scarlet Noir** (black, red and white).
+* **Friday**: Dhuhr becomes Jumu'ah (الجمعة) at a fixed time, 12:30 by default (setting
+  Jumu'ah time, HHMM, 0 = computed Dhuhr). From 00:00 until Asr the Friday dial is shown: Sidi Bou
+  Said blue wrought iron with forged lyres, a few sprigs of jasmine and geranium, gold hour ring,
+  and the greeting جمعة مباركة (not a verse) in the verse area. Setting Friday design to turn it
+  off. Vector version on Connect IQ 3 watches. Unit test for the Jumu'ah time.
 * Two high-contrast styles readable without the backlight on MIP screens: **Ember Gold** (black,
   white, red, orange, gold) and **Oasis Gold** (black, white, blue, green, gold). Flat colours
   taken from the 64-colour palette, no gradient, glow or dithering.

@@ -126,9 +126,9 @@ def check_size(size, report):
             if math.hypot(half, yb) > rin:
                 ck.fail.append("gauge label %s/%s (%d px) crosses the ring" % (lang, s[key], b[2] - b[0]))
         # cartouche text
-        names = [s["Prayer%d" % i] for i in (0, 2, 3, 5, 6)]
+        names = [s["Prayer%d" % i] for i in (0, 2, 3, 5, 6, 7)]   # 7: Jumu'ah (Fridays)
         area = p(L.PANEL_W) - p(22)
-        for t, fn in [(widest("luxe_xs", size, names), "luxe_xs"), (widest("ar_small", size, list("NOPQR")), "ar_small"),
+        for t, fn in [(widest("luxe_xs", size, names), "luxe_xs"), (widest("ar_small", size, list("NOPQRS")), "ar_small"),
                       ("23h59", "luxe_s"), ("00:00", "luxe_s"),
                       (s["SetLocation"], "luxe_xs"), (s["SetLocation2"], "luxe_xs")]:
             w = face.font(fontname_for(fn), size).width(t)

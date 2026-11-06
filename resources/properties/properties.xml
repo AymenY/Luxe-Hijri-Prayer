@@ -68,6 +68,8 @@
     <property id="AdjustAsr" type="number">0</property>
     <property id="AdjustMaghrib" type="number">0</property>
     <property id="AdjustIsha" type="number">0</property>
+    <property id="JumuahTime" type="number">1230</property>
+    <property id="FridayDesign" type="number">0</property>
     <property id="LocationMode" type="number">0</property>
     <property id="Latitude" type="float">33.8754</property>
     <property id="Longitude" type="float">10.8575</property>

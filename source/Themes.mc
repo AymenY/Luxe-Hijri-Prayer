@@ -59,6 +59,14 @@ module Themes {
     // instead of the preset accent.
     const MULTICOLOR = [true, false, false, false, true, false, false, false, false];
 
+    // Friday dial (from 00:00 until Asr, setting FridayDesign), whatever the style: Sidi Bou Said
+    // blue wrought iron, gold hour ring, white text, jasmine (STAR) and geranium (SIL) on the
+    // vector dial, one gauge colour per data type. Hands: FRIDAY_HANDS unless the user chose a colour.
+    const FRIDAY = [0x000055, 0x000000, 0x0055AA, 0x00AA00, 0xFFAA00, 0xAA5500, 0x00AAFF, 0x55AAFF,
+                    0xFFFFFF, 0xAAAAAA, 0x0055AA, 0x00AAFF, 0xFF0000, 0xFFFFFF, 0xFF5500, 0xFFFFAA];
+    const FRIDAY_HANDS = [0xFFFFFF, 0xAAAAAA];
+    const FRIDAY_NUMERALS = 1;   // gold numerals of the Royal Gold style
+
     // Gauge colour per data source (DataFields order), used by MULTICOLOR presets.
     const SOURCE_COLORS = [0x00AAFF, 0xFF0055, 0xFFAA00, 0x00FF55, 0x55FFFF, 0xAAAAFF, 0x00FFAA, 0xFFFF55, 0xFF55FF, 0xAAAAAA];
 

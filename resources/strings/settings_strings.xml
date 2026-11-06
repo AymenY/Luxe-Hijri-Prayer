@@ -152,6 +152,10 @@
     <string id="S_AdjustAsr">Adjust Asr (min)</string>
     <string id="S_AdjustMaghrib">Adjust Maghrib (min)</string>
     <string id="S_AdjustIsha">Adjust Isha (min)</string>
+    <string id="S_JumuahTime">Jumu&apos;ah time (e.g. 1230)</string>
+    <string id="S_FridayDesign">Friday design</string>
+    <string id="S_FridayDesign_0">On</string>
+    <string id="S_FridayDesign_1">Off</string>
     <string id="S_LocationMode">Position</string>
     <string id="S_LocationMode_0">Automatic (watch GPS position)</string>
     <string id="S_LocationMode_1">Manual (latitude / longitude below)</string>
@@ -170,4 +174,5 @@
     <string id="M_Gps">Use current position</string>
     <string id="M_Title">Luxe Hijri Prayer</string>
     <string id="M_GpsNone">No position: start a GPS activity first</string>
+    <string id="M_JumuahOff">Computed Dhuhr</string>
 </strings>

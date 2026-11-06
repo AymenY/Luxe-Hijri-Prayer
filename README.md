@@ -94,6 +94,8 @@ The settings and the watch menu are generated from `tools/gen_settings.py` (Engl
 | Faith & calendar | Prayer method, Asr, high-latitude rule | Tunisia 18°/18°, standard, middle of the night |
 | Faith & calendar | Prayer names | Arabic (الفجر …), Latin script |
 | Faith & calendar | Adjust Fajr / Dhuhr / Asr / Maghrib / Isha | −30…+30 min each (0, a number in Garmin Connect), to match a mosque timetable |
+| Faith & calendar | Jumu'ah time | Fridays: Dhuhr is replaced by Jumu'ah at this time, HHMM (**1230**; 0 = keep the computed Dhuhr); on the watch 11:30…14:30 every 15 min |
+| Faith & calendar | Friday design | **On** / Off: from 00:00 until Asr on Fridays (15:00 without a location), the Friday dial (blue wrought iron, jasmine and geranium, gold hour ring) and the greeting جمعة مباركة in the verse area. The greeting is not a verse: it is not part of the verse list or the rotation |
 | Faith & calendar | Location | Automatic (follows the watch's GPS position), manual |
 | Faith & calendar | Latitude / longitude / time zone | 33.8754 / 10.8575 (Houmt Souk, Djerba) / watch time zone |
 

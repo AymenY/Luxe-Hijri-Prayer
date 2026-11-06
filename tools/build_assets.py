@@ -196,6 +196,12 @@ def ayah_fits(w, h, L, k):
 AYAH_GROUP = 8
 AYAH_SLICES = 4    # glyphs per verse: codes "A" + 4 * slot + 0..3 (see LuxeHijriPrayerView.drawAyah)
 AYAH_MIN_PX = 13   # at 280 px: complete verses below this size are not included
+# The Friday greeting "Jumu'ah Mubarakah" is NOT a verse: it is not in tools/ayat.json, never in the
+# verse rotation or the settings. It only borrows the free slot 7 of the last verse font (Ayah4,
+# glyphs "]".."`" = "A" + 28..31) so that no extra font is loaded on Fridays.
+GREETING = "جمعة مباركة"
+GREETING_GROUP = 4
+GREETING_SLOT = 7
 
 
 def build_ayah_fonts(folder, k, L):
@@ -222,6 +228,15 @@ def build_ayah_fonts(folder, k, L):
                 raise SystemExit("Ayah %s would be %d px at 280 px (< %d)" % (a["ref"], size, AYAH_MIN_PX))
             verse_imgs.append((a, img))
             sizes[a["ref"]] = {"px": size, "w": img.width, "h": img.height}
+        if g == GREETING_GROUP:
+            if len(verse_imgs) != GREETING_SLOT:
+                raise SystemExit("the Friday greeting needs slot %d of Ayah%d" % (GREETING_SLOT, g))
+            for size in range(int(26 * k), 7, -1):
+                img = render_arabic_line(GREETING, size)
+                if ayah_fits(img.width, img.height, L, k):
+                    break
+            verse_imgs.append(({"ref": "greeting"}, img))
+            sizes["greeting"] = {"px": size, "w": img.width, "h": img.height}
         line_h = max(i.height for _, i in verse_imgs)
         for slot, (a, img) in enumerate(verse_imgs):
             # AYAH_SLICES adjacent glyphs per verse: on a real fenix 7X Pro a single crisp glyph
@@ -238,13 +253,13 @@ def build_ayah_fonts(folder, k, L):
 AR_DIGITS = "٠١٢٣٤٥٦٧٨٩"
 AR_SMALL_PX = 12  # at 280 px (11 was hard to read on the watch)
 # prayer names in the cartouches (setting PrayerNames): glyphs "N".."R"
-PRAYERS_AR = ["الفجر", "الظهر", "العصر", "المغرب", "العشاء"]
+PRAYERS_AR = ["الفجر", "الظهر", "العصر", "المغرب", "العشاء", "الجمعة"]   # "S": Jumu'ah (Friday)
 
 
 def build_arabic_small_font(folder, k):
     """Small Arabic font assembled at runtime: glyph "0".."9" = Eastern Arabic digits, "A".."L" =
     Hijri month names, "M" = the AH suffix, "a".."j" = Arabic (Western) digits, "N".."R" = the
-    prayer names Fajr, Dhuhr, Asr, Maghrib, Isha. Every glyph is
+    prayer names Fajr, Dhuhr, Asr, Maghrib, Isha, "S" = Jumu'ah (Friday noon prayer). Every glyph is
     shaped with HarfBuzz and placed on a
     common baseline."""
     data = json.load(open(os.path.join(ROOT, "tools", "ayat.json")))
@@ -517,11 +532,55 @@ def bg_night(L):
     return ops
 
 
+def clip_line(p, q, r=139):
+    """Segment p-q clipped to the circle of radius r around the centre, or None."""
+    (x0, y0), (x1, y1) = p, q
+    dx, dy = x1 - x0, y1 - y0
+    fx, fy = x0 - 140, y0 - 140
+    a, b, c = dx * dx + dy * dy, 2 * (fx * dx + fy * dy), fx * fx + fy * fy - r * r
+    disc = b * b - 4 * a * c
+    if disc <= 0:
+        return None
+    t0, t1 = max(0.0, (-b - math.sqrt(disc)) / (2 * a)), min(1.0, (-b + math.sqrt(disc)) / (2 * a))
+    if t0 >= t1:
+        return None
+    return [int(round(x0 + dx * t0)), int(round(y0 + dy * t0)), int(round(x0 + dx * t1)), int(round(y0 + dy * t1))]
+
+
+def bg_friday(L):
+    """Friday dial for Connect IQ 3 watches (vector, Themes.FRIDAY palette): the wrought-iron
+    grille of tools/render_friday.py with its lyres, and the jasmine and geranium sprigs.
+    ORN = iron, ORN2 = leaves, STAR = jasmine, SIL = geranium."""
+    import render_friday as F
+    ops = []
+    for a, b in F.lattice_lines():
+        seg = clip_line(a, b)
+        if seg:
+            ops.append([OP_LINE, ORN, 1] + seg)
+    for pts in F.lyres():
+        pts = [(x, y) for x, y in pts if inside(x, y, 137)]
+        if len(pts) > 1:
+            ops.append([OP_POLYLINE, ORN, 1] + flat([(int(round(x)), int(round(y))) for x, y in pts[::4] + pts[-1:]]))
+    stems, leaves, jas, buds, gers, gleaves = F.plants()
+    for x, y, r in gleaves:
+        ops.append([OP_CIRCLE, ORN2, int(round(x)), int(round(y)), int(round(r * 0.8))])
+    for pts in stems:
+        ops.append([OP_POLYLINE, ORN2, 1] + flat([(int(round(x)), int(round(y))) for x, y in pts]))
+    for (x, y) in [(pts[6][0], pts[6][1]) for pts in leaves]:
+        ops.append([OP_CIRCLE, ORN2, int(round(x)), int(round(y)), 2])
+    for x, y, r in gers:
+        ops.append([OP_CIRCLE, SIL, int(round(x)), int(round(y)), 2])
+    for x, y, r, rot in jas:
+        ops.append([OP_CIRCLE, STAR, int(round(x)), int(round(y)), 3])
+        ops.append([OP_POINTS, GOLD, 1, int(round(x)), int(round(y))])
+    return ops
+
+
 def build_vector_art():
     L = layout_consts()
     out = {}
     jobs = [("bg_mosque", bg_mosque), ("bg_geometric", bg_geometric), ("bg_marble", bg_marble),
-            ("bg_night", bg_night), ("frame", frame_ops)]
+            ("bg_night", bg_night), ("bg_friday", bg_friday), ("frame", frame_ops)]
     os.makedirs(os.path.join(RES, "jsonData"), exist_ok=True)
     for name, fn in jobs:
         ops = fn(L)

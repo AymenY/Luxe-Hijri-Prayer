@@ -21,6 +21,8 @@ module Backgrounds {
     const OP_RRECT = 10;      // [10, role, x, y, w, h, radius]
     const OP_RRECT_LINE = 11; // [11, role, pen, x, y, w, h, radius]
 
+    const FRIDAY = 4;         // load(FRIDAY): the Friday grille, jasmine and geranium
+
     function load(index as Number) as Array? {
         var id = Rez.JsonData.BgMosque;
         if (index == 1) {
@@ -29,6 +31,8 @@ module Backgrounds {
             id = Rez.JsonData.BgMarble;
         } else if (index == 3) {
             id = Rez.JsonData.BgNight;
+        } else if (index == FRIDAY) {
+            id = Rez.JsonData.BgFriday;
         }
         return WatchUi.loadResource(id) as Array?;
     }

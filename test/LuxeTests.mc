@@ -164,3 +164,24 @@ function testPrayerAdjustment(logger as Logger) as Boolean {
     Test.assertEqual(s.minutes(0, PrayerTimes.SUNRISE), rise);   // sunrise is not a prayer: unchanged
     return true;
 }
+
+(:test)
+function testJumuah(logger as Logger) as Boolean {
+    var offset = 3600;
+    var now = 20756 * 86400 - offset + 6 * 3600;      // Friday 2026-10-30, local morning, Djerba
+    var s = new PrayerSchedule();
+    s.configure(33.8754d, 10.8575d, 0, 1, PrayerTimes.HL_MIDDLE);
+    s.update(now, offset);
+    var asr = s.minutes(0, PrayerTimes.ASR);
+    Test.assert(!s.isJumuah(0));                       // feature off: the computed Dhuhr
+    s.setJumuah(750);
+    s.update(now, offset);
+    Test.assert(s.isJumuah(0));
+    Test.assert(!s.isJumuah(1));                       // Saturday
+    Test.assertEqual(s.minutes(0, PrayerTimes.DHUHR), 750);
+    Test.assertEqual(s.minutes(0, PrayerTimes.ASR), asr);
+    var nxt = s.next(now) as Array;                    // next prayer after 06:00: Jumu'ah at 12:30
+    Test.assertEqual(nxt[0], PrayerTimes.DHUHR);
+    Test.assertEqual(nxt[1], (20756 * 86400 - offset + 750 * 60).toLong());
+    return true;
+}
