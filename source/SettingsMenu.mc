@@ -22,16 +22,18 @@ module SettingsMenu {
         return menu;
     }
 
-    // About: name and version, how the times are computed, sources and licences, privacy
+    // About: name and version, author, thanks, how the times are computed, sources and licences, privacy
     function about() as WatchUi.Menu2 {
         var menu = new WatchUi.Menu2({:title => text(Rez.Strings.M_About)});
         var rows = [[Rez.Strings.M_PrayerCalc, Rez.Strings.M_PrayerCalcV], [Rez.Strings.M_Hijri, Rez.Strings.M_HijriV],
                     [Rez.Strings.M_Quran, Rez.Strings.M_QuranV], [Rez.Strings.M_Fonts, Rez.Strings.M_FontsV],
                     [Rez.Strings.M_Privacy, Rez.Strings.M_PrivacyV]];
         menu.addItem(new WatchUi.MenuItem(text(Rez.Strings.M_Title), VERSION, 0, null));
+        menu.addItem(new WatchUi.MenuItem(text(Rez.Strings.M_Credit), null, 1, null));
+        menu.addItem(new WatchUi.MenuItem(text(Rez.Strings.M_Thanks), text(Rez.Strings.M_ThanksV), 2, null));
         for (var i = 0; i < rows.size(); i++) {
             var r = rows[i] as Array;
-            menu.addItem(new WatchUi.MenuItem(text(r[0]), text(r[1]), i + 1, null));
+            menu.addItem(new WatchUi.MenuItem(text(r[0]), text(r[1]), i + 3, null));
         }
         return menu;
     }

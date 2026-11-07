@@ -181,6 +181,9 @@
     <string id="M_GpsNone">No position: start a GPS activity first</string>
     <string id="M_JumuahOff">Computed Dhuhr</string>
     <string id="M_About">About</string>
+    <string id="M_Credit">Proudly Made By A. Y.</string>
+    <string id="M_Thanks">Thanks</string>
+    <string id="M_ThanksV">To my family</string>
     <string id="M_PrayerCalc">Prayer times</string>
     <string id="M_PrayerCalcV">Computed on the watch (astronomy)</string>
     <string id="M_Hijri">Hijri calendar</string>
