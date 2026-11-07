@@ -8,6 +8,9 @@ Remaining release steps: `docs/RELEASE_CHECKLIST.md`.
   A. Y.", thanks to the author's family, prayer times computed
   on the watch, tabular Hijri calendar, Quran text from Tanzil.net (CC BY 3.0), fonts (SIL OFL),
   privacy (no data leaves the watch).
+* Styles: Burgundy Royale, Stealth and Ember Gold removed; new **E-Ink Inverse** (white ink on
+  black, the illustration as a grey drawing, grey daylight ring and Moon, red seconds hand). Eight
+  styles; a style index stored by an earlier test build may now point to another style.
 * New style **E-Ink**: black ink on white paper like an electronic-paper screen; flat palette
   colours without shadow or glow, the mosque illustration printed as an inverted ink drawing,
   daylight ring and Moon dial in greys, red seconds hand.

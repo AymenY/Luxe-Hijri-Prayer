@@ -40,8 +40,8 @@ round Garmin displays (MIP and AMOLED).
 * A complete Quranic verse in Arabic, changing every hour (39 short verses), a fixed verse or none
 * Four configurable complications: steps, heart rate, calories, battery, distance, floors,
   Body Battery, stress, active minutes, Moon, daylight
-* Ten styles (including Scarlet Noir: black, red and white, E-Ink: black ink on white paper, and two
-  high-contrast styles readable without the backlight, Ember Gold and Oasis Gold), four backgrounds (mosque illustration, Islamic geometry, black marble, night sky),
+* Eight styles (including Scarlet Noir: black, red and white, E-Ink and E-Ink Inverse: black ink on
+  white paper or white on black, and Oasis Gold, high contrast and readable without the backlight), four backgrounds (mosque illustration, Islamic geometry, black marble, night sky),
   three fonts, Arabic or Indian dial numerals, hand styles and colours
 * Older watches (Connect IQ 3: fēnix 5 / 6, Forerunner 245 / 945, Venu, vívoactive 3 / 4…): a
   digital e-paper face, light, dark or automatic (dark at night)
@@ -89,8 +89,8 @@ pour les écrans ronds Garmin (MIP et AMOLED).
   fixe ou aucun
 * Quatre complications configurables : pas, fréquence cardiaque, calories, batterie, distance,
   étages, Body Battery, stress, minutes intensives, lune, lumière du jour
-* Dix styles (dont Scarlet Noir : noir, rouge et blanc, E-Ink : encre noire sur papier blanc, et
-  deux styles à contraste élevé lisibles sans rétroéclairage, Ember Gold et Oasis Gold), quatre arrière-plans (illustration de mosquée, géométrie islamique, marbre noir,
+* Huit styles (dont Scarlet Noir : noir, rouge et blanc, E-Ink et E-Ink inversé : encre noire sur
+  papier blanc ou blanc sur noir, et Oasis Gold, à contraste élevé et lisible sans rétroéclairage), quatre arrière-plans (illustration de mosquée, géométrie islamique, marbre noir,
   ciel nocturne), trois polices, chiffres du cadran arabes ou indiens, styles et couleurs d'aiguilles
 * Montres plus anciennes (Connect IQ 3 : fēnix 5 / 6, Forerunner 245 / 945, Venu, vívoactive 3 / 4…) :
   un cadran numérique façon papier électronique, clair, sombre ou automatique (sombre la nuit)

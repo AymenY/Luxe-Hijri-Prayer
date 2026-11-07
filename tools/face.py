@@ -61,7 +61,8 @@ def _friday():
 FRIDAY, FRIDAY_HANDS = _friday()
 FRIDAY_NUMERALS = T["FRIDAY_NUMERALS"]
 FAMILIES = ["luxe", "classic", "sport"]
-PRESET_NAMES = ["Luxury Blue", "Royal Gold", "Emerald Night", "Burgundy Royale", "Ice Silver", "Stealth", "Scarlet Noir", "Ember Gold", "Oasis Gold", "E-Ink"]
+PRESET_NAMES = ["Luxury Blue", "Royal Gold", "Emerald Night", "Ice Silver", "Scarlet Noir", "Oasis Gold", "E-Ink",
+                "E-Ink Inverse"]
 BACKGROUNDS = ["bg_mosque", "bg_geometric", "bg_marble", "bg_night"]
 RESOLUTIONS = [218, 240, 260, 280, 360, 390, 416, 454, 466]
 
@@ -315,9 +316,12 @@ class Face:
         self.friday = friday
         self.c = FRIDAY if friday else PRESETS[st["preset"]]
         self.multi = st.get("gauge_colors", 0) == 0 and (friday or MULTICOLOR[st["preset"]])
-        ink = not friday and st["preset"] == T["INK"]     # E-Ink: grey daylight ring and Moon
-        self.sun_cols = [0x555555, 0xAAAAAA, 0x000000, 0x000000] if ink else [SUN_DAY, SUN_TWILIGHT, SUN_NIGHT, SUN_NIGHT_TEXT]
-        self.moon_cols = [0xFFFFFF, 0x000000, 0x000000] if ink else [MOON_LIT, MOON_DARK, MOON_RING]
+        ink = not friday and st["preset"] == T["INK"]     # E-Ink styles: grey daylight ring and Moon
+        inv = not friday and st["preset"] == T["INK_INV"]
+        self.sun_cols = ([0x555555, 0xAAAAAA, 0x000000, 0x000000] if ink else
+                         [0xFFFFFF, 0xAAAAAA, 0x555555, 0xAAAAAA] if inv else [SUN_DAY, SUN_TWILIGHT, SUN_NIGHT, SUN_NIGHT_TEXT])
+        self.moon_cols = ([0xFFFFFF, 0x000000, 0x000000] if ink else
+                          [0xFFFFFF, 0x000000, 0xFFFFFF] if inv else [MOON_LIT, MOON_DARK, MOON_RING])
         self.text = TEXT_CHOICES[st["text_color"] - 1] if st.get("text_color") else self.c[T["TEXT"]]
         self.accent = COLOUR_CHOICES[st["accent_color"] - 1] if st.get("accent_color") else self.c[T["ACCENT"]]
         self.sec = COLOUR_CHOICES[st["seconds_color"] - 1] if st.get("seconds_color") else self.c[T["SECONDS"]]

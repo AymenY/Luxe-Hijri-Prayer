@@ -54,28 +54,16 @@ STYLES = [
          metal=("#fff2c4", "#e2b04a", "#8a5a14"), glow="#2ee59d", tick="#c9f5df",
          sky=("#010a07", "#0f4a35"), pattern="#0f5a3e", recess=("#05261a", "#010604"), track="#0e3d2b",
          panel=("#082a1d", "#020a07")),
-    dict(name="burgundy-royale", base=("#5c1027", "#14030a"), ring=("#2e0812", "#080104"),
-         metal=("#ffe1d2", "#de9a7e", "#7a3f2c"), glow="#ff5c8a", tick="#ffd6dc",
-         sky=("#14030a", "#5a1436"), pattern="#6e1a33", recess=("#2c0712", "#070104"), track="#4a1222",
-         panel=("#2d0914", "#0a0205")),
     dict(name="ice-silver", base=("#173a63", "#02070f"), ring=("#0c1d33", "#020509"),
          metal=("#ffffff", "#c2cfdc", "#56677a"), glow="#9ee7ff", tick="#e6f6ff",
          sky=("#020611", "#21497a"), pattern="#21456e", recess=("#0b1a2e", "#010409"), track="#1c3352",
          panel=("#0e2038", "#030810")),
-    dict(name="stealth", base=("#2a2f35", "#050607"), ring=("#16191c", "#030404"),
-         metal=("#f2f4f6", "#9aa1a8", "#3a3f44"), glow="#d8e2ec", tick="#d0d4d8",
-         sky=("#040506", "#283038"), pattern="#30363d", recess=("#121417", "#020303"), track="#2a2f35",
-         panel=("#16191c", "#040505")),
     dict(name="scarlet-noir", base=("#2a0306", "#000000"), ring=("#1c1c1e", "#030303"),
          metal=("#ffffff", "#c9c9ce", "#55585e"), glow="#ff1a1a", tick="#ffffff",
          sky=("#030000", "#4a0508"), pattern="#5a0a10", recess=("#160204", "#000000"), track="#4a0a0e",
          panel=("#1a0306", "#050001")),
     # High-contrast styles, readable without the backlight on MIP screens: flat colours taken
     # from the 64-colour palette, no gradient, glow or dithering (see flat_finish)
-    dict(name="ember-gold", flat=True, base=("#000000", "#000000"), ring=("#000000", "#000000"),
-         metal=("#ffaa00", "#ffaa00", "#ffaa00"), glow="#000000", tick="#ffffff",
-         sky=("#000000", "#000000"), pattern="#550000", recess=("#000000", "#000000"), track="#550000",
-         panel=("#000000", "#000000"), vein="#aa0000"),
     dict(name="oasis-gold", flat=True, base=("#000000", "#000000"), ring=("#000000", "#000000"),
          metal=("#ffaa00", "#ffaa00", "#ffaa00"), glow="#000000", tick="#ffffff",
          sky=("#000000", "#000000"), pattern="#000055", recess=("#000000", "#000000"), track="#005500",
@@ -86,6 +74,11 @@ STYLES = [
          metal=("#000000", "#000000", "#000000"), glow="#000000", tick="#000000",
          sky=("#ffffff", "#ffffff"), pattern="#aaaaaa", recess=("#ffffff", "#ffffff"), track="#aaaaaa",
          panel=("#ffffff", "#ffffff"), vein="#555555"),
+    # E-Ink Inverse: white ink on black (flat palette colours; the illustration as a grey drawing)
+    dict(name="e-ink-inverse", flat=True, base=("#000000", "#000000"), ring=("#000000", "#000000"),
+         metal=("#ffffff", "#ffffff", "#ffffff"), glow="#000000", tick="#ffffff",
+         sky=("#000000", "#000000"), pattern="#555555", recess=("#000000", "#000000"), track="#555555",
+         panel=("#000000", "#000000"), vein="#555555"),
 ]
 BACKGROUNDS = ["mosque", "geometric", "marble", "night"]
 
@@ -635,13 +628,11 @@ GRADES = [
     None,                                                                   # Luxury Blue: original
     (("#050403", "#2d2210", "#8a6a34"), None),                              # Royal Gold
     (("#010c08", "#0b3b28", "#5fae86"), None),                              # Emerald Night
-    (("#0e0207", "#4a0f26", "#c2708c"), "#ffc7b0"),                         # Burgundy Royale (rose gold)
     (("#020814", "#1b3a63", "#b8d4ee"), "#e8eef5"),                         # Ice Silver
-    (("#040506", "#24282d", "#a9b0b8"), "#e6e8ea"),                         # Stealth
     (("#040000", "#3c060c", "#d9d9de"), "#ff4040"),                         # Scarlet Noir (red lights)
-    (("#000000", "#2a0000", "#aa0000"), "#ffaa00"),                         # Ember Gold
     (("#000000", "#00002a", "#0055aa"), "#ffaa00"),                         # Oasis Gold
     "ink",                                                                  # E-Ink: inverted ink drawing
+    "ink-inverse",                                                          # E-Ink Inverse: grey drawing
 ]
 
 
@@ -652,6 +643,12 @@ def layer_illustration(art, style_index):
     crop = img.crop((int(left), int(top), int(left + 2 * ILLU_RADIUS), int(top + 2 * ILLU_RADIUS)))
     a = np.asarray(crop.resize((art.n, art.n), Image.LANCZOS), dtype=np.float64) / 255.0
     g = GRADES[style_index]
+    if g == "ink-inverse":
+        # the night scene in greys on black: dark tones pushed to black, the lights kept white
+        lum = 0.299 * a[..., 0] + 0.587 * a[..., 1] + 0.114 * a[..., 2]
+        v = np.clip(lum * 1.5 - 0.08, 0, 1) ** 1.2
+        art.rgb = np.repeat(v[..., None], 3, axis=2)
+        return
     if g == "ink":
         # the night scene as an ink drawing on paper: inverted luminance, light tones lifted
         lum = 0.299 * a[..., 0] + 0.587 * a[..., 1] + 0.114 * a[..., 2]

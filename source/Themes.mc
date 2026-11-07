@@ -22,7 +22,7 @@ module Themes {
     const WARN = 14;     // low battery
     const TICK = 15;     // minute track
 
-    const COUNT = 10;
+    const COUNT = 8;
 
     // Order must match the "StylePreset" list in resources/settings/settings.xml.
     const PRESETS = [
@@ -35,32 +35,26 @@ module Themes {
         // C  Emerald Night
         [0x000000, 0x000000, 0x005500, 0x005555, 0xFFAA00, 0xAA5500, 0x00AA55, 0x55FFAA,
          0xFFFFFF, 0xAAAAAA, 0x005500, 0x55FF55, 0x005500, 0xFFFFAA, 0xFF5500, 0x55AA55],
-        // D  Burgundy Royale
-        [0x550000, 0x000000, 0x000000, 0xAA0055, 0xFFAA55, 0xAA5555, 0xFF0055, 0xFFAAAA,
-         0xFFFFAA, 0xAAAAAA, 0x550000, 0xFFAAAA, 0x000000, 0xFFAAAA, 0xFF5500, 0xAA5555],
-        // E  Ice Silver
+        // D  Ice Silver
         [0x000055, 0x000000, 0x0055AA, 0x00AAAA, 0xFFFFFF, 0xAAAAAA, 0x55AAFF, 0xAAFFFF,
          0xFFFFFF, 0xAAAAAA, 0x0055AA, 0xAAFFFF, 0x000000, 0xFFFFFF, 0xFF5500, 0xAAFFFF],
-        // F  Stealth
-        [0x000000, 0x000000, 0x555555, 0x555555, 0xAAAAAA, 0x555555, 0xFFFFFF, 0xFFFFFF,
-         0xFFFFFF, 0xAAAAAA, 0x555555, 0xFFFFFF, 0x555555, 0xAAAAAA, 0xFF5500, 0xAAAAAA],
-        // G  Scarlet Noir: black, red and white
+        // E  Scarlet Noir: black, red and white
         [0x000000, 0x000000, 0x550000, 0xAA0000, 0xFFFFFF, 0xAAAAAA, 0xFF0000, 0xFF5555,
          0xFFFFFF, 0xAAAAAA, 0x550000, 0xFF0000, 0x000000, 0xFFFFFF, 0xFF5500, 0xAAAAAA],
-        // H  Ember Gold: high contrast, black, white, red, orange and gold (readable without backlight)
-        [0x000000, 0x000000, 0x550000, 0xAA0000, 0xFFAA00, 0xAA5500, 0xFF5500, 0xFFAA00,
-         0xFFFFFF, 0xFFAA55, 0x550000, 0xFF0000, 0x000000, 0xFFFFFF, 0xFF0000, 0xFFFFFF],
-        // I  Oasis Gold: high contrast, black, white, blue, green and gold (readable without backlight)
+        // F  Oasis Gold: high contrast, black, white, blue, green and gold (readable without backlight)
         [0x000000, 0x000000, 0x000055, 0x005500, 0xFFAA00, 0xAA5500, 0x00FF55, 0x00AAFF,
          0xFFFFFF, 0x55AAFF, 0x005500, 0x00AAFF, 0x000000, 0xFFFFFF, 0xFF5500, 0xFFFFFF],
-        // J  E-Ink: black ink on white paper, red seconds hand (like an electronic-paper screen)
+        // G  E-Ink: black ink on white paper, red seconds hand (like an electronic-paper screen)
         [0xFFFFFF, 0xFFFFFF, 0xAAAAAA, 0xAAAAAA, 0x000000, 0x555555, 0x000000, 0x000000,
-         0x000000, 0x555555, 0xAAAAAA, 0xFF0000, 0x000000, 0x000000, 0xFF0000, 0x000000]
+         0x000000, 0x555555, 0xAAAAAA, 0xFF0000, 0x000000, 0x000000, 0xFF0000, 0x000000],
+        // H  E-Ink Inverse: white ink on black, red seconds hand
+        [0x000000, 0x000000, 0x555555, 0x555555, 0xFFFFFF, 0xAAAAAA, 0xFFFFFF, 0xFFFFFF,
+         0xFFFFFF, 0xAAAAAA, 0x555555, 0xFF0000, 0x000000, 0xFFFFFF, 0xFF0000, 0xFFFFFF]
     ];
 
     // Presets whose gauges use one colour per data type (as in the approved concept)
     // instead of the preset accent.
-    const MULTICOLOR = [true, false, false, false, true, false, false, false, false, false];
+    const MULTICOLOR = [true, false, false, true, false, false, false, false];
 
     // Friday dial (from 00:00 until Asr, setting FridayDesign), whatever the style: Sidi Bou Said
     // blue wrought iron, gold hour ring, white text, jasmine (STAR) and geranium (SIL) on the
@@ -82,9 +76,12 @@ module Themes {
 
     // E-Ink style: daylight ring and Moon dial in greys (day, twilight, night, night text;
     // lit, dark, ring)
-    const INK = 9;
+    const INK = 6;
     const SUN_INK = [0x555555, 0xAAAAAA, 0x000000, 0x000000];
     const MOON_INK = [0xFFFFFF, 0x000000, 0x000000];
+    const INK_INV = 7;           // E-Ink Inverse: the same in light greys on black
+    const SUN_INK_INV = [0xFFFFFF, 0xAAAAAA, 0x555555, 0xAAAAAA];
+    const MOON_INK_INV = [0xFFFFFF, 0x000000, 0xFFFFFF];
 
     // Moon dial: lit surface, dark surface (earthshine), lunation ring
     const MOON_LIT = 0xFFF2C0;

@@ -50,8 +50,8 @@ Based on the approved concept image:
   hour (39 short verses; see [`docs/AYAT.md`](docs/AYAT.md))
 * the Hijri date in Arabic (Eastern Arabic digits, month names, هـ) or in Latin script
 
-Nine style presets recolour everything (two of them, Ember Gold and Oasis Gold, are
-high-contrast styles in flat palette colours, readable without the backlight on MIP screens); four backgrounds (mosque, geometric, black marble,
+Eight style presets recolour everything (Oasis Gold is a high-contrast style readable without the
+backlight on MIP screens; E-Ink and E-Ink Inverse imitate an electronic-paper screen); four backgrounds (mosque, geometric, black marble,
 night sky) change the art; the layout is identical on every screen size.
 
 **HD artwork.** The static part of the dial — background, arch scene, metallic chapter ring,
@@ -84,7 +84,7 @@ The settings and the watch menu are generated from `tools/gen_settings.py` (Engl
 
 | Group | Setting | Choices (default first) |
 |---|---|---|
-| Appearance | Style | Luxury Blue, Royal Gold, Emerald Night, Burgundy Royale, Ice Silver, Stealth, Scarlet Noir (black, red, white), Ember Gold and Oasis Gold (high contrast) |
+| Appearance | Style | Luxury Blue, Royal Gold, Emerald Night, Ice Silver, Scarlet Noir (black, red, white), Oasis Gold (high contrast), E-Ink (black on white), E-Ink Inverse (white on black) |
 | Appearance | Background | Mosque at night (illustration), Islamic geometric pattern, Black marble, Night sky |
 | Appearance | Dial numerals | Arabic (12 3 6 9), Indian (Eastern Arabic) |
 | Appearance | Font | Modern (Barlow), Classic (Cinzel + Barlow), Sport (Rajdhani); digits always in IBM Plex Sans Condensed (distinct 5 / 6 / 8 / 9) |

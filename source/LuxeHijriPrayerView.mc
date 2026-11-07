@@ -135,10 +135,13 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         var friday = mFriday && st.fridayDesign;
         mColors = (friday ? Themes.FRIDAY : Themes.PRESETS[st.preset]) as Array<Number>;
         mMulticolor = (st.gaugeColors == 0) && (friday || (Themes.MULTICOLOR[st.preset] as Boolean));
-        // E-Ink style: daylight ring and Moon dial in greys
+        // E-Ink styles: daylight ring and Moon dial in greys
         var ink = !friday && st.preset == Themes.INK;
-        mSunCols = (ink ? Themes.SUN_INK : [Themes.SUN_DAY, Themes.SUN_TWILIGHT, Themes.SUN_NIGHT, Themes.SUN_NIGHT_TEXT]) as Array<Number>;
-        mMoonCols = (ink ? Themes.MOON_INK : [Themes.MOON_LIT, Themes.MOON_DARK, Themes.MOON_RING]) as Array<Number>;
+        var inv = !friday && st.preset == Themes.INK_INV;
+        mSunCols = (ink ? Themes.SUN_INK : (inv ? Themes.SUN_INK_INV
+                    : [Themes.SUN_DAY, Themes.SUN_TWILIGHT, Themes.SUN_NIGHT, Themes.SUN_NIGHT_TEXT])) as Array<Number>;
+        mMoonCols = (ink ? Themes.MOON_INK : (inv ? Themes.MOON_INK_INV
+                     : [Themes.MOON_LIT, Themes.MOON_DARK, Themes.MOON_RING])) as Array<Number>;
         mText = mColors[Themes.TEXT];
         if (st.textColor > 0) {
             mText = Themes.TEXT_CHOICES[st.textColor - 1] as Number;
@@ -233,9 +236,7 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
                    Rez.Drawables.Dial40, Rez.Drawables.Dial41, Rez.Drawables.Dial42, Rez.Drawables.Dial43,
                    Rez.Drawables.Dial50, Rez.Drawables.Dial51, Rez.Drawables.Dial52, Rez.Drawables.Dial53,
                    Rez.Drawables.Dial60, Rez.Drawables.Dial61, Rez.Drawables.Dial62, Rez.Drawables.Dial63,
-                   Rez.Drawables.Dial70, Rez.Drawables.Dial71, Rez.Drawables.Dial72, Rez.Drawables.Dial73,
-                   Rez.Drawables.Dial80, Rez.Drawables.Dial81, Rez.Drawables.Dial82, Rez.Drawables.Dial83,
-                   Rez.Drawables.Dial90, Rez.Drawables.Dial91, Rez.Drawables.Dial92, Rez.Drawables.Dial93];
+                   Rez.Drawables.Dial70, Rez.Drawables.Dial71, Rez.Drawables.Dial72, Rez.Drawables.Dial73];
         try {
             return WatchUi.loadResource(ids[st * 4 + bg]);
         } catch (e) {
@@ -271,11 +272,7 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
                    Rez.Drawables.Num600, Rez.Drawables.Num601, Rez.Drawables.Num602, Rez.Drawables.Num603,
                    Rez.Drawables.Num610, Rez.Drawables.Num611, Rez.Drawables.Num612, Rez.Drawables.Num613,
                    Rez.Drawables.Num700, Rez.Drawables.Num701, Rez.Drawables.Num702, Rez.Drawables.Num703,
-                   Rez.Drawables.Num710, Rez.Drawables.Num711, Rez.Drawables.Num712, Rez.Drawables.Num713,
-                   Rez.Drawables.Num800, Rez.Drawables.Num801, Rez.Drawables.Num802, Rez.Drawables.Num803,
-                   Rez.Drawables.Num810, Rez.Drawables.Num811, Rez.Drawables.Num812, Rez.Drawables.Num813,
-                   Rez.Drawables.Num900, Rez.Drawables.Num901, Rez.Drawables.Num902, Rez.Drawables.Num903,
-                   Rez.Drawables.Num910, Rez.Drawables.Num911, Rez.Drawables.Num912, Rez.Drawables.Num913];
+                   Rez.Drawables.Num710, Rez.Drawables.Num711, Rez.Drawables.Num712, Rez.Drawables.Num713];
         try {
             var out = [];
             for (var q = 0; q < 4; q++) {

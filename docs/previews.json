@@ -24,15 +24,7 @@
   "next_prayer": "Dhuhr"
  },
  {
-  "file": "previews/style-4-burgundy-royale.png",
-  "title": "Style Burgundy Royale, background Mosque, 280 px",
-  "size": 280,
-  "local_time": "2026-09-16T10:25:37+01:00",
-  "hijri": "1448-04-03",
-  "next_prayer": "Dhuhr"
- },
- {
-  "file": "previews/style-5-ice-silver.png",
+  "file": "previews/style-4-ice-silver.png",
   "title": "Style Ice Silver, background Mosque, 280 px",
   "size": 280,
   "local_time": "2026-09-16T10:25:37+01:00",
@@ -40,15 +32,7 @@
   "next_prayer": "Dhuhr"
  },
  {
-  "file": "previews/style-6-stealth.png",
-  "title": "Style Stealth, background Mosque, 280 px",
-  "size": 280,
-  "local_time": "2026-09-16T10:25:37+01:00",
-  "hijri": "1448-04-03",
-  "next_prayer": "Dhuhr"
- },
- {
-  "file": "previews/style-7-scarlet-noir.png",
+  "file": "previews/style-5-scarlet-noir.png",
   "title": "Style Scarlet Noir, background Mosque, 280 px",
   "size": 280,
   "local_time": "2026-09-16T10:25:37+01:00",
@@ -56,15 +40,7 @@
   "next_prayer": "Dhuhr"
  },
  {
-  "file": "previews/style-8-ember-gold.png",
-  "title": "Style Ember Gold, background Mosque, 280 px",
-  "size": 280,
-  "local_time": "2026-09-16T10:25:37+01:00",
-  "hijri": "1448-04-03",
-  "next_prayer": "Dhuhr"
- },
- {
-  "file": "previews/style-9-oasis-gold.png",
+  "file": "previews/style-6-oasis-gold.png",
   "title": "Style Oasis Gold, background Mosque, 280 px",
   "size": 280,
   "local_time": "2026-09-16T10:25:37+01:00",
@@ -72,8 +48,16 @@
   "next_prayer": "Dhuhr"
  },
  {
-  "file": "previews/style-10-e-ink.png",
+  "file": "previews/style-7-e-ink.png",
   "title": "Style E-Ink, background Mosque, 280 px",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/style-8-e-ink-inverse.png",
+  "title": "Style E-Ink Inverse, background Mosque, 280 px",
   "size": 280,
   "local_time": "2026-09-16T10:25:37+01:00",
   "hijri": "1448-04-03",
@@ -96,8 +80,8 @@
   "next_prayer": "Dhuhr"
  },
  {
-  "file": "previews/background-mosque-burgundy-royale.png",
-  "title": "Background mosque, style Burgundy Royale",
+  "file": "previews/background-mosque-ice-silver.png",
+  "title": "Background mosque, style Ice Silver",
   "size": 280,
   "local_time": "2026-09-16T10:25:37+01:00",
   "hijri": "1448-04-03",
@@ -120,8 +104,8 @@
   "next_prayer": "Dhuhr"
  },
  {
-  "file": "previews/background-geometric-burgundy-royale.png",
-  "title": "Background geometric, style Burgundy Royale",
+  "file": "previews/background-geometric-ice-silver.png",
+  "title": "Background geometric, style Ice Silver",
   "size": 280,
   "local_time": "2026-09-16T10:25:37+01:00",
   "hijri": "1448-04-03",
@@ -144,8 +128,8 @@
   "next_prayer": "Dhuhr"
  },
  {
-  "file": "previews/background-marble-burgundy-royale.png",
-  "title": "Background marble, style Burgundy Royale",
+  "file": "previews/background-marble-ice-silver.png",
+  "title": "Background marble, style Ice Silver",
   "size": 280,
   "local_time": "2026-09-16T10:25:37+01:00",
   "hijri": "1448-04-03",
@@ -168,8 +152,8 @@
   "next_prayer": "Dhuhr"
  },
  {
-  "file": "previews/background-night-sky-burgundy-royale.png",
-  "title": "Background night-sky, style Burgundy Royale",
+  "file": "previews/background-night-sky-ice-silver.png",
+  "title": "Background night-sky, style Ice Silver",
   "size": 280,
   "local_time": "2026-09-16T10:25:37+01:00",
   "hijri": "1448-04-03",
