@@ -1,0 +1,17 @@
+info face="IBMPlexSansCondensed-Bold (1-bit)" size=58 bold=0 italic=0 charset="" unicode=1 stretchH=100 smooth=1 aa=1 padding=0,0,0,0 spacing=1,1 outline=0
+common lineHeight=76 base=60 scaleW=256 scaleH=128 pages=1 packed=0 alphaChnl=0 redChnl=4 greenChnl=4 blueChnl=4
+page id=0 file="dg_time.png"
+chars count=12
+char id=32    x=0    y=0    width=0    height=0    xoffset=0    yoffset=0    xadvance=12   page=0  chnl=15
+char id=48    x=1    y=0    width=32   height=43   xoffset=0    yoffset=18   xadvance=31   page=0  chnl=15
+char id=49    x=34   y=0    width=32   height=41   xoffset=0    yoffset=19   xadvance=31   page=0  chnl=15
+char id=50    x=67   y=0    width=32   height=42   xoffset=0    yoffset=18   xadvance=31   page=0  chnl=15
+char id=51    x=100  y=0    width=32   height=43   xoffset=0    yoffset=18   xadvance=31   page=0  chnl=15
+char id=52    x=133  y=0    width=32   height=41   xoffset=0    yoffset=19   xadvance=31   page=0  chnl=15
+char id=53    x=166  y=0    width=32   height=42   xoffset=0    yoffset=19   xadvance=31   page=0  chnl=15
+char id=54    x=199  y=0    width=32   height=42   xoffset=0    yoffset=19   xadvance=31   page=0  chnl=15
+char id=55    x=0    y=44   width=32   height=41   xoffset=0    yoffset=19   xadvance=31   page=0  chnl=15
+char id=56    x=33   y=44   width=32   height=43   xoffset=0    yoffset=18   xadvance=31   page=0  chnl=15
+char id=57    x=66   y=44   width=32   height=42   xoffset=0    yoffset=18   xadvance=31   page=0  chnl=15
+char id=58    x=99   y=44   width=18   height=32   xoffset=0    yoffset=29   xadvance=18   page=0  chnl=15
+kernings count=0

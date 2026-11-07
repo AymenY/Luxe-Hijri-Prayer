@@ -1,0 +1,140 @@
+#!/usr/bin/env python3
+"""Rewrite the <iq:products> list of manifest.xml from the device files of the installed
+Connect IQ SDK, so that the watch face targets every current round colour watch.
+
+Run it on the machine where the SDK Manager has downloaded the devices:
+    python3 tools/update_products.py            # show what would change
+    python3 tools/update_products.py --write    # update manifest.xml
+    python3 tools/update_products.py --report   # one line per device with the reason it is (not) selected
+
+A device is selected when its compiler.json says:
+  * square MIP or AMOLED display (round on Garmin watches) whose resolution has a font set in
+    this project (218 ... 466 px),
+  * more than 1 bit per pixel (colour; monochrome Instinct models are excluded),
+  * watch faces are supported,
+  * Connect IQ 3.0 or newer (the manifest's minApiLevel). Connect IQ 4+ watches get the HD dial,
+    older ones the vector dial; --write also regenerates the device lines of monkey.jungle.
+Fields that are missing in a device file are reported; such devices are skipped unless
+--include-unknown is given. Check the result in the SDK's device list before publishing.
+"""
+import glob
+import json
+import os
+import re
+import sys
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SIZES = {218, 240, 260, 280, 360, 390, 416, 454, 466}
+MIN_CIQ = (3, 0, 0)
+HD_CIQ = (4, 0, 0)    # from this version on the watch gets the HD dial (hd/<size>/, (:hd) code)
+
+
+def device_dirs():
+    env = os.environ.get("CIQ_DEVICES")
+    cands = [env] if env else []
+    home = os.path.expanduser("~")
+    cands += [os.path.join(home, ".Garmin", "ConnectIQ", "Devices"),
+              os.path.join(home, "Library", "Application Support", "Garmin", "ConnectIQ", "Devices"),
+              os.path.join(os.environ.get("APPDATA", ""), "Garmin", "ConnectIQ", "Devices")]
+    for c in cands:
+        if c and os.path.isdir(c):
+            return c
+    return None
+
+
+def version(v):
+    nums = [int(x) for x in re.findall(r"\d+", str(v))[:3]]
+    return tuple(nums + [0] * (3 - len(nums)))
+
+
+def assess(cfg):
+    """Returns (selected?, reasons, unknown fields)."""
+    unknown, reasons = [], []
+    res = cfg.get("resolution") or {}
+    w, h = res.get("width"), res.get("height")
+    # device files have no shape field: displayType is the technology (mip, amoled, lcd). Square
+    # resolutions are round on every current MIP / AMOLED watch; the LCD Venu Sq is square.
+    shape = cfg.get("displayType")
+    bpp = cfg.get("bitsPerPixel")
+    if w is None or h is None:
+        unknown.append("resolution")
+    elif not (w == h and w in SIZES):
+        reasons.append("%sx%s" % (w, h))
+    if shape is None:
+        unknown.append("displayType")
+    elif str(shape).lower() not in ("mip", "amoled"):
+        reasons.append(str(shape))
+    if bpp is None:
+        unknown.append("bitsPerPixel")
+    elif int(bpp) <= 1:
+        reasons.append("monochrome")
+    types = [str(t.get("type", "")).lower() for t in cfg.get("appTypes", []) if isinstance(t, dict)]
+    if not types:
+        unknown.append("appTypes")
+    elif "watchface" not in types:
+        reasons.append("no watch faces")
+    versions = [version(p.get("connectIQVersion")) for p in cfg.get("partNumbers", []) if isinstance(p, dict)
+                and p.get("connectIQVersion")]
+    if not versions:
+        unknown.append("connectIQVersion")
+    elif max(versions) < MIN_CIQ:
+        reasons.append("CIQ %s" % ".".join(map(str, max(versions))))
+    return (not reasons and not unknown), reasons, unknown
+
+
+def main():
+    write = "--write" in sys.argv
+    include_unknown = "--include-unknown" in sys.argv
+    report = "--report" in sys.argv
+    base = device_dirs()
+    if base is None:
+        sys.exit("Connect IQ device folder not found (set CIQ_DEVICES=/path/to/Devices).")
+    selected = []
+    info = {}
+    for cfg_path in sorted(glob.glob(os.path.join(base, "*", "compiler.json"))):
+        dev = os.path.basename(os.path.dirname(cfg_path))
+        cfg = json.load(open(cfg_path))
+        dev = cfg.get("deviceId", dev)
+        ok, reasons, unknown = assess(cfg)
+        if report:
+            res = cfg.get("resolution") or {}
+            vers = [version(p.get("connectIQVersion")) for p in cfg.get("partNumbers", [])
+                    if isinstance(p, dict) and p.get("connectIQVersion")]
+            mem = [t.get("memoryLimit") for t in cfg.get("appTypes", [])
+                   if isinstance(t, dict) and str(t.get("type", "")).lower() == "watchface"]
+            print("| %s | %s | %sx%s | %s | %s | %s | %s | %s |" % (
+                dev, cfg.get("displayName", ""), res.get("width"), res.get("height"), cfg.get("displayType"),
+                cfg.get("bitsPerPixel"), ".".join(map(str, max(vers))) if vers else "?",
+                "%s KB" % (mem[0] // 1024) if mem and mem[0] else "?",
+                "yes" if ok else ", ".join(reasons + ["missing " + u for u in unknown])))
+            if ok:
+                selected.append(dev)
+                info[dev] = (res.get("width"), max(vers) >= HD_CIQ if vers else False)
+            continue
+        if ok or (include_unknown and not reasons):
+            selected.append(dev)
+            res = cfg.get("resolution") or {}
+            vers = [version(p.get("connectIQVersion")) for p in cfg.get("partNumbers", [])
+                    if isinstance(p, dict) and p.get("connectIQVersion")]
+            info[dev] = (res.get("width"), max(vers) >= HD_CIQ if vers else False)
+            print("  + %-24s %s" % (dev, cfg.get("displayName", "")))
+        elif unknown:
+            print("  ? %-24s missing %s" % (dev, ", ".join(unknown)))
+    man_path = os.path.join(ROOT, "manifest.xml")
+    man = open(man_path).read()
+    block = "\n".join('            <iq:product id="%s" />' % d for d in selected)
+    new = re.sub(r"(<iq:products>\n)(.*?)(\n\s*</iq:products>)", lambda m: m.group(1) + block + m.group(3), man,
+                 flags=re.S)
+    print("%d devices selected" % len(selected))
+    if write:
+        open(man_path, "w").write(new)
+        jpath = os.path.join(ROOT, "monkey.jungle")
+        head = open(jpath).read().split("base.excludeAnnotations = lite")[0] + "base.excludeAnnotations = lite\n\n"
+        hd = ["%s.resourcePath = $(%s.resourcePath);hd/%s" % (d, d, info[d][0]) for d in selected if info[d][1]]
+        lite = ["%s.excludeAnnotations = hd" % d for d in selected if not info[d][1]]
+        open(jpath, "w").write(head + "\n".join(hd) + "\n\n" + "\n".join(lite) + "\n")
+        print("manifest.xml and monkey.jungle updated (%d HD, %d vector)" % (len(hd), len(lite)))
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,149 @@
+# Compiles Luxe Hijri Prayer with the official Connect IQ SDK on GitHub's runners.
+#
+# One-time setup (repository Settings -> Secrets and variables -> Actions):
+#   secrets   GARMIN_USERNAME, GARMIN_PASSWORD   your Garmin account (device files need a login)
+#   variable  CIQ_ACCEPT_LICENSE = yes           set it only after reading and accepting the
+#                                                Connect IQ SDK license agreement
+# Signing: with the secret CIQ_DEVELOPER_KEY (your permanent key, base64 of the .der file) the
+# builds are signed with it, which the Store package (mode iq) requires. Without it, test builds
+# are signed with a temporary key generated for the run.
+name: Build
+
+on:
+  push:
+    branches: ["**"]
+    paths-ignore: ["docs/**", "store/**", "**.md"]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "preview (one device per screen size), all (every product), iq (Store package)"
+        default: preview
+        type: choice
+        options: [preview, all, iq, devices]
+      sdk:
+        description: "Connect IQ SDK version constraint"
+        default: ">=7.4.0"
+
+jobs:
+  checks:
+    name: Static checks (no SDK)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install tools
+        run: |
+          pip install -r tools/requirements.txt
+          (cd tools && npm install --silent)
+      - name: Project, calculations and layout checks
+        run: |
+          python3 tools/check_project.py
+          python3 tools/validate_calculations.py
+          python3 tools/check_layout.py
+
+  compile:
+    name: Compile (Connect IQ SDK)
+    runs-on: ubuntu-latest
+    if: ${{ vars.CIQ_ACCEPT_LICENSE == 'yes' }}
+    env:
+      MODE: ${{ github.event.inputs.mode || 'preview' }}
+      SDK: ${{ github.event.inputs.sdk || '>=7.4.0' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Install connect-iq-sdk-manager
+        run: |
+          curl -s https://raw.githubusercontent.com/lindell/connect-iq-sdk-manager-cli/master/install.sh | sh -s -- -b "$HOME/bin"
+          echo "$HOME/bin" >> "$GITHUB_PATH"
+      - name: Accept the SDK license (enabled by CIQ_ACCEPT_LICENSE=yes), log in, download SDK and devices
+        env:
+          GARMIN_USERNAME: ${{ secrets.GARMIN_USERNAME }}
+          GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
+        run: |
+          connect-iq-sdk-manager agreement accept
+          connect-iq-sdk-manager login
+          connect-iq-sdk-manager sdk set "$SDK"
+          echo "$(connect-iq-sdk-manager sdk current-path --bin)" >> "$GITHUB_PATH"
+          # one device at a time: an id unknown to Garmin's catalogue is reported, not fatal
+          missing=""
+          for d in $(grep -o 'iq:product id="[^"]*"' manifest.xml | sed 's/.*id="\([^"]*\)"/\1/'); do
+            connect-iq-sdk-manager device download -d "$d" > /dev/null 2>&1 || missing="$missing $d"
+          done
+          echo "Devices not found in the catalogue:${missing:- none}"
+          if [ "$MODE" = "devices" ]; then
+            # compatibility report: download every device of the catalogue and list them
+            # outside the project, otherwise the tool lists only the manifest's devices
+            (cd "$RUNNER_TEMP" && connect-iq-sdk-manager device list > "$RUNNER_TEMP/devices.txt" 2>&1) || true
+            echo "catalogue size: $(grep -cE '^[a-z0-9_]+ ' "$RUNNER_TEMP/devices.txt")"
+            echo "device list output (first lines):"; head -5 "$RUNNER_TEMP/devices.txt"
+            for d in $(awk '{print $1}' "$RUNNER_TEMP/devices.txt" | grep -E '^[a-z0-9_]+$' | grep -v '^NAME$' | sort -u); do
+              (cd "$RUNNER_TEMP" && connect-iq-sdk-manager device download -d "$d" > /dev/null 2>&1) || true
+            done
+            # colour depth and palette of the fenix 7X Pro (and Pro Solar) as the compiler sees them
+            python3 - <<'PY'
+          import json, os, glob
+          base = os.path.expanduser("~/.Garmin/ConnectIQ/Devices/fenix7xpro")
+          c = json.load(open(os.path.join(base, "compiler.json")))
+          print("fenix7xpro compiler.json:", {k: c.get(k) for k in ("displayName", "bitsPerPixel", "pixelFormat", "displayType")})
+          for f in sorted(glob.glob(os.path.join(base, "*.json"))):
+              d = json.load(open(f))
+              def walk(o, path=""):
+                  if isinstance(o, dict):
+                      for k, v in o.items():
+                          if "palette" in k.lower() or "color" in k.lower() or "colour" in k.lower():
+                              n = len(v) if isinstance(v, list) else v
+                              print(os.path.basename(f), path + "/" + k, "->", n if isinstance(n, int) else str(v)[:300])
+                          walk(v, path + "/" + k)
+                  elif isinstance(o, list):
+                      for i, v in enumerate(o[:3]):
+                          walk(v, path + "[%d]" % i)
+              walk(d)
+          PY
+            echo "| id | name | size | display | bits/px | CIQ | watch face memory | selected |"
+            python3 tools/update_products.py --report
+          fi
+          echo "Installed device files:"
+          ls "$HOME/.Garmin/ConnectIQ/Devices" | tr '\n' ' '; echo
+      - name: Developer key (secret CIQ_DEVELOPER_KEY, else a temporary key for test builds)
+        env:
+          CIQ_DEVELOPER_KEY: ${{ secrets.CIQ_DEVELOPER_KEY }}
+        run: |
+          umask 077
+          if [ -n "$CIQ_DEVELOPER_KEY" ]; then
+            echo "$CIQ_DEVELOPER_KEY" | base64 -d > "$RUNNER_TEMP/key.der"
+            echo "Signing with the owner's developer key"
+          elif [ "$MODE" = "iq" ]; then
+            echo "::error::The Store package needs your permanent developer key: add the secret CIQ_DEVELOPER_KEY (see README)"
+            exit 1
+          else
+            openssl genrsa -out "$RUNNER_TEMP/key.pem" 4096 2> /dev/null
+            openssl pkcs8 -topk8 -inform PEM -outform DER -in "$RUNNER_TEMP/key.pem" -out "$RUNNER_TEMP/key.der" -nocrypt
+            echo "Signing with a temporary key (test builds only)"
+          fi
+      - name: Compile watch face
+        if: env.MODE != 'devices'
+        run: tools/ci_build.sh "$RUNNER_TEMP/key.der" "$MODE"
+      - name: Compile unit tests
+        if: always() && env.MODE != 'devices'
+        run: tools/ci_build.sh "$RUNNER_TEMP/key.der" tests
+      - name: Upload builds and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: LuxeHijriPrayer-${{ env.MODE }}-${{ github.sha }}
+          path: |
+            bin/*.prg
+            bin/*.iq
+            bin/logs/
+      - name: Delete the key files
+        if: always()
+        run: rm -f "$RUNNER_TEMP/key.der" "$RUNNER_TEMP/key.pem"

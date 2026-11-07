@@ -1,0 +1,9 @@
+node_modules/
+__pycache__/
+*.pyc
+bin/
+*.prg
+*.iq
+*.der
+*.pem
+.vscode/
