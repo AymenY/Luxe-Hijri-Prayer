@@ -1,0 +1,530 @@
+{
+ "source_arabic": "Tanzil \"quran-simple\" text via github.com/fawazahmed0/quran-api (edition ara-quransimple), cross-checked letter-by-letter against Tanzil Uthmani 1.0.2 (md5 6aae945d556a1b28cfe682c0ea5ab518)",
+ "source_french": "Muhammad Hamidullah, via Tanzil (edition fra-muhammadhamidul); punctuation normalised",
+ "selection": "Complete verses only (owner's requirement), chosen among short well-known verses so that each fits on one line at >= 13 px on a 280 px screen; verified letter by letter against Tanzil Uthmani.",
+ "layout": "39 entries in 5 fonts of up to 8 (Ayah0..Ayah4). In each font: verse glyphs 'A'..'H', reference glyphs 'a'..'h' (surah name and verse number in Arabic).",
+ "hijri_months_ar": [
+  "محرم",
+  "صفر",
+  "ربيع الأول",
+  "ربيع الآخر",
+  "جمادى الأولى",
+  "جمادى الآخرة",
+  "رجب",
+  "شعبان",
+  "رمضان",
+  "شوال",
+  "ذو القعدة",
+  "ذو الحجة"
+ ],
+ "hijri_suffix_ar": "هـ",
+ "ayat": [
+  {
+   "index": 0,
+   "ref": "Al-Fatiha 1:2",
+   "name_fr": "Al-Fâtiha 1:2",
+   "lines": [
+    "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ"
+   ],
+   "ref_ar": "الفاتحة: ٢",
+   "fr": "Louange à Allah, Seigneur de l'univers",
+   "font": 0,
+   "code": "A",
+   "ref_code": "a"
+  },
+  {
+   "index": 1,
+   "ref": "Al-Fatiha 1:4",
+   "name_fr": "Al-Fâtiha 1:4",
+   "lines": [
+    "مَالِكِ يَوْمِ الدِّينِ"
+   ],
+   "ref_ar": "الفاتحة: ٤",
+   "fr": "Maître du Jour de la rétribution",
+   "font": 0,
+   "code": "B",
+   "ref_code": "b"
+  },
+  {
+   "index": 2,
+   "ref": "Al-Fatiha 1:5",
+   "name_fr": "Al-Fâtiha 1:5",
+   "lines": [
+    "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ"
+   ],
+   "ref_ar": "الفاتحة: ٥",
+   "fr": "C'est Toi [Seul] que nous adorons, et c'est Toi [Seul] dont nous implorons secours",
+   "font": 0,
+   "code": "C",
+   "ref_code": "c"
+  },
+  {
+   "index": 3,
+   "ref": "Al-Fatiha 1:6",
+   "name_fr": "Al-Fâtiha 1:6",
+   "lines": [
+    "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ"
+   ],
+   "ref_ar": "الفاتحة: ٦",
+   "fr": "Guide-nous dans le droit chemin",
+   "font": 0,
+   "code": "D",
+   "ref_code": "d"
+  },
+  {
+   "index": 4,
+   "ref": "Taha 20:25",
+   "name_fr": "Tâ-Hâ 20:25",
+   "lines": [
+    "قَالَ رَبِّ اشْرَحْ لِي صَدْرِي"
+   ],
+   "ref_ar": "طه: ٢٥",
+   "fr": "[Moïse] dit: «Seigneur, ouvre-moi ma poitrine",
+   "font": 0,
+   "code": "E",
+   "ref_code": "e"
+  },
+  {
+   "index": 5,
+   "ref": "Taha 20:26",
+   "name_fr": "Tâ-Hâ 20:26",
+   "lines": [
+    "وَيَسِّرْ لِي أَمْرِي"
+   ],
+   "ref_ar": "طه: ٢٦",
+   "fr": "et facilite ma mission",
+   "font": 0,
+   "code": "F",
+   "ref_code": "f"
+  },
+  {
+   "index": 6,
+   "ref": "Taha 20:27",
+   "name_fr": "Tâ-Hâ 20:27",
+   "lines": [
+    "وَاحْلُلْ عُقْدَةً مِنْ لِسَانِي"
+   ],
+   "ref_ar": "طه: ٢٧",
+   "fr": "et dénoue un nœud en ma langue",
+   "font": 0,
+   "code": "G",
+   "ref_code": "g"
+  },
+  {
+   "index": 7,
+   "ref": "Taha 20:28",
+   "name_fr": "Tâ-Hâ 20:28",
+   "lines": [
+    "يَفْقَهُوا قَوْلِي"
+   ],
+   "ref_ar": "طه: ٢٨",
+   "fr": "afin qu'ils comprennent mes paroles",
+   "font": 0,
+   "code": "H",
+   "ref_code": "h"
+  },
+  {
+   "index": 8,
+   "ref": "Al-Anbiya 21:107",
+   "name_fr": "Al-Anbiyâ' 21:107",
+   "lines": [
+    "وَمَا أَرْسَلْنَاكَ إِلَّا رَحْمَةً لِلْعَالَمِينَ"
+   ],
+   "ref_ar": "الأنبياء: ١٠٧",
+   "fr": "Et Nous ne t'avons envoyé qu'en miséricorde pour l'univers",
+   "font": 1,
+   "code": "A",
+   "ref_code": "a"
+  },
+  {
+   "index": 9,
+   "ref": "Ar-Rahman 55:13",
+   "name_fr": "Ar-Rahmân 55:13",
+   "lines": [
+    "فَبِأَيِّ آلَاءِ رَبِّكُمَا تُكَذِّبَانِ"
+   ],
+   "ref_ar": "الرحمن: ١٣",
+   "fr": "Lequel donc des bienfaits de votre Seigneur nierez-vous",
+   "font": 1,
+   "code": "B",
+   "ref_code": "b"
+  },
+  {
+   "index": 10,
+   "ref": "Ar-Rahman 55:26",
+   "name_fr": "Ar-Rahmân 55:26",
+   "lines": [
+    "كُلُّ مَنْ عَلَيْهَا فَانٍ"
+   ],
+   "ref_ar": "الرحمن: ٢٦",
+   "fr": "Tout ce qui est sur elle [la terre] doit disparaître",
+   "font": 1,
+   "code": "C",
+   "ref_code": "c"
+  },
+  {
+   "index": 11,
+   "ref": "Al-A'la 87:1",
+   "name_fr": "Al-A'lâ 87:1",
+   "lines": [
+    "سَبِّحِ اسْمَ رَبِّكَ الْأَعْلَى"
+   ],
+   "ref_ar": "الأعلى: ١",
+   "fr": "Glorifie le nom de ton Seigneur, le Très Haut",
+   "font": 1,
+   "code": "D",
+   "ref_code": "d"
+  },
+  {
+   "index": 12,
+   "ref": "Al-Fajr 89:27",
+   "name_fr": "Al-Fajr 89:27",
+   "lines": [
+    "يَا أَيَّتُهَا النَّفْسُ الْمُطْمَئِنَّةُ"
+   ],
+   "ref_ar": "الفجر: ٢٧",
+   "fr": "«O toi, âme apaisée",
+   "font": 1,
+   "code": "E",
+   "ref_code": "e"
+  },
+  {
+   "index": 13,
+   "ref": "Al-Fajr 89:28",
+   "name_fr": "Al-Fajr 89:28",
+   "lines": [
+    "ارْجِعِي إِلَىٰ رَبِّكِ رَاضِيَةً مَرْضِيَّةً"
+   ],
+   "ref_ar": "الفجر: ٢٨",
+   "fr": "retourne vers ton Seigneur, satisfaite et agréée",
+   "font": 1,
+   "code": "F",
+   "ref_code": "f"
+  },
+  {
+   "index": 14,
+   "ref": "Ad-Duha 93:3",
+   "name_fr": "Ad-Duhâ 93:3",
+   "lines": [
+    "مَا وَدَّعَكَ رَبُّكَ وَمَا قَلَىٰ"
+   ],
+   "ref_ar": "الضحى: ٣",
+   "fr": "Ton Seigneur ne t'a ni abandonné, ni détesté",
+   "font": 1,
+   "code": "G",
+   "ref_code": "g"
+  },
+  {
+   "index": 15,
+   "ref": "Ad-Duha 93:4",
+   "name_fr": "Ad-Duhâ 93:4",
+   "lines": [
+    "وَلَلْآخِرَةُ خَيْرٌ لَكَ مِنَ الْأُولَىٰ"
+   ],
+   "ref_ar": "الضحى: ٤",
+   "fr": "La vie dernière t'est, certes, meilleure que la vie présente",
+   "font": 1,
+   "code": "H",
+   "ref_code": "h"
+  },
+  {
+   "index": 16,
+   "ref": "Ad-Duha 93:5",
+   "name_fr": "Ad-Duhâ 93:5",
+   "lines": [
+    "وَلَسَوْفَ يُعْطِيكَ رَبُّكَ فَتَرْضَىٰ"
+   ],
+   "ref_ar": "الضحى: ٥",
+   "fr": "Ton Seigneur t'accordera certes [Ses faveurs], et alors tu seras satisfait",
+   "font": 2,
+   "code": "A",
+   "ref_code": "a"
+  },
+  {
+   "index": 17,
+   "ref": "Ad-Duha 93:11",
+   "name_fr": "Ad-Duhâ 93:11",
+   "lines": [
+    "وَأَمَّا بِنِعْمَةِ رَبِّكَ فَحَدِّثْ"
+   ],
+   "ref_ar": "الضحى: ١١",
+   "fr": "Et quant au bienfait de ton Seigneur, proclame-le",
+   "font": 2,
+   "code": "B",
+   "ref_code": "b"
+  },
+  {
+   "index": 18,
+   "ref": "Ash-Sharh 94:5",
+   "name_fr": "Ash-Sharh 94:5",
+   "lines": [
+    "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا"
+   ],
+   "ref_ar": "الشرح: ٥",
+   "fr": "A côté de la difficulté est, certes, une facilité",
+   "font": 2,
+   "code": "C",
+   "ref_code": "c"
+  },
+  {
+   "index": 19,
+   "ref": "Ash-Sharh 94:6",
+   "name_fr": "Ash-Sharh 94:6",
+   "lines": [
+    "إِنَّ مَعَ الْعُسْرِ يُسْرًا"
+   ],
+   "ref_ar": "الشرح: ٦",
+   "fr": "A côté de la difficulté est, certes, une facilité",
+   "font": 2,
+   "code": "D",
+   "ref_code": "d"
+  },
+  {
+   "index": 20,
+   "ref": "Ash-Sharh 94:7",
+   "name_fr": "Ash-Sharh 94:7",
+   "lines": [
+    "فَإِذَا فَرَغْتَ فَانْصَبْ"
+   ],
+   "ref_ar": "الشرح: ٧",
+   "fr": "Quand tu te libères, donc, lève-toi",
+   "font": 2,
+   "code": "E",
+   "ref_code": "e"
+  },
+  {
+   "index": 21,
+   "ref": "Ash-Sharh 94:8",
+   "name_fr": "Ash-Sharh 94:8",
+   "lines": [
+    "وَإِلَىٰ رَبِّكَ فَارْغَبْ"
+   ],
+   "ref_ar": "الشرح: ٨",
+   "fr": "et à ton Seigneur aspire",
+   "font": 2,
+   "code": "F",
+   "ref_code": "f"
+  },
+  {
+   "index": 22,
+   "ref": "Al-Alaq 96:1",
+   "name_fr": "Al-'Alaq 96:1",
+   "lines": [
+    "اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ"
+   ],
+   "ref_ar": "العلق: ١",
+   "fr": "Lis, au nom de ton Seigneur qui a créé",
+   "font": 2,
+   "code": "G",
+   "ref_code": "g"
+  },
+  {
+   "index": 23,
+   "ref": "Al-Qadr 97:1",
+   "name_fr": "Al-Qadr 97:1",
+   "lines": [
+    "إِنَّا أَنْزَلْنَاهُ فِي لَيْلَةِ الْقَدْرِ"
+   ],
+   "ref_ar": "القدر: ١",
+   "fr": "Nous l'avons certes, fait descendre (le Coran) pendant la nuit d'Al-Qadr",
+   "font": 2,
+   "code": "H",
+   "ref_code": "h"
+  },
+  {
+   "index": 24,
+   "ref": "Al-Qadr 97:3",
+   "name_fr": "Al-Qadr 97:3",
+   "lines": [
+    "لَيْلَةُ الْقَدْرِ خَيْرٌ مِنْ أَلْفِ شَهْرٍ"
+   ],
+   "ref_ar": "القدر: ٣",
+   "fr": "La nuit d'Al-Qadr est meilleure que mille mois",
+   "font": 3,
+   "code": "A",
+   "ref_code": "a"
+  },
+  {
+   "index": 25,
+   "ref": "Az-Zalzalah 99:7",
+   "name_fr": "Az-Zalzala 99:7",
+   "lines": [
+    "فَمَنْ يَعْمَلْ مِثْقَالَ ذَرَّةٍ خَيْرًا يَرَهُ"
+   ],
+   "ref_ar": "الزلزلة: ٧",
+   "fr": "Quiconque fait un bien fût-ce du poids d'un atome, le verra",
+   "font": 3,
+   "code": "B",
+   "ref_code": "b"
+  },
+  {
+   "index": 26,
+   "ref": "Al-Asr 103:1",
+   "name_fr": "Al-'Asr 103:1",
+   "lines": [
+    "وَالْعَصْرِ"
+   ],
+   "ref_ar": "العصر: ١",
+   "fr": "Par le Temps",
+   "font": 3,
+   "code": "C",
+   "ref_code": "c"
+  },
+  {
+   "index": 27,
+   "ref": "Al-Asr 103:2",
+   "name_fr": "Al-'Asr 103:2",
+   "lines": [
+    "إِنَّ الْإِنْسَانَ لَفِي خُسْرٍ"
+   ],
+   "ref_ar": "العصر: ٢",
+   "fr": "L'homme est certes, en perdition",
+   "font": 3,
+   "code": "D",
+   "ref_code": "d"
+  },
+  {
+   "index": 28,
+   "ref": "Al-Kawthar 108:1",
+   "name_fr": "Al-Kawthar 108:1",
+   "lines": [
+    "إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ"
+   ],
+   "ref_ar": "الكوثر: ١",
+   "fr": "Nous t'avons certes, accordé l'Abondance",
+   "font": 3,
+   "code": "E",
+   "ref_code": "e"
+  },
+  {
+   "index": 29,
+   "ref": "Al-Kawthar 108:2",
+   "name_fr": "Al-Kawthar 108:2",
+   "lines": [
+    "فَصَلِّ لِرَبِّكَ وَانْحَرْ"
+   ],
+   "ref_ar": "الكوثر: ٢",
+   "fr": "Accomplis la Salât pour ton Seigneur et sacrifie",
+   "font": 3,
+   "code": "F",
+   "ref_code": "f"
+  },
+  {
+   "index": 30,
+   "ref": "An-Nasr 110:1",
+   "name_fr": "An-Nasr 110:1",
+   "lines": [
+    "إِذَا جَاءَ نَصْرُ اللَّهِ وَالْفَتْحُ"
+   ],
+   "ref_ar": "النصر: ١",
+   "fr": "Lorsque vient le secours d'Allah ainsi que la victoire",
+   "font": 3,
+   "code": "G",
+   "ref_code": "g"
+  },
+  {
+   "index": 31,
+   "ref": "Al-Ikhlas 112:1",
+   "name_fr": "Al-Ikhlâs 112:1",
+   "lines": [
+    "قُلْ هُوَ اللَّهُ أَحَدٌ"
+   ],
+   "ref_ar": "الإخلاص: ١",
+   "fr": "Dis: «Il est Allah, Unique",
+   "font": 3,
+   "code": "H",
+   "ref_code": "h"
+  },
+  {
+   "index": 32,
+   "ref": "Al-Ikhlas 112:2",
+   "name_fr": "Al-Ikhlâs 112:2",
+   "lines": [
+    "اللَّهُ الصَّمَدُ"
+   ],
+   "ref_ar": "الإخلاص: ٢",
+   "fr": "Allah, Le Seul à être imploré pour ce que nous désirons",
+   "font": 4,
+   "code": "A",
+   "ref_code": "a"
+  },
+  {
+   "index": 33,
+   "ref": "Al-Ikhlas 112:3",
+   "name_fr": "Al-Ikhlâs 112:3",
+   "lines": [
+    "لَمْ يَلِدْ وَلَمْ يُولَدْ"
+   ],
+   "ref_ar": "الإخلاص: ٣",
+   "fr": "Il n'a jamais engendré, n'a pas été engendré non plus",
+   "font": 4,
+   "code": "B",
+   "ref_code": "b"
+  },
+  {
+   "index": 34,
+   "ref": "Al-Ikhlas 112:4",
+   "name_fr": "Al-Ikhlâs 112:4",
+   "lines": [
+    "وَلَمْ يَكُنْ لَهُ كُفُوًا أَحَدٌ"
+   ],
+   "ref_ar": "الإخلاص: ٤",
+   "fr": "Et nul n'est égal à Lui»",
+   "font": 4,
+   "code": "C",
+   "ref_code": "c"
+  },
+  {
+   "index": 35,
+   "ref": "Al-Falaq 113:1",
+   "name_fr": "Al-Falaq 113:1",
+   "lines": [
+    "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ"
+   ],
+   "ref_ar": "الفلق: ١",
+   "fr": "Dis: «Je cherche protection auprès du Seigneur de l'aube naissante",
+   "font": 4,
+   "code": "D",
+   "ref_code": "d"
+  },
+  {
+   "index": 36,
+   "ref": "An-Nas 114:1",
+   "name_fr": "An-Nâs 114:1",
+   "lines": [
+    "قُلْ أَعُوذُ بِرَبِّ النَّاسِ"
+   ],
+   "ref_ar": "الناس: ١",
+   "fr": "Dis: «Je cherche protection auprès du Seigneur des hommes",
+   "font": 4,
+   "code": "E",
+   "ref_code": "e"
+  },
+  {
+   "index": 37,
+   "ref": "An-Nas 114:2",
+   "name_fr": "An-Nâs 114:2",
+   "lines": [
+    "مَلِكِ النَّاسِ"
+   ],
+   "ref_ar": "الناس: ٢",
+   "fr": "Le Souverain des hommes",
+   "font": 4,
+   "code": "F",
+   "ref_code": "f"
+  },
+  {
+   "index": 38,
+   "ref": "An-Nas 114:3",
+   "name_fr": "An-Nâs 114:3",
+   "lines": [
+    "إِلَٰهِ النَّاسِ"
+   ],
+   "ref_ar": "الناس: ٣",
+   "fr": "Dieu des hommes",
+   "font": 4,
+   "code": "G",
+   "ref_code": "g"
+  }
+ ]
+}

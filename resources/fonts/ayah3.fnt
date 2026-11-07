@@ -1,0 +1,38 @@
+info face="Amiri-Bold (pre-shaped Ayat 3)" size=26 bold=0 italic=0 charset="" unicode=1 stretchH=100 smooth=1 aa=1 padding=0,0,0,0 spacing=1,1 outline=0
+common lineHeight=26 base=26 scaleW=256 scaleH=128 pages=1 packed=0 alphaChnl=0 redChnl=4 greenChnl=4 blueChnl=4
+page id=0 file="ayah3.png"
+chars count=33
+char id=65    x=0    y=0    width=31   height=26   xoffset=0    yoffset=0    xadvance=31   page=0  chnl=15
+char id=66    x=32   y=0    width=31   height=26   xoffset=0    yoffset=0    xadvance=31   page=0  chnl=15
+char id=67    x=64   y=0    width=31   height=26   xoffset=0    yoffset=0    xadvance=31   page=0  chnl=15
+char id=68    x=96   y=0    width=31   height=26   xoffset=0    yoffset=0    xadvance=31   page=0  chnl=15
+char id=69    x=128  y=0    width=33   height=24   xoffset=0    yoffset=1    xadvance=33   page=0  chnl=15
+char id=70    x=162  y=0    width=33   height=24   xoffset=0    yoffset=1    xadvance=33   page=0  chnl=15
+char id=71    x=196  y=0    width=33   height=24   xoffset=0    yoffset=1    xadvance=33   page=0  chnl=15
+char id=72    x=0    y=27   width=33   height=24   xoffset=0    yoffset=1    xadvance=33   page=0  chnl=15
+char id=73    x=34   y=27   width=9    height=26   xoffset=0    yoffset=0    xadvance=9    page=0  chnl=15
+char id=74    x=44   y=27   width=10   height=26   xoffset=0    yoffset=0    xadvance=10   page=0  chnl=15
+char id=75    x=55   y=27   width=9    height=26   xoffset=0    yoffset=0    xadvance=9    page=0  chnl=15
+char id=76    x=65   y=27   width=10   height=26   xoffset=0    yoffset=0    xadvance=10   page=0  chnl=15
+char id=77    x=76   y=27   width=25   height=26   xoffset=0    yoffset=0    xadvance=25   page=0  chnl=15
+char id=78    x=102  y=27   width=26   height=26   xoffset=0    yoffset=0    xadvance=26   page=0  chnl=15
+char id=79    x=129  y=27   width=26   height=26   xoffset=0    yoffset=0    xadvance=26   page=0  chnl=15
+char id=80    x=156  y=27   width=26   height=26   xoffset=0    yoffset=0    xadvance=26   page=0  chnl=15
+char id=81    x=183  y=27   width=25   height=25   xoffset=0    yoffset=0    xadvance=25   page=0  chnl=15
+char id=82    x=209  y=27   width=25   height=25   xoffset=0    yoffset=0    xadvance=25   page=0  chnl=15
+char id=83    x=0    y=54   width=25   height=25   xoffset=0    yoffset=0    xadvance=25   page=0  chnl=15
+char id=84    x=26   y=54   width=25   height=25   xoffset=0    yoffset=0    xadvance=25   page=0  chnl=15
+char id=85    x=52   y=54   width=23   height=26   xoffset=0    yoffset=0    xadvance=23   page=0  chnl=15
+char id=86    x=76   y=54   width=23   height=26   xoffset=0    yoffset=0    xadvance=23   page=0  chnl=15
+char id=87    x=100  y=54   width=23   height=26   xoffset=0    yoffset=0    xadvance=23   page=0  chnl=15
+char id=88    x=124  y=54   width=24   height=26   xoffset=0    yoffset=0    xadvance=24   page=0  chnl=15
+char id=89    x=149  y=54   width=28   height=25   xoffset=0    yoffset=0    xadvance=28   page=0  chnl=15
+char id=90    x=178  y=54   width=28   height=25   xoffset=0    yoffset=0    xadvance=28   page=0  chnl=15
+char id=91    x=207  y=54   width=28   height=25   xoffset=0    yoffset=0    xadvance=28   page=0  chnl=15
+char id=92    x=0    y=81   width=29   height=25   xoffset=0    yoffset=0    xadvance=29   page=0  chnl=15
+char id=93    x=30   y=81   width=19   height=26   xoffset=0    yoffset=0    xadvance=19   page=0  chnl=15
+char id=94    x=50   y=81   width=19   height=26   xoffset=0    yoffset=0    xadvance=19   page=0  chnl=15
+char id=95    x=70   y=81   width=19   height=26   xoffset=0    yoffset=0    xadvance=19   page=0  chnl=15
+char id=96    x=90   y=81   width=19   height=26   xoffset=0    yoffset=0    xadvance=19   page=0  chnl=15
+char id=32    x=110  y=81   width=0    height=0    xoffset=0    yoffset=0    xadvance=4    page=0  chnl=15
+kernings count=0
