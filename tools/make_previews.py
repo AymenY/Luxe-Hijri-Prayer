@@ -189,9 +189,9 @@ def main():
         ["Mosquée (illustration)", "Motif géométrique", "Marbre noir", "Ciel nocturne"])], cols=2)
     gallery("gallery-customisation", [
         ("Classique · Royal Gold", {"preset": 1, "font_family": 1, "hand_style": 1}),
-        ("Sport · Stealth", {"preset": 5, "font_family": 2, "hand_style": 2, "seconds_color": 2}),
+        ("Sport · Oasis Gold", {"preset": 5, "font_family": 2, "hand_style": 2, "seconds_color": 2}),
         ("Emerald · or rose", {"preset": 2, "hand_color": 2, "text_color": 2}),
-        ("Burgundy · dauphine", {"preset": 3, "hand_style": 1, "background": 3}),
+        ("Ice Silver · dauphine", {"preset": 3, "hand_style": 1, "background": 3}),
         ("Ice Silver · glaive", {"preset": 4, "hand_style": 2, "background": 1}),
         ("Luxury Blue · marbre", {"preset": 0, "background": 2, "accent_color": 3})])
     big = face.Face(dict(face.DEFAULT_SETTINGS), "fre", 454).render(DEFAULT_NOW, 3600, face.DEFAULT_SENSORS, mip=False)[0]
