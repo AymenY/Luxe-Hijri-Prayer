@@ -138,6 +138,24 @@ def main():
     sheet("overview-ayat", ayat, cols=4)
     sheet("overview-states", states)
 
+    # digital e-paper face of the Connect IQ 3 watches (drawDigital)
+    digital = []
+    for f, title, size, s2, now in [
+            ("digital-240-light", "Connect IQ 3 watch, 240 px (fenix 6S, Forerunner 245): light", 240, {"digital_theme": 1}, None),
+            ("digital-240-dark", "Same, dark theme", 240, {"digital_theme": 2}, None),
+            ("digital-260-auto-night", "260 px (fenix 6, vivoactive 4), automatic theme at night", 260, {}, when(2026, 9, 16, 21, 40, 5)),
+            ("digital-280-light", "280 px (fenix 6X Pro, Enduro)", 280, {"digital_theme": 1}, None),
+            ("digital-280-friday", "Friday: Jumu'ah in the prayer row", 280, {"digital_theme": 1}, when(2026, 9, 18, 10, 25, 37)),
+            ("digital-390-dark", "390 px AMOLED (Venu), dark", 390, {"digital_theme": 2}, None)]:
+        s = dict(face.DEFAULT_SETTINGS)
+        s.update(s2)
+        t = now or DEFAULT_NOW
+        img = face.Face(s, "fre", size).render_digital(t, 3600, face.DEFAULT_SENSORS, mip=size < AMOLED_FROM)
+        face.circular(img).save(os.path.join(OUT, f + ".png"))
+        manifest.append({"file": "previews/%s.png" % f, "title": title, "size": size})
+        digital.append(f)
+    sheet("overview-digital", digital)
+
     custom = []
 
     def cu(f, title, **settings):

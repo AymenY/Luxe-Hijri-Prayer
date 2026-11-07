@@ -72,6 +72,14 @@
   "next_prayer": "Dhuhr"
  },
  {
+  "file": "previews/style-10-e-ink.png",
+  "title": "Style E-Ink, background Mosque, 280 px",
+  "size": 280,
+  "local_time": "2026-09-16T10:25:37+01:00",
+  "hijri": "1448-04-03",
+  "next_prayer": "Dhuhr"
+ },
+ {
   "file": "previews/background-mosque-luxury-blue.png",
   "title": "Background mosque, style Luxury Blue",
   "size": 280,
@@ -480,6 +488,36 @@
   "local_time": "2026-09-16T10:25:37+01:00",
   "hijri": "1448-04-03",
   "next_prayer": "Dhuhr"
+ },
+ {
+  "file": "previews/digital-240-light.png",
+  "title": "Connect IQ 3 watch, 240 px (fenix 6S, Forerunner 245): light",
+  "size": 240
+ },
+ {
+  "file": "previews/digital-240-dark.png",
+  "title": "Same, dark theme",
+  "size": 240
+ },
+ {
+  "file": "previews/digital-260-auto-night.png",
+  "title": "260 px (fenix 6, vivoactive 4), automatic theme at night",
+  "size": 260
+ },
+ {
+  "file": "previews/digital-280-light.png",
+  "title": "280 px (fenix 6X Pro, Enduro)",
+  "size": 280
+ },
+ {
+  "file": "previews/digital-280-friday.png",
+  "title": "Friday: Jumu'ah in the prayer row",
+  "size": 280
+ },
+ {
+  "file": "previews/digital-390-dark.png",
+  "title": "390 px AMOLED (Venu), dark",
+  "size": 390
  },
  {
   "file": "previews/custom-font-modern.png",

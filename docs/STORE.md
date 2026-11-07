@@ -8,7 +8,7 @@ renders and must be replaced by real simulator or device screenshots before subm
 * Supported devices: the 121 round colour watches listed in `manifest.xml`: HD dial on the 70
   Connect IQ 4+ models (fēnix 7 / 8 / 9 / E, epix 2, tactix, quatix, Enduro 3 / 4, Forerunner 165
   to 970, Venu 2 / 3 / 4, vívoactive 5 / 6, MARQ 2 / 3, Instinct AMOLED, D2, Descent, Approach),
-  vector dial on the 51 Connect IQ 3 models (fēnix 5 / 6, Forerunner 245 / 645 / 745 / 935 / 945,
+  digital e-paper face on the 51 Connect IQ 3 models (fēnix 5 / 6, Forerunner 245 / 645 / 745 / 935 / 945,
   MARQ Gen 1, Venu, vívoactive 3 / 4, Enduro, Descent Mk1 / Mk2, D2 Charlie / Delta / Air…)
 * Languages: English, French
 * Price: free (suggested)
@@ -40,9 +40,11 @@ round Garmin displays (MIP and AMOLED).
 * A complete Quranic verse in Arabic, changing every hour (39 short verses), a fixed verse or none
 * Four configurable complications: steps, heart rate, calories, battery, distance, floors,
   Body Battery, stress, active minutes, Moon, daylight
-* Nine styles (including Scarlet Noir: black, red and white, and two high-contrast styles readable
-  without the backlight, Ember Gold and Oasis Gold), four backgrounds (mosque illustration, Islamic geometry, black marble, night sky),
+* Ten styles (including Scarlet Noir: black, red and white, E-Ink: black ink on white paper, and two
+  high-contrast styles readable without the backlight, Ember Gold and Oasis Gold), four backgrounds (mosque illustration, Islamic geometry, black marble, night sky),
   three fonts, Arabic or Indian dial numerals, hand styles and colours
+* Older watches (Connect IQ 3: fēnix 5 / 6, Forerunner 245 / 945, Venu, vívoactive 3 / 4…): a
+  digital e-paper face, light, dark or automatic (dark at night)
 * Settings on the watch (watch face → Customise) and in Garmin Connect
 * Burn-in-safe always-on mode on AMOLED watches; seconds hand in low power on MIP watches
 
@@ -85,9 +87,11 @@ pour les écrans ronds Garmin (MIP et AMOLED).
   fixe ou aucun
 * Quatre complications configurables : pas, fréquence cardiaque, calories, batterie, distance,
   étages, Body Battery, stress, minutes intensives, lune, lumière du jour
-* Neuf styles (dont Scarlet Noir : noir, rouge et blanc, et deux styles à contraste élevé lisibles
-  sans rétroéclairage, Ember Gold et Oasis Gold), quatre arrière-plans (illustration de mosquée, géométrie islamique, marbre noir,
+* Dix styles (dont Scarlet Noir : noir, rouge et blanc, E-Ink : encre noire sur papier blanc, et
+  deux styles à contraste élevé lisibles sans rétroéclairage, Ember Gold et Oasis Gold), quatre arrière-plans (illustration de mosquée, géométrie islamique, marbre noir,
   ciel nocturne), trois polices, chiffres du cadran arabes ou indiens, styles et couleurs d'aiguilles
+* Montres plus anciennes (Connect IQ 3 : fēnix 5 / 6, Forerunner 245 / 945, Venu, vívoactive 3 / 4…) :
+  un cadran numérique façon papier électronique, clair, sombre ou automatique (sombre la nuit)
 * Réglages sur la montre (cadran → Personnaliser) et dans Garmin Connect
 * Mode toujours allumé protégé contre le marquage sur AMOLED ; trotteuse en basse consommation sur MIP
 

@@ -7,11 +7,15 @@ for **round colour Garmin watches** — 121 models, MIP and AMOLED, 218 to 466 p
   tactix 7 AMOLED / 8, quatix 7 / 8, Enduro 3 / 4, Forerunner 165 / 170 / 255 / 265 / 570 / 70 /
   955 / 965 / 970, Venu 2 / 3 / 4, vívoactive 5 / 6, MARQ 2 / 3, Instinct 3 AMOLED / Crossover
   AMOLED, D2 Mach 1 / 2, D2 Air X10, Descent G2 / Mk3, Approach S50 / S70 / S72.
-* **Vector dial** (Connect IQ 3, 51 models): fēnix 5 / 5 Plus / 6 / 6 Pro / Chronos, Forerunner
-  245 / 645 / 745 / 935 / 945, MARQ (Gen 1), Venu, vívoactive 3 / 4, Enduro, Descent Mk1 / Mk2,
-  D2 Charlie / Delta / Air, Approach S62, vívolife and the Legacy editions. Same functions, with
-  the vector backgrounds instead of the HD images (their 96–128 KB of app memory cannot hold them),
-  Arabic dial numerals only, and the seconds hand after a wrist raise.
+* **Digital e-paper face** (Connect IQ 3, 51 models): fēnix 5 / 5 Plus / 6 / 6 Pro / Chronos,
+  Forerunner 245 / 645 / 745 / 935 / 945, MARQ (Gen 1), Venu, vívoactive 3 / 4, Enduro, Descent
+  Mk1 / Mk2, D2 Charlie / Delta / Air, Approach S62, vívolife and the Legacy editions. Their 96–128 KB
+  of app memory cannot hold the HD images, so they show a digital face in the spirit of e-paper
+  smartwatches: black ink on white (or the reverse, automatically at night), crisp 1-bit IBM Plex
+  digits, a dithered band behind the time, the Hijri date, the next prayer (Jumu'ah on Fridays)
+  with its countdown, steps, heart rate, battery and the Moon phase.
+
+![Digital face of the Connect IQ 3 watches (reference renders)](docs/previews/overview-digital.png)
 
 ![Styles (reference renders)](docs/previews/overview-styles.png)
 

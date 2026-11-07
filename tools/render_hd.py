@@ -80,6 +80,12 @@ STYLES = [
          metal=("#ffaa00", "#ffaa00", "#ffaa00"), glow="#000000", tick="#ffffff",
          sky=("#000000", "#000000"), pattern="#000055", recess=("#000000", "#000000"), track="#005500",
          panel=("#000000", "#000000"), vein="#005500"),
+    # E-Ink: black ink on white paper, like an electronic-paper screen (flat palette colours, no
+    # shadow, glow or gradient; the night illustration is printed as an inverted ink drawing)
+    dict(name="e-ink", flat=True, light=True, base=("#ffffff", "#ffffff"), ring=("#ffffff", "#ffffff"),
+         metal=("#000000", "#000000", "#000000"), glow="#000000", tick="#000000",
+         sky=("#ffffff", "#ffffff"), pattern="#aaaaaa", recess=("#ffffff", "#ffffff"), track="#aaaaaa",
+         panel=("#ffffff", "#ffffff"), vein="#555555"),
 ]
 BACKGROUNDS = ["mosque", "geometric", "marble", "night"]
 
@@ -90,6 +96,7 @@ class Art:
     def __init__(self, size):
         self.size = size
         self.flat = False         # high-contrast styles: no glows (Art.add is ignored unless forced)
+        self.light = False        # light (paper) styles: no shadows (Art.shade is ignored)
         self.n = size * SS
         self.k = size / 280.0 * SS
         self.rgb = np.zeros((self.n, self.n, 3))
@@ -121,6 +128,11 @@ class Art:
         if self.flat and not force:
             return
         self.rgb = np.clip(self.rgb + np.clip(m * amount, 0, 1)[..., None] * color, 0, 1)
+
+    def shade(self, m, alpha):
+        """Drop / inner shadow in black (none on light paper styles)."""
+        if not self.light:
+            self.paint(np.zeros(3), m, alpha)
 
     def radial(self, cx, cy, r, c0, c1, power=1.0):
         d = np.clip(np.hypot(self.x - cx, self.y - cy) / r, 0, 1) ** power
@@ -239,7 +251,7 @@ def layer_pattern(art, st, bg):
         m = lattice_mask(art, 34, 11)
         # embossed: highlight up-left, shadow down-right
         art.paint(pat * 1.6, np.roll(m, (-SS, -SS), (0, 1)), 0.22)
-        art.paint(np.zeros(3), np.roll(m, (SS, SS), (0, 1)), 0.25)
+        art.shade(np.roll(m, (SS, SS), (0, 1)), 0.25)
         art.paint(pat, m, 0.55)
     elif bg == "geometric":
         m = lattice_mask(art, 28, 9, 0.8)
@@ -292,6 +304,9 @@ def stars(art, count, seed, st, big=6, region=None, size=0.35):
             if i < big:
                 glow[cy, cx] = 1.0
     core = art.blur(m, size) * (9 if size <= 0.35 else 9 * (size / 0.35) ** 2)
+    if art.light:      # paper styles: stars printed in ink
+        art.paint(np.zeros(3), np.clip(core, 0, 1), 1.0)
+        return m
     art.add(np.array([1.0, 0.98, 0.92]), core, 1.0, force=True)
     halo = art.blur(glow, 2.2) * 120
     art.add(hexc(st["glow"]) * 0.6, halo, 1.0)
@@ -423,7 +438,7 @@ def chapter_ring(art, st):
     art.paint(ring, band)
     # inner shadow under the bezel
     edge = art.mask(lambda d, u: circle(d, u, 140, 140, L["RING_R_IN"], outline=255, width=max(1, int(u(1.0)))))
-    art.paint(np.zeros(3), art.blur(edge, 2.5), 0.6)
+    art.shade(art.blur(edge, 2.5), 0.6)
     metal = art.metal(0, 280, st["metal"])
     for r, w in ((L["RING_R_IN"] + 0.2, 0.8), (139.2, 1.0)):
         m = art.mask(lambda d, u, r=r, w=w: circle(d, u, 140, 140, r, outline=255, width=max(1, int(u(w)))))
@@ -458,7 +473,7 @@ def indices(art, st):
         left.append(rot([(-wi, -ri), (0, -ri), (0, -ro - 0.5), (-wo, -ro)], a))
         right.append(rot([(0, -ri), (wi, -ri), (wo, -ro), (0, -ro - 0.5)], a))
     whole = art.mask(lambda d, u: [poly(d, u, p, fill=255) for p in left + right])
-    art.paint(np.zeros(3), art.blur(np.roll(whole, (SS, SS), (0, 1)), 1.0), 0.7)
+    art.shade(art.blur(np.roll(whole, (SS, SS), (0, 1)), 1.0), 0.7)
     art.paint(metal, art.mask(lambda d, u: [poly(d, u, p, fill=255) for p in left]))
     art.paint(metal * 0.55 + dark * 0.45, art.mask(lambda d, u: [poly(d, u, p, fill=255) for p in right]))
 
@@ -494,6 +509,7 @@ def numeral_sprites(size, style_index):
     st = STYLES[style_index]
     art = Art(size)
     dark = np.zeros(3) if st.get("flat") else hexc(st["metal"][2]) * 0.35
+    no_shadow = bool(st.get("light"))
     out = {}
     for indian in (0, 1):
         font = numeral_font(art, indian)
@@ -505,7 +521,7 @@ def numeral_sprites(size, style_index):
             sw = int(art.u(0.9)) if indian else 0
             m = art.mask(lambda d, u, t=txt, cx=cx, cy=cy: d.text((u(cx), u(cy)), t, font=font, fill=255, anchor="mm",
                                                                   stroke_width=sw, stroke_fill=255))
-            shadow = np.clip(np.roll(m, (SS, SS), (0, 1)) - m, 0, 1)
+            shadow = np.clip(np.roll(m, (SS, SS), (0, 1)) - m, 0, 1) * (0 if no_shadow else 1)
             body = art.metal(cy - 11, cy + 11, st["metal"])
             hi = np.clip(m - np.roll(m, SS, 0), 0, 1)
             body = np.clip(body + hi[..., None] * (0 if st.get("flat") else 0.35), 0, 1)
@@ -531,11 +547,11 @@ def gauge_recesses(art, st):
         outer = art.mask(lambda d, u, cx=cx, cy=cy: circle(d, u, cx, cy, r + 1.6, fill=255))
         disc = art.mask(lambda d, u, cx=cx, cy=cy: circle(d, u, cx, cy, r, fill=255))
         bezel = np.clip(outer - disc, 0, 1)
-        art.paint(np.zeros(3), np.clip(art.blur(outer, 2.5) - disc, 0, 1), 0.55)  # drop shadow outside
+        art.shade(np.clip(art.blur(outer, 2.5) - disc, 0, 1), 0.55)  # drop shadow outside
         art.paint(art.metal(cy - r - 2, cy + r + 2, st["metal"]), bezel)         # metal bezel ring
         art.paint(art.radial(cx, cy - 6, r * 1.3, rc0, rc1), disc, 0.72)          # smoked-glass recess
         top = np.clip(disc - np.roll(disc, SS * 3, 0), 0, 1)
-        art.paint(np.zeros(3), art.blur(top, 2.0) * disc, 0.5)                   # inner shadow
+        art.shade(art.blur(top, 2.0) * disc, 0.5)                   # inner shadow
         tr = art.mask(lambda d, u, cx=cx, cy=cy: circle(d, u, cx, cy, L["GAUGE_R"] + L["GAUGE_PEN"] / 2.0,
                                                          outline=255, width=max(1, int(u(L["GAUGE_PEN"])))))
         art.paint(track, tr, 0.9)
@@ -551,7 +567,7 @@ def glass_panel(art, st, pts, y0, y1, radius=None, rect=None):
         m = art.mask(lambda d, u: poly(d, u, pts, fill=255))
         line = art.mask(lambda d, u: d.line([(u(x), u(y)) for x, y in pts + pts[:1]], fill=255, width=max(1, int(u(1.0)))))
     p0, p1 = hexc(st["panel"][0]), hexc(st["panel"][1])
-    art.paint(np.zeros(3), art.blur(m, 2.5), 0.5)
+    art.shade(art.blur(m, 2.5), 0.5)
     art.paint(art.vertical(y0, y1, p0, p1), m, 0.93)
     sheen = np.clip(m - np.roll(m, SS * 2, 0), 0, 1)
     art.add(np.ones(3) * 0.18, art.blur(sheen, 0.6), 1.0)
@@ -566,7 +582,7 @@ def cartouches(art, st):
         glass_panel(art, st, None, y0, y0 + h, radius=7, rect=(x0, y0, x0 + w, y0 + h))
     # no Ayah cartouche: a soft, shapeless shadow keeps the verse readable over the pattern
     shade = art.mask(lambda d, u: d.ellipse([u(72), u(L["AYAH_Y"] - 16), u(208), u(L["BATT_Y"] + 9)], fill=255))
-    art.paint(np.zeros(3), art.blur(shade, 9), 0.55)
+    art.shade(art.blur(shade, 9), 0.55)
 
 
 def fixed_icons(art, st, hub_diamond=True):
@@ -625,6 +641,7 @@ GRADES = [
     (("#040000", "#3c060c", "#d9d9de"), "#ff4040"),                         # Scarlet Noir (red lights)
     (("#000000", "#2a0000", "#aa0000"), "#ffaa00"),                         # Ember Gold
     (("#000000", "#00002a", "#0055aa"), "#ffaa00"),                         # Oasis Gold
+    "ink",                                                                  # E-Ink: inverted ink drawing
 ]
 
 
@@ -635,6 +652,12 @@ def layer_illustration(art, style_index):
     crop = img.crop((int(left), int(top), int(left + 2 * ILLU_RADIUS), int(top + 2 * ILLU_RADIUS)))
     a = np.asarray(crop.resize((art.n, art.n), Image.LANCZOS), dtype=np.float64) / 255.0
     g = GRADES[style_index]
+    if g == "ink":
+        # the night scene as an ink drawing on paper: inverted luminance, light tones lifted
+        lum = 0.299 * a[..., 0] + 0.587 * a[..., 1] + 0.114 * a[..., 2]
+        v = np.clip(1.0 - lum * 1.6, 0, 1) ** 0.6
+        art.rgb = np.repeat(v[..., None], 3, axis=2)
+        return
     if g is not None:
         (deep, mid, light), warm = g
         deep, mid, light = hexc(deep), hexc(mid), hexc(light)
@@ -659,13 +682,17 @@ def legibility_shadows(art):
             (24, 88, 72, 120, 7, 0.5), (208, 88, 256, 120, 7, 0.5),   # sunrise / sunset
             (66, 204, 214, L["BATT_Y"] + 10, 8, 0.75)]:  # Ayah
         m = art.mask(lambda d, u, b=(x0, y0, x1, y1): d.ellipse([u(b[0]), u(b[1]), u(b[2]), u(b[3])], fill=255))
-        art.paint(np.zeros(3), art.blur(m, r), alpha)
+        if art.light:      # paper styles: lighten behind the texts instead
+            art.paint(np.ones(3), art.blur(m, r), alpha)
+        else:
+            art.shade(art.blur(m, r), alpha)
 
 
 def render(size, style_index, bg):
     st = STYLES[style_index]
     art = Art(size)
     art.flat = bool(st.get("flat"))
+    art.light = bool(st.get("light"))
     if bg == "mosque":
         layer_illustration(art, style_index)
         legibility_shadows(art)
@@ -674,7 +701,8 @@ def render(size, style_index, bg):
         layer_pattern(art, st, bg)
         # soft vignette towards the bezel
         vig = np.clip((np.hypot(art.x - 140, art.y - 140) - 70) / 60.0, 0, 1) ** 2
-        art.rgb *= (1 - 0.35 * vig)[..., None]
+        if not art.light:
+            art.rgb *= (1 - 0.35 * vig)[..., None]
         if bg != "marble":      # the marble is a plain stone slab: no window, no geometric shapes
             arch_window(art, st, bg)
     chapter_ring(art, st)

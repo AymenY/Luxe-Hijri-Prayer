@@ -36,6 +36,10 @@
     <bitmap id="Dial81" filename="dial_8_1.png" dithering="none" />
     <bitmap id="Dial82" filename="dial_8_2.png" dithering="none" />
     <bitmap id="Dial83" filename="dial_8_3.png" dithering="none" />
+    <bitmap id="Dial90" filename="dial_9_0.png" dithering="none" />
+    <bitmap id="Dial91" filename="dial_9_1.png" dithering="none" />
+    <bitmap id="Dial92" filename="dial_9_2.png" dithering="none" />
+    <bitmap id="Dial93" filename="dial_9_3.png" dithering="none" />
     <bitmap id="DialFri" filename="dial_fri.jpg" dithering="floyd_steinberg" />
     <!-- numerals 12 / 3 / 6 / 9: NumSDQ = style S, digits D (0 Arabic, 1 Indian), position Q -->
     <bitmap id="Num000" filename="num_0_0_0.png" dithering="floyd_steinberg" />
@@ -110,4 +114,12 @@
     <bitmap id="Num811" filename="num_8_1_1.png" dithering="none" />
     <bitmap id="Num812" filename="num_8_1_2.png" dithering="none" />
     <bitmap id="Num813" filename="num_8_1_3.png" dithering="none" />
+    <bitmap id="Num900" filename="num_9_0_0.png" dithering="none" />
+    <bitmap id="Num901" filename="num_9_0_1.png" dithering="none" />
+    <bitmap id="Num902" filename="num_9_0_2.png" dithering="none" />
+    <bitmap id="Num903" filename="num_9_0_3.png" dithering="none" />
+    <bitmap id="Num910" filename="num_9_1_0.png" dithering="none" />
+    <bitmap id="Num911" filename="num_9_1_1.png" dithering="none" />
+    <bitmap id="Num912" filename="num_9_1_2.png" dithering="none" />
+    <bitmap id="Num913" filename="num_9_1_3.png" dithering="none" />
 </drawables>

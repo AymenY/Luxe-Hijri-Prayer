@@ -4,6 +4,14 @@ Remaining release steps: `docs/RELEASE_CHECKLIST.md`.
 
 ## 1.0.0 — release candidate (2026-11-05)
 * New style **Scarlet Noir** (black, red and white).
+* New style **E-Ink**: black ink on white paper like an electronic-paper screen; flat palette
+  colours without shadow or glow, the mosque illustration printed as an inverted ink drawing,
+  daylight ring and Moon dial in greys, red seconds hand.
+* Connect IQ 3 watches (51 models, 96–128 KB of memory): a **digital e-paper face** replaces the
+  simplified vector dial — 1-bit IBM Plex fonts, dithered band behind the time, date and Hijri
+  date, next prayer (Jumu'ah on Fridays) and countdown pill, steps ring, heart rate, battery, Moon
+  phase; setting Digital face: automatic (dark between sunset and sunrise), light or dark; AMOLED
+  always-on: the time alone, shifted every minute. No analog fonts or vector art in memory there.
 * Digits everywhere in **IBM Plex Sans Condensed** (owner feedback: with Barlow, 6, 8 and 9 — and
   sometimes 5 and 6 — looked alike on the fenix 7X Pro): text fonts of the three families, the
   Western digits of the Hijri date and the 12 / 3 / 6 / 9 numerals; same digit height, layout unchanged.

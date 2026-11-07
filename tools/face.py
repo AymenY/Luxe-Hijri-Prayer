@@ -61,7 +61,7 @@ def _friday():
 FRIDAY, FRIDAY_HANDS = _friday()
 FRIDAY_NUMERALS = T["FRIDAY_NUMERALS"]
 FAMILIES = ["luxe", "classic", "sport"]
-PRESET_NAMES = ["Luxury Blue", "Royal Gold", "Emerald Night", "Burgundy Royale", "Ice Silver", "Stealth", "Scarlet Noir", "Ember Gold", "Oasis Gold"]
+PRESET_NAMES = ["Luxury Blue", "Royal Gold", "Emerald Night", "Burgundy Royale", "Ice Silver", "Stealth", "Scarlet Noir", "Ember Gold", "Oasis Gold", "E-Ink"]
 BACKGROUNDS = ["bg_mosque", "bg_geometric", "bg_marble", "bg_night"]
 RESOLUTIONS = [218, 240, 260, 280, 360, 390, 416, 454, 466]
 
@@ -315,6 +315,9 @@ class Face:
         self.friday = friday
         self.c = FRIDAY if friday else PRESETS[st["preset"]]
         self.multi = st.get("gauge_colors", 0) == 0 and (friday or MULTICOLOR[st["preset"]])
+        ink = not friday and st["preset"] == T["INK"]     # E-Ink: grey daylight ring and Moon
+        self.sun_cols = [0x555555, 0xAAAAAA, 0x000000, 0x000000] if ink else [SUN_DAY, SUN_TWILIGHT, SUN_NIGHT, SUN_NIGHT_TEXT]
+        self.moon_cols = [0xFFFFFF, 0x000000, 0x000000] if ink else [MOON_LIT, MOON_DARK, MOON_RING]
         self.text = TEXT_CHOICES[st["text_color"] - 1] if st.get("text_color") else self.c[T["TEXT"]]
         self.accent = COLOUR_CHOICES[st["accent_color"] - 1] if st.get("accent_color") else self.c[T["ACCENT"]]
         self.sec = COLOUR_CHOICES[st["seconds_color"] - 1] if st.get("seconds_color") else self.c[T["SECONDS"]]
@@ -615,10 +618,11 @@ class Face:
         isha = sset if isha is None else isha
         r = p(L.GAUGE_R)
         dc.setPenWidth(self.pen(L.GAUGE_PEN))
-        self.sun_arc(dc, x, y, r, isha, fajr + 1440, SUN_NIGHT)
-        self.sun_arc(dc, x, y, r, fajr, rise, SUN_TWILIGHT)
-        self.sun_arc(dc, x, y, r, rise, sset, SUN_DAY)
-        self.sun_arc(dc, x, y, r, sset, isha, SUN_TWILIGHT)
+        SD, ST, SN, SNT = self.sun_cols
+        self.sun_arc(dc, x, y, r, isha, fajr + 1440, SN)
+        self.sun_arc(dc, x, y, r, fajr, rise, ST)
+        self.sun_arc(dc, x, y, r, rise, sset, SD)
+        self.sun_arc(dc, x, y, r, sset, isha, ST)
         dc.setPenWidth(1)
         now_min = ((now + offset) % 86400) // 60
         a = (now_min - 720) * math.pi / 720.0
@@ -632,7 +636,7 @@ class Face:
             target = calc.moment(day + 1, comp(1)[calc.SUNRISE], tz)
         else:
             target = calc.moment(day, d0[calc.SUNRISE], tz)
-        col = SUN_DAY if is_day else SUN_NIGHT_TEXT
+        col = self.sun_cols[0] if is_day else self.sun_cols[3]
         ix, iy = x, y + p(L.GAUGE_ICON_DY)
         dc.setColor(col, -1)
         if is_day:
@@ -659,13 +663,13 @@ class Face:
         s = 1.0 if waxing else -1.0
         sweep = int(360.0 * age / calc.SYNODIC)
         if sweep >= 2:
-            dc.setColor(MOON_RING, -1)
+            dc.setColor(self.moon_cols[2], -1)
             dc.setPenWidth(self.pen(L.GAUGE_PEN))
             dc.drawArc(x, y, p(L.GAUGE_R), CLOCKWISE, 90, (90 - sweep) % 360)
             dc.setPenWidth(1)
         cy, mr = y + p(L.MOON_DY), p(L.MOON_R)
-        dc.setColor(MOON_DARK, -1); dc.fillCircle(x, cy, mr)
-        dc.setColor(MOON_LIT, -1)
+        dc.setColor(self.moon_cols[1], -1); dc.fillCircle(x, cy, mr)
+        dc.setColor(self.moon_cols[0], -1)
         e = 1.0 - 2.0 * k
         for dy in range(-mr, mr + 1):
             h = math.sqrt(mr * mr - dy * dy)
@@ -675,6 +679,143 @@ class Face:
                 dc.drawLine(x + x0, cy + dy, x + x1, cy + dy)
         dc.setColor(self.text, -1)
         dc.drawText(x, y + p(L.MOON_LABEL_DY), self.f_xs, "%d%%" % int(math.floor(k * 100 + 0.5)), CENTER | VCENTER)
+
+    # ---- digital e-paper face of Connect IQ 3 watches (mirror of drawDigital)
+    def digital_dark(self, now, watch_offset):
+        s = self.s
+        t = s.get("digital_theme", 0)
+        if t:
+            return t == 2
+        local = now + watch_offset
+        m = (local % 86400) // 60
+        if s["lat"] == 0 and s["lon"] == 0:
+            return m < 7 * 60 or m >= 19 * 60
+        offset = s["utc_offset"] if s.get("tz_manual") else watch_offset
+        day = calc.local_epoch_day(now, offset)
+        t = self.day_times(day, offset / 3600.0)
+        rise, sset = calc.to_minutes(t[calc.SUNRISE]), calc.to_minutes(t[calc.SUNSET])
+        if rise is None or sset is None:
+            return m < 7 * 60 or m >= 19 * 60
+        return m < rise or m >= sset
+
+    def render_digital(self, now, watch_offset, sensors, awake=True, mip=True):
+        size, p, s = self.size, self.p, self.s
+        f_t, f_m, f_s = font("dg_time", size), font("dg_m", size), font("dg_s", size)
+        dc = Dc(size, size)
+        dark = self.digital_dark(now, watch_offset)
+        paper, ink = (0x000000, 0xFFFFFF) if dark else (0xFFFFFF, 0x000000)
+        dc.setColor(paper, paper); dc.clear()
+        band_path = os.path.join(font_dir(size), "..", "drawables", "band_%s.png" % ("dark" if dark else "light"))
+        if os.path.exists(band_path):
+            b = Image.open(band_path).convert("RGBA")
+            big = b.resize((b.width * S, b.height * S), Image.NEAREST)
+            dc.img.paste(big, (0, p(L.DG_BAND_Y0) * S), big)
+        cx = size // 2
+        local = now + watch_offset
+        hour, minute, sec = (local % 86400) // 3600, (local % 3600) // 60, local % 60
+        is24 = s.get("is24", True)
+        hh = hour if is24 else (hour % 12 or 12)
+        time = ("%02d" % hh if is24 else str(hh)) + ":%02d" % minute
+        dc.setColor(ink, -1); dc.setPenWidth(1)
+        dc.drawCircle(cx, cx, p(L.DG_RIM_R))
+        for i in range(12):
+            x, y = self.polar(L.DG_DOT_R, i * math.pi / 6)
+            dc.fillCircle(x, y, self.pen(2.6) if i % 3 == 0 else self.pen(1.6))
+        ty, o = p(L.DG_TIME_Y), self.pen(L.DG_HALO)
+        dc.setColor(paper, -1)
+        for dx in (-o, 0, o):
+            for dy in (-o, 0, o):
+                if dx or dy:
+                    dc.drawText(cx + dx, ty + dy, f_t, time, CENTER | VCENTER)
+        dc.setColor(ink, -1)
+        dc.drawText(cx, ty, f_t, time, CENTER | VCENTER)
+        k, waxing, age = calc.moon_phase(now)
+        sg = 1.0 if waxing else -1.0
+        my, mr = p(L.DG_MOON_Y), p(L.DG_MOON_R)
+        e = 1.0 - 2.0 * k
+        for dy in range(-mr, mr + 1):
+            h = math.sqrt(mr * mr - dy * dy)
+            a0, a1 = sorted((sg * h, sg * e * h))
+            x0, x1 = int(math.floor(a0 + 0.5)), int(math.floor(a1 + 0.5))
+            if x1 > x0:
+                dc.drawLine(cx + x0, my + dy, cx + x1, my + dy)
+        dc.drawCircle(cx, my, mr)
+        day = local // 86400
+        y_, m_, d_ = calc.civil_from_days(day)
+        dc.drawText(cx, p(L.DG_DATE_Y), f_m, "%s %d %s" % (self.str["Day%d" % calc.day_of_week(day)], d_,
+                                                          self.str["Month%d" % m_]), CENTER | VCENTER)
+        hy, hm, hd = calc.hijri_for_epoch_day(day, s["hijri_corr"])
+        if s.get("hijri_arabic", True):
+            ar = (lambda n: str(n)) if s.get("hijri_digits", 0) == 1 else \
+                (lambda n: "".join(chr(ord(ch) - 48 + 97) for ch in str(n)))
+            dc.drawText(cx, p(L.DG_HIJRI_Y), self.f_ar, "M %s %s %s" % (ar(hy), chr(ord("A") + hm - 1), ar(hd)), CENTER | VCENTER)
+        else:
+            dc.drawText(cx, p(L.DG_HIJRI_Y), f_s, "%d %s %d %s" % (hd, self.str["Hijri%d" % hm], hy, self.str["HijriSuffix"]),
+                        CENTER | VCENTER)
+        if awake:
+            by = p(L.DG_SEC_Y)
+            dc.fillRectangle(p(L.DG_SEC_X0), by - self.pen(2), p(L.DG_SEC_W) * sec // 59, self.pen(4))
+            dc.fillRectangle(p(L.DG_SEC_X0 + L.DG_SEC_W), by - self.pen(2), 1, self.pen(4))
+        # next prayer
+        y = p(L.DG_PRAYER_Y)
+        if s["lat"] == 0 and s["lon"] == 0:
+            dc.drawText(cx, y, f_s, self.str["SetLocation"] + " " + self.str["SetLocation2"], CENTER | VCENTER)
+        else:
+            offset = s["utc_offset"] if s.get("tz_manual") else watch_offset
+            pday = calc.local_epoch_day(now, offset)
+            days = [self.day_times(pday + i, offset / 3600.0) for i in range(3)]
+            nxt = None
+            for dd in range(3):
+                for pr in calc.PRAYERS:
+                    mo = calc.moment(pday + dd, days[dd][pr], offset / 3600.0)
+                    if mo is not None and mo > now:
+                        nxt = (pr, mo, dd)
+                        break
+                if nxt:
+                    break
+            if nxt:
+                jum = nxt[0] == calc.DHUHR and self.is_jumuah(pday + nxt[2])
+                if s.get("prayer_names", 0) == 0:
+                    kk = 5 if jum else [0, -1, 1, 2, -1, 3, 4][nxt[0]]
+                    dc.drawText(cx + p(L.DG_NAME_DX), y, self.f_ar, chr(ord("N") + kk), CENTER | VCENTER)
+                else:
+                    dc.drawText(cx + p(L.DG_NAME_DX), y, f_s, self.str["Prayer7" if jum else PRAYER_NAMES[nxt[0]]], CENTER | VCENTER)
+                dc.drawText(cx + p(L.DG_PTIME_DX), y, f_m, format_time(calc.to_minutes(days[nxt[2]][nxt[0]]), is24),
+                            CENTER | VCENTER)
+                pw, ph = p(L.DG_PILL_W), p(L.DG_PILL_H)
+                dc.fillRoundedRectangle(cx + p(L.DG_PILL_DX) - pw // 2, y - ph // 2, pw, ph, self.pen(4))
+                dc.setColor(paper, -1)
+                dc.drawText(cx + p(L.DG_PILL_DX), y, f_m, calc.countdown_text(nxt[1] - now), CENTER | VCENTER)
+                dc.setColor(ink, -1)
+        # status row
+        y, ly = p(L.DG_STATUS_Y), p(L.DG_LABEL_Y)
+        sx, r = cx - p(L.DG_STATUS_DX), p(L.DG_RING_R)
+        st = sensors.get(0, {})
+        pr = min(1.0, st["value"] / float(st["goal"])) if st.get("goal") else 0.0
+        sweep = int(360.0 * pr)
+        dc.setPenWidth(self.pen(3))
+        if sweep >= 2:
+            dc.drawArc(sx, y, r, CLOCKWISE, 90, (90 - sweep) % 360)
+        dc.setPenWidth(self.pen(1))
+        for a in range(0, 360, 20):
+            if a > sweep:
+                s0 = 90 - a
+                dc.drawArc(sx, y, r, CLOCKWISE, (s0 + 360) % 360, (s0 - 6 + 360) % 360)
+        dc.setPenWidth(1)
+        dc.drawText(sx, y, f_s, str(int(pr * 100)), CENTER | VCENTER)
+        dc.drawText(sx, ly, f_s, str(st.get("value", "--")), CENTER | VCENTER)
+        hr = sensors.get(1, {}).get("value")
+        dc.drawText(cx, y, f_m, str(hr) if hr is not None else "--", CENTER | VCENTER)
+        dc.drawText(cx, ly, f_s, self.str["LabelHeart"], CENTER | VCENTER)
+        batt = sensors.get(3, {}).get("battery", 0.0)
+        bx, by, bw, bh = cx + p(L.DG_STATUS_DX) - p(14), y - p(6), p(28), p(12)
+        dc.fillRectangle(bx, by, bw, 1); dc.fillRectangle(bx, by + bh - 1, bw, 1)
+        dc.fillRectangle(bx, by, 1, bh); dc.fillRectangle(bx + bw - 1, by, 1, bh)
+        dc.fillRectangle(bx + bw, by + bh // 2 - p(2), self.pen(3), p(5))
+        dc.fillRectangle(bx + self.pen(2), by + self.pen(2), int((bw - 2 * self.pen(2)) * batt / 100.0), bh - 2 * self.pen(2))
+        dc.drawText(cx + p(L.DG_STATUS_DX), ly, f_s, "%d%%" % int(round(batt)), CENTER | VCENTER)
+        img = dc.bitmap()
+        return to_mip(img) if mip else img
 
     def battery_line(self, dc, sensors):
         """Mirror of drawBatteryLine."""

@@ -46,7 +46,11 @@ def settings():
           ("Burgundy Royale", "Burgundy Royale (bordeaux)"), ("Ice Silver", "Ice Silver (argent)"), ("Stealth", "Stealth (graphite)"),
           ("Scarlet Noir (black, red, white)", "Scarlet Noir (noir, rouge, blanc)"),
           ("Ember Gold (high contrast)", "Ember Gold (contraste élevé)"),
-          ("Oasis Gold (high contrast)", "Oasis Gold (contraste élevé)")]),
+          ("Oasis Gold (high contrast)", "Oasis Gold (contraste élevé)"),
+          ("E-Ink (black on white)", "E-Ink (noir sur blanc)")]),
+        ("DigitalTheme", "number", 0, (A + "Digital face (Connect IQ 3 watches)", AF + "écran numérique (montres Connect IQ 3)"),
+         [("Automatic (dark at night)", "Automatique (sombre la nuit)"), ("Light (black on white)", "Clair (noir sur blanc)"),
+          ("Dark (white on black)", "Sombre (blanc sur noir)")]),
         ("Background", "number", 0, (A + "Background", AF + "arrière-plan"),
          [("Mosque at night (illustration)", "Mosquée de nuit (illustration)"), ("Islamic geometric pattern", "Motif géométrique islamique"),
           ("Black marble, gold veining", "Marbre noir veiné d'or"), ("Night sky and crescent", "Ciel nocturne et croissant")]),
@@ -124,6 +128,7 @@ def settings():
 MENU = [
     ("Appearance", ("Appearance", "Apparence"), [
         ("StylePreset", ("Style", "Style")), ("Background", ("Background", "Arrière-plan")),
+        ("DigitalTheme", ("Digital face (older watches)", "Écran numérique (anciennes montres)")),
         ("DialDigits", ("Dial numerals", "Chiffres du cadran")), ("FontFamily", ("Font", "Police")),
         ("TextColor", ("Text colour", "Couleur du texte")), ("AccentColor", ("Accent colour", "Couleur d'accent")),
         ("HandStyle", ("Hands", "Aiguilles")), ("HandColor", ("Hands colour", "Couleur des aiguilles")),

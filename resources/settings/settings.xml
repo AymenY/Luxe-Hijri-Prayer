@@ -11,6 +11,14 @@
             <listEntry value="6">@Strings.S_StylePreset_6</listEntry>
             <listEntry value="7">@Strings.S_StylePreset_7</listEntry>
             <listEntry value="8">@Strings.S_StylePreset_8</listEntry>
+            <listEntry value="9">@Strings.S_StylePreset_9</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.DigitalTheme" title="@Strings.S_DigitalTheme">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.S_DigitalTheme_0</listEntry>
+            <listEntry value="1">@Strings.S_DigitalTheme_1</listEntry>
+            <listEntry value="2">@Strings.S_DigitalTheme_2</listEntry>
         </settingConfig>
     </setting>
     <setting propertyKey="@Properties.Background" title="@Strings.S_Background">

@@ -10,6 +10,7 @@ class LuxeSettings {
     // Appearance
     var preset as Number = 0;
     var background as Number = 0;
+    var digitalTheme as Number = 0;       // digital face (Connect IQ 3 watches): 0 auto, 1 light, 2 dark
     var dialDigits as Number = 0;         // 0 Arabic (12 3 6 9), 1 Indian (Eastern Arabic)
     var fontFamily as Number = 0;         // 0 Modern, 1 Classic, 2 Sport
     var textColor as Number = 0;          // 0 = preset, else Themes.TEXT_CHOICES[i - 1]
@@ -50,6 +51,7 @@ class LuxeSettings {
     function load() as Void {
         preset = readList("StylePreset", Themes.COUNT - 1, 0);
         background = readList("Background", 3, 0);
+        digitalTheme = readList("DigitalTheme", 2, 0);
         dialDigits = readList("DialDigits", 1, 0);
         fontFamily = readList("FontFamily", 2, 0);
         textColor = readList("TextColor", Themes.TEXT_CHOICES.size(), 0);

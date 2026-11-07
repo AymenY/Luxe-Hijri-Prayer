@@ -10,6 +10,11 @@
     <string id="S_StylePreset_6">Scarlet Noir (noir, rouge, blanc)</string>
     <string id="S_StylePreset_7">Ember Gold (contraste élevé)</string>
     <string id="S_StylePreset_8">Oasis Gold (contraste élevé)</string>
+    <string id="S_StylePreset_9">E-Ink (noir sur blanc)</string>
+    <string id="S_DigitalTheme">Écran numérique (anciennes montres)</string>
+    <string id="S_DigitalTheme_0">Automatique (sombre la nuit)</string>
+    <string id="S_DigitalTheme_1">Clair (noir sur blanc)</string>
+    <string id="S_DigitalTheme_2">Sombre (blanc sur noir)</string>
     <string id="S_Background">Arrière-plan</string>
     <string id="S_Background_0">Mosquée de nuit (illustration)</string>
     <string id="S_Background_1">Motif géométrique islamique</string>

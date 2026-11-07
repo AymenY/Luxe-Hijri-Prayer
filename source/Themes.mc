@@ -22,7 +22,7 @@ module Themes {
     const WARN = 14;     // low battery
     const TICK = 15;     // minute track
 
-    const COUNT = 9;
+    const COUNT = 10;
 
     // Order must match the "StylePreset" list in resources/settings/settings.xml.
     const PRESETS = [
@@ -52,12 +52,15 @@ module Themes {
          0xFFFFFF, 0xFFAA55, 0x550000, 0xFF0000, 0x000000, 0xFFFFFF, 0xFF0000, 0xFFFFFF],
         // I  Oasis Gold: high contrast, black, white, blue, green and gold (readable without backlight)
         [0x000000, 0x000000, 0x000055, 0x005500, 0xFFAA00, 0xAA5500, 0x00FF55, 0x00AAFF,
-         0xFFFFFF, 0x55AAFF, 0x005500, 0x00AAFF, 0x000000, 0xFFFFFF, 0xFF5500, 0xFFFFFF]
+         0xFFFFFF, 0x55AAFF, 0x005500, 0x00AAFF, 0x000000, 0xFFFFFF, 0xFF5500, 0xFFFFFF],
+        // J  E-Ink: black ink on white paper, red seconds hand (like an electronic-paper screen)
+        [0xFFFFFF, 0xFFFFFF, 0xAAAAAA, 0xAAAAAA, 0x000000, 0x555555, 0x000000, 0x000000,
+         0x000000, 0x555555, 0xAAAAAA, 0xFF0000, 0x000000, 0x000000, 0xFF0000, 0x000000]
     ];
 
     // Presets whose gauges use one colour per data type (as in the approved concept)
     // instead of the preset accent.
-    const MULTICOLOR = [true, false, false, false, true, false, false, false, false];
+    const MULTICOLOR = [true, false, false, false, true, false, false, false, false, false];
 
     // Friday dial (from 00:00 until Asr, setting FridayDesign), whatever the style: Sidi Bou Said
     // blue wrought iron, gold hour ring, white text, jasmine (STAR) and geranium (SIL) on the
@@ -76,6 +79,12 @@ module Themes {
     const SUN_TWILIGHT = 0x8A5BC8;
     const SUN_NIGHT = 0x3355AA;
     const SUN_NIGHT_TEXT = 0x9FB8FF;
+
+    // E-Ink style: daylight ring and Moon dial in greys (day, twilight, night, night text;
+    // lit, dark, ring)
+    const INK = 9;
+    const SUN_INK = [0x555555, 0xAAAAAA, 0x000000, 0x000000];
+    const MOON_INK = [0xFFFFFF, 0x000000, 0x000000];
 
     // Moon dial: lit surface, dark surface (earthshine), lunation ring
     const MOON_LIT = 0xFFF2C0;

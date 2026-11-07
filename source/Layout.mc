@@ -88,4 +88,29 @@ module Layout {
     const CAP_R = 7;
     const CAP_INNER_R = 4;
     const HUB_DIAMOND_Y = 152;   // small gold diamond under the pivot
+
+    // Digital e-paper face of the Connect IQ 3 watches ((:lite) build, LuxeHijriPrayerView.drawDigital)
+    const DG_MOON_Y = 26;        // Moon phase icon, radius DG_MOON_R
+    const DG_MOON_R = 8;
+    const DG_DATE_Y = 50;        // day, date, month
+    const DG_HIJRI_Y = 74;       // Hijri date (one line)
+    const DG_BAND_Y0 = 94;       // dithered band behind the time
+    const DG_BAND_Y1 = 162;
+    const DG_TIME_Y = 128;
+    const DG_HALO = 3;           // paper outline around the time digits
+    const DG_SEC_Y = 170;        // seconds bar
+    const DG_SEC_X0 = 60;
+    const DG_SEC_W = 160;
+    const DG_PRAYER_Y = 192;     // next prayer: name, time, countdown pill
+    const DG_NAME_DX = -42;
+    const DG_PTIME_DX = 10;
+    const DG_PILL_DX = 70;
+    const DG_PILL_W = 52;
+    const DG_PILL_H = 20;
+    const DG_STATUS_Y = 222;     // steps ring, heart rate, battery
+    const DG_STATUS_DX = 48;
+    const DG_RING_R = 13;
+    const DG_LABEL_Y = 242;
+    const DG_RIM_R = 137;        // outer ring and hour dots
+    const DG_DOT_R = 131;
 }

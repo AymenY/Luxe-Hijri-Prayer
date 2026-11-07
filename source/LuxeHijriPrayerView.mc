@@ -37,7 +37,9 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     hidden var mBgOps as Array? = null;
     hidden var mFrameOps as Array? = null;
     hidden var mDial = null;        // HD static layer (BitmapResource) or null
-    hidden var mFriday as Boolean = false;   // Friday dial and greeting shown (00:00 until Asr)
+    hidden var mFriday as Boolean = false;
+    hidden var mSunCols as Array<Number> = [Themes.SUN_DAY, Themes.SUN_TWILIGHT, Themes.SUN_NIGHT, Themes.SUN_NIGHT_TEXT];
+    hidden var mMoonCols as Array<Number> = [Themes.MOON_LIT, Themes.MOON_DARK, Themes.MOON_RING];   // Friday dial and greeting shown (00:00 until Asr)
     hidden var mNums = null;
     hidden var mMoon as Array? = null;   // MoonPhase.at() result, recomputed every 10 minutes
     hidden var mMoonSlot as Number = -1;        // the four numeral bitmaps (12, 3, 6, 9) of the HD dial, or null
@@ -53,6 +55,12 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     hidden var mAyahGroup as Number = -1;
     hidden var mFontAr;             // small Arabic pieces: digits, Hijri months, AH
     hidden var mFontFamily as Number = -1;
+    // digital e-paper face (Connect IQ 3 watches): 1-bit fonts and the dithered band
+    hidden var mDgTime;
+    hidden var mDgM;
+    hidden var mDgS;
+    hidden var mBand = null;
+    hidden var mBandDark as Boolean = false;
 
     // effective colours after the user's overrides
     hidden var mText as Number = 0xFFFFFF;
@@ -99,8 +107,14 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     function onLayout(dc as Graphics.Dc) as Void {
         mSize = dc.getWidth();
         mK = mSize / 280.0;
-        mFontNum = WatchUi.loadResource(Rez.Fonts.LuxeNum);
         mFontAr = WatchUi.loadResource(Rez.Fonts.ArSmall);
+        if (isDigital()) {
+            mDgTime = WatchUi.loadResource(Rez.Fonts.DigiTime);
+            mDgM = WatchUi.loadResource(Rez.Fonts.DigiM);
+            mDgS = WatchUi.loadResource(Rez.Fonts.DigiS);
+            return;
+        }
+        mFontNum = WatchUi.loadResource(Rez.Fonts.LuxeNum);
         loadFonts();
         // Connect IQ 3: no off-screen buffers, their memory would count against the app (96 KB on
         // some watches); the dial is drawn directly and the seconds hand shows after a wrist raise.
@@ -121,6 +135,10 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         var friday = mFriday && st.fridayDesign;
         mColors = (friday ? Themes.FRIDAY : Themes.PRESETS[st.preset]) as Array<Number>;
         mMulticolor = (st.gaugeColors == 0) && (friday || (Themes.MULTICOLOR[st.preset] as Boolean));
+        // E-Ink style: daylight ring and Moon dial in greys
+        var ink = !friday && st.preset == Themes.INK;
+        mSunCols = (ink ? Themes.SUN_INK : [Themes.SUN_DAY, Themes.SUN_TWILIGHT, Themes.SUN_NIGHT, Themes.SUN_NIGHT_TEXT]) as Array<Number>;
+        mMoonCols = (ink ? Themes.MOON_INK : [Themes.MOON_LIT, Themes.MOON_DARK, Themes.MOON_RING]) as Array<Number>;
         mText = mColors[Themes.TEXT];
         if (st.textColor > 0) {
             mText = Themes.TEXT_CHOICES[st.textColor - 1] as Number;
@@ -144,13 +162,20 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
             mHandLight = hc[0];
             mHandDark = hc[1];
         }
-        loadFonts();
         mDial = null;
         mNums = null;
-        mDial = friday ? loadFridayDial() : loadDial(st.preset, st.background);
-        mNums = loadNumerals(friday ? Themes.FRIDAY_NUMERALS : st.preset, st.dialDigits);
         mBgOps = null;
-        if (mDial == null) {
+        mFrameOps = null;
+        if (isDigital()) {
+            // Connect IQ 3 watches: digital face only, none of the analog fonts or art in memory
+        } else {
+            loadFonts();
+            mDial = friday ? loadFridayDial() : loadDial(st.preset, st.background);
+            mNums = loadNumerals(friday ? Themes.FRIDAY_NUMERALS : st.preset, st.dialDigits);
+        }
+        if (isDigital()) {
+            // nothing more to load
+        } else if (mDial == null) {
             mBgOps = Backgrounds.load(friday ? Backgrounds.FRIDAY : st.background);
             mFrameOps = Backgrounds.loadFrame();
         } else {
@@ -209,7 +234,8 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
                    Rez.Drawables.Dial50, Rez.Drawables.Dial51, Rez.Drawables.Dial52, Rez.Drawables.Dial53,
                    Rez.Drawables.Dial60, Rez.Drawables.Dial61, Rez.Drawables.Dial62, Rez.Drawables.Dial63,
                    Rez.Drawables.Dial70, Rez.Drawables.Dial71, Rez.Drawables.Dial72, Rez.Drawables.Dial73,
-                   Rez.Drawables.Dial80, Rez.Drawables.Dial81, Rez.Drawables.Dial82, Rez.Drawables.Dial83];
+                   Rez.Drawables.Dial80, Rez.Drawables.Dial81, Rez.Drawables.Dial82, Rez.Drawables.Dial83,
+                   Rez.Drawables.Dial90, Rez.Drawables.Dial91, Rez.Drawables.Dial92, Rez.Drawables.Dial93];
         try {
             return WatchUi.loadResource(ids[st * 4 + bg]);
         } catch (e) {
@@ -247,7 +273,9 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
                    Rez.Drawables.Num700, Rez.Drawables.Num701, Rez.Drawables.Num702, Rez.Drawables.Num703,
                    Rez.Drawables.Num710, Rez.Drawables.Num711, Rez.Drawables.Num712, Rez.Drawables.Num713,
                    Rez.Drawables.Num800, Rez.Drawables.Num801, Rez.Drawables.Num802, Rez.Drawables.Num803,
-                   Rez.Drawables.Num810, Rez.Drawables.Num811, Rez.Drawables.Num812, Rez.Drawables.Num813];
+                   Rez.Drawables.Num810, Rez.Drawables.Num811, Rez.Drawables.Num812, Rez.Drawables.Num813,
+                   Rez.Drawables.Num900, Rez.Drawables.Num901, Rez.Drawables.Num902, Rez.Drawables.Num903,
+                   Rez.Drawables.Num910, Rez.Drawables.Num911, Rez.Drawables.Num912, Rez.Drawables.Num913];
         try {
             var out = [];
             for (var q = 0; q < 4; q++) {
@@ -395,6 +423,10 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
             // switch between the Friday dial and the chosen style (loads the other dial image)
             mFriday = friday;
             applySettings();
+        }
+        if (isDigital()) {
+            drawDigital(dc, now, clock);
+            return;
         }
         if (mSleeping && mBurnIn) {
             drawAlwaysOn(dc, clock);
@@ -736,10 +768,10 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         var isha = (ishaM == null) ? sunset : ishaM as Number;
         var r = p(Layout.GAUGE_R);
         dc.setPenWidth(pen(Layout.GAUGE_PEN));
-        sunArc(dc, x, y, r, isha, fajr + 1440, Themes.SUN_NIGHT);
-        sunArc(dc, x, y, r, fajr, rise, Themes.SUN_TWILIGHT);
-        sunArc(dc, x, y, r, rise, sunset, Themes.SUN_DAY);
-        sunArc(dc, x, y, r, sunset, isha, Themes.SUN_TWILIGHT);
+        sunArc(dc, x, y, r, isha, fajr + 1440, mSunCols[2]);
+        sunArc(dc, x, y, r, fajr, rise, mSunCols[1]);
+        sunArc(dc, x, y, r, rise, sunset, mSunCols[0]);
+        sunArc(dc, x, y, r, sunset, isha, mSunCols[1]);
         dc.setPenWidth(1);
 
         var offset = mSettings.tzManual ? mSettings.utcOffsetSeconds : clock.timeZoneOffset;
@@ -755,7 +787,7 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         var day = (nowMin >= rise && nowMin < sunset);
         var target = day ? sch.momentOf(0, PrayerTimes.SUNSET)
                          : sch.momentOf(nowMin >= sunset ? 1 : 0, PrayerTimes.SUNRISE);
-        var col = day ? Themes.SUN_DAY : Themes.SUN_NIGHT_TEXT;
+        var col = day ? mSunCols[0] : mSunCols[3];
         var ix = x;
         var iy = y + p(Layout.GAUGE_ICON_DY);
         dc.setColor(col, Graphics.COLOR_TRANSPARENT);
@@ -816,16 +848,25 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
             if (end < 0) {
                 end += 360;
             }
-            dc.setColor(Themes.MOON_RING, Graphics.COLOR_TRANSPARENT);
+            dc.setColor(mMoonCols[2], Graphics.COLOR_TRANSPARENT);
             dc.setPenWidth(pen(Layout.GAUGE_PEN));
             dc.drawArc(x, y, p(Layout.GAUGE_R), Graphics.ARC_CLOCKWISE, 90, end);
             dc.setPenWidth(1);
         }
         var cy = y + p(Layout.MOON_DY);
         var mr = p(Layout.MOON_R);
-        dc.setColor(Themes.MOON_DARK, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(mMoonCols[1], Graphics.COLOR_TRANSPARENT);
         dc.fillCircle(x, cy, mr);
-        dc.setColor(Themes.MOON_LIT, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(mMoonCols[0], Graphics.COLOR_TRANSPARENT);
+        moonLit(dc, x, cy, mr, k, s);
+        dc.setColor(mText, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(x, y + p(Layout.MOON_LABEL_DY), mFontXS, Math.round(k * 100.0).toNumber().toString() + "%",
+                    Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+    }
+
+    // Lit part of the Moon disc (centre x, cy; radius mr), drawn row by row in the current colour.
+    // k: illuminated fraction; s: +1 waxing (lit on the right), -1 waning.
+    hidden function moonLit(dc as Graphics.Dc, x as Number, cy as Number, mr as Number, k as Double, s as Float) as Void {
         var e = 1.0 - 2.0 * k;            // terminator: +1 new moon, -1 full moon
         for (var dy = -mr; dy <= mr; dy++) {
             var h = Math.sqrt(mr * mr - dy * dy);
@@ -839,9 +880,6 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
                 dc.drawLine(x + x0, cy + dy, x + x1, cy + dy);
             }
         }
-        dc.setColor(mText, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(x, y + p(Layout.MOON_LABEL_DY), mFontXS, Math.round(k * 100.0).toNumber().toString() + "%",
-                    Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 
     // Battery line under the verse (only when no gauge shows the battery): text colour, fill
@@ -1220,6 +1258,216 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     // ------------------------------------------------------------------ AMOLED always-on
     // Burn-in safe frame: black screen, thin hour/minute hands, four dots; everything shifts by
     // up to 2 px each minute so that no pixel stays lit.
+    // ------------------------------------------------------------------ digital e-paper face
+    // Connect IQ 3 watches ((:lite) build) show a digital face in the spirit of e-paper
+    // smartwatches: black ink on white paper (or the reverse), 1-bit fonts, a dithered band behind
+    // the time. Layout constants DG_* in Layout.mc; mirrored by tools/face.py (render_digital).
+    (:hd)
+    hidden function isDigital() as Boolean {
+        return false;
+    }
+
+    (:lite)
+    hidden function isDigital() as Boolean {
+        return true;
+    }
+
+    // Dark theme: setting DigitalTheme (0 automatic = dark between sunset and sunrise, 1 light, 2 dark).
+    hidden function digitalDark(clock as System.ClockTime) as Boolean {
+        var t = mSettings.digitalTheme;
+        if (t != 0) {
+            return t == 2;
+        }
+        var m = clock.hour * 60 + clock.min;
+        var rise = mSchedule.minutes(0, PrayerTimes.SUNRISE);
+        var set = mSchedule.minutes(0, PrayerTimes.SUNSET);
+        if (!mSettings.locationSet || rise == null || set == null) {
+            return m < 7 * 60 || m >= 19 * 60;
+        }
+        return m < (rise as Number) || m >= (set as Number);
+    }
+
+    hidden function digitalBand(dark as Boolean) {
+        if (mBand == null || mBandDark != dark) {
+            mBand = null;
+            try {
+                mBand = WatchUi.loadResource(dark ? Rez.Drawables.BandDark : Rez.Drawables.BandLight);
+            } catch (e) {
+                mBand = null;
+            }
+            mBandDark = dark;
+        }
+        return mBand;
+    }
+
+    hidden function drawDigital(dc as Graphics.Dc, now as Number, clock as System.ClockTime) as Void {
+        var vc = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
+        var cx = mSize / 2;
+        if (mSettings.locationSet) {
+            mSchedule.update(now, mSettings.tzManual ? mSettings.utcOffsetSeconds : clock.timeZoneOffset);
+        }
+        var is24 = System.getDeviceSettings().is24Hour;
+        var hh = clock.hour;
+        if (!is24) {
+            hh = hh % 12;
+            if (hh == 0) {
+                hh = 12;
+            }
+        }
+        var time = (is24 ? hh.format("%02d") : hh.toString()) + ":" + clock.min.format("%02d");
+        if (mSleeping && mBurnIn) {
+            // AMOLED always-on: the time alone, small, shifted every minute
+            dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
+            dc.clear();
+            dc.setColor(0xAAAAAA, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(cx + (clock.min % 5) - 2, p(Layout.DG_TIME_Y) + (clock.min % 3) - 1, mDgM, time, vc);
+            return;
+        }
+        var dark = digitalDark(clock);
+        var paper = dark ? Graphics.COLOR_BLACK : Graphics.COLOR_WHITE;
+        var ink = dark ? Graphics.COLOR_WHITE : Graphics.COLOR_BLACK;
+        dc.setColor(paper, paper);
+        dc.clear();
+        var band = digitalBand(dark);
+        if (band != null) {
+            dc.drawBitmap(0, p(Layout.DG_BAND_Y0), band);
+        }
+        // rim and hour dots
+        dc.setColor(ink, Graphics.COLOR_TRANSPARENT);
+        dc.setPenWidth(1);
+        dc.drawCircle(cx, cx, p(Layout.DG_RIM_R));
+        for (var i = 0; i < 12; i++) {
+            var pt = polar(Layout.DG_DOT_R, i * Math.PI / 6.0);
+            dc.fillCircle(pt[0], pt[1], (i % 3 == 0) ? pen(2.6) : pen(1.6));
+        }
+        // time, with a paper outline over the dithered band
+        var ty = p(Layout.DG_TIME_Y);
+        var o = pen(Layout.DG_HALO);
+        dc.setColor(paper, Graphics.COLOR_TRANSPARENT);
+        for (var dx = -o; dx <= o; dx += o) {
+            for (var dy = -o; dy <= o; dy += o) {
+                if (dx != 0 || dy != 0) {
+                    dc.drawText(cx + dx, ty + dy, mDgTime, time, vc);
+                }
+            }
+        }
+        dc.setColor(ink, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(cx, ty, mDgTime, time, vc);
+        // Moon phase above the date (outline, lit part in ink)
+        if (now / 600 != mMoonSlot || mMoon == null) {
+            mMoon = MoonPhase.at(now);
+            mMoonSlot = now / 600;
+        }
+        var mp = mMoon as Array;
+        var my = p(Layout.DG_MOON_Y);
+        var mr = p(Layout.DG_MOON_R);
+        moonLit(dc, cx, my, mr, mp[0] as Double, (mp[1] as Boolean) ? 1.0 : -1.0);
+        dc.drawCircle(cx, my, mr);
+        // date and Hijri date
+        var day = CivilDate.localEpochDay(now, clock.timeZoneOffset);
+        var ymd = CivilDate.fromDays(day);
+        dc.drawText(cx, p(Layout.DG_DATE_Y), mDgM,
+                    mDays[CivilDate.dayOfWeek(day)] + " " + ymd[2].toString() + " " + mMonths[ymd[1] - 1], vc);
+        var h = HijriCalendar.forEpochDay(day, mSettings.hijriCorrection);
+        if (mSettings.hijriArabic) {
+            var month = (('A' as Char).toNumber() + h[1] - 1).toChar().toString();
+            dc.drawText(cx, p(Layout.DG_HIJRI_Y), mFontAr, "M " + arDigits(h[0]) + " " + month + " " + arDigits(h[2]), vc);
+        } else {
+            dc.drawText(cx, p(Layout.DG_HIJRI_Y), mDgS,
+                        h[2].toString() + " " + mHijriMonths[h[1] - 1] + " " + h[0].toString() + " " + mHijriSuffix, vc);
+        }
+        // seconds bar (awake only: in low power the screen is redrawn once a minute)
+        if (!mSleeping) {
+            var by = p(Layout.DG_SEC_Y);
+            dc.fillRectangle(p(Layout.DG_SEC_X0), by - pen(2), p(Layout.DG_SEC_W) * clock.sec / 59, pen(4));
+            dc.fillRectangle(p(Layout.DG_SEC_X0 + Layout.DG_SEC_W), by - pen(2), 1, pen(4));
+        }
+        drawDigitalPrayer(dc, now, is24, ink, paper);
+        drawDigitalStatus(dc, ink);
+    }
+
+    hidden function drawDigitalPrayer(dc as Graphics.Dc, now as Number, is24 as Boolean, ink as Number,
+                                      paper as Number) as Void {
+        var vc = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
+        var cx = mSize / 2;
+        var y = p(Layout.DG_PRAYER_Y);
+        if (!mSettings.locationSet) {
+            dc.drawText(cx, y, mDgS, mSetLocation + " " + mSetLocation2, vc);
+            return;
+        }
+        var list = mSchedule.upcoming(now, 1);
+        if (list.size() == 0) {
+            return;
+        }
+        var n = list[0] as Array;
+        var prayer = n[0] as Number;
+        var jum = jumuah(n);
+        if (mSettings.prayerArabic) {
+            var k = jum ? 5 : [0, -1, 1, 2, -1, 3, 4][prayer] as Number;
+            dc.drawText(cx + p(Layout.DG_NAME_DX), y, mFontAr, (('N' as Char).toNumber() + k).toChar().toString(), vc);
+        } else {
+            dc.drawText(cx + p(Layout.DG_NAME_DX), y, mDgS, jum ? mJumuahName : mPrayerNames[prayer] as String, vc);
+        }
+        dc.drawText(cx + p(Layout.DG_PTIME_DX), y, mDgM, formatTime(mSchedule.minutes(n[2] as Number, prayer), is24), vc);
+        // countdown in a pill (inverted)
+        var pw = p(Layout.DG_PILL_W);
+        var ph = p(Layout.DG_PILL_H);
+        dc.fillRoundedRectangle(cx + p(Layout.DG_PILL_DX) - pw / 2, y - ph / 2, pw, ph, pen(4));
+        dc.setColor(paper, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(cx + p(Layout.DG_PILL_DX), y, mDgM, countdown(((n[1] as Long) - now).toNumber()), vc);
+        dc.setColor(ink, Graphics.COLOR_TRANSPARENT);
+    }
+
+    hidden function drawDigitalStatus(dc as Graphics.Dc, ink as Number) as Void {
+        var vc = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
+        var cx = mSize / 2;
+        var y = p(Layout.DG_STATUS_Y);
+        var ly = p(Layout.DG_LABEL_Y);
+        var info = ActivityMonitor.getInfo();
+        // steps: ring of the goal (solid done, dotted remaining), percentage inside, count below
+        var sx = cx - p(Layout.DG_STATUS_DX);
+        var r = p(Layout.DG_RING_R);
+        var steps = DataFields.read(DataFields.STEPS, info);
+        var pr = (steps[1] != null) ? (steps[1] as Float) : 0.0;
+        if (pr > 1.0) {
+            pr = 1.0;
+        }
+        var sweep = (360.0 * pr).toNumber();
+        dc.setPenWidth(pen(3));
+        if (sweep >= 2) {
+            var end = 90 - sweep;
+            if (end < 0) {
+                end += 360;
+            }
+            dc.drawArc(sx, y, r, Graphics.ARC_CLOCKWISE, 90, end);
+        }
+        dc.setPenWidth(pen(1));
+        for (var a = 0; a < 360; a += 20) {
+            if (a > sweep) {
+                var s0 = 90 - a;
+                dc.drawArc(sx, y, r, Graphics.ARC_CLOCKWISE, (s0 + 360) % 360, (s0 - 6 + 360) % 360);
+            }
+        }
+        dc.setPenWidth(1);
+        dc.drawText(sx, y, mDgS, (pr * 100.0).toNumber().toString(), vc);
+        dc.drawText(sx, ly, mDgS, (steps[0] != null) ? steps[0] as String : "--", vc);
+        // heart rate
+        var hr = DataFields.read(DataFields.HEART, info);
+        dc.drawText(cx, y, mDgM, (hr[0] != null) ? hr[0] as String : "--", vc);
+        dc.drawText(cx, ly, mDgS, mLabels[DataFields.HEART] as String, vc);
+        // battery icon and percentage
+        var batt = DataFields.read(DataFields.BATTERY, info);
+        var bx = cx + p(Layout.DG_STATUS_DX) - p(14);
+        var by = y - p(6);
+        var bw = p(28);
+        var bh = p(12);
+        dc.drawRectangle(bx, by, bw, bh);
+        dc.fillRectangle(bx + bw, by + bh / 2 - p(2), pen(3), p(5));
+        var lvl = (batt[1] != null) ? (batt[1] as Float) : 0.0;
+        dc.fillRectangle(bx + pen(2), by + pen(2), ((bw - 2 * pen(2)) * lvl).toNumber(), bh - 2 * pen(2));
+        dc.drawText(cx + p(Layout.DG_STATUS_DX), ly, mDgS, ((batt[0] != null) ? batt[0] as String : "--") + "%", vc);
+    }
+
     hidden function drawAlwaysOn(dc as Graphics.Dc, clock as System.ClockTime) as Void {
         var c = mColors;
         dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
