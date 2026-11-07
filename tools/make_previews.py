@@ -192,7 +192,7 @@ def main():
         ("Sport · Oasis Gold", {"preset": 5, "font_family": 2, "hand_style": 2, "seconds_color": 2}),
         ("Emerald · or rose", {"preset": 2, "hand_color": 2, "text_color": 2}),
         ("Ice Silver · dauphine", {"preset": 3, "hand_style": 1, "background": 3}),
-        ("Ice Silver · glaive", {"preset": 4, "hand_style": 2, "background": 1}),
+        ("Scarlet Noir · glaive", {"preset": 4, "hand_style": 2, "background": 1}),
         ("Luxury Blue · marbre", {"preset": 0, "background": 2, "accent_color": 3})])
     big = face.Face(dict(face.DEFAULT_SETTINGS), "fre", 454).render(DEFAULT_NOW, 3600, face.DEFAULT_SENSORS, mip=False)[0]
     face.circular(big).resize((680, 680), Image.LANCZOS).save(os.path.join(OUT, "showcase-luxury-blue-454.png"))
