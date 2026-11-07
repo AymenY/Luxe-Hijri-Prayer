@@ -875,25 +875,23 @@ class Face:
 
     def draw_panel(self, dc, cx, kind, prayer, value, value_color, jum=False):
         p = self.p
-        x0 = cx - p(L.PANEL_W) // 2
-        self.panel_icon(dc, x0 + p(11), p(L.PANEL_Y0 + L.PANEL_H // 2), kind)
-        tx = x0 + p(20) + (p(L.PANEL_W) - p(22)) // 2
+        tx = cx        # no icon: name and time centred on the whole cartouche
         dc.setColor(self.text, -1)
         if self.s.get("prayer_names", 0) == 0:   # ArSmall "N".."R"
             k = 5 if jum else [0, -1, 1, 2, -1, 3, 4][prayer]
-            dc.drawText(tx, p(L.PANEL_Y0 + 8), self.f_ar, chr(ord("N") + k), CENTER | VCENTER)
+            dc.drawText(tx, p(L.PANEL_Y0 + L.PANEL_NAME_DY), self.f_ar, chr(ord("N") + k), CENTER | VCENTER)
         else:
-            dc.drawText(tx, p(L.PANEL_Y0 + 8), self.f_xs, self.str["Prayer7" if jum else PRAYER_NAMES[prayer]], CENTER | VCENTER)
+            dc.drawText(tx, p(L.PANEL_Y0 + L.PANEL_NAME_DY), self.f_xs, self.str["Prayer7" if jum else PRAYER_NAMES[prayer]], CENTER | VCENTER)
         dc.setColor(value_color, -1)
-        dc.drawText(tx, p(L.PANEL_Y0 + 20), self.f_s, value, CENTER | VCENTER)
+        dc.drawText(tx, p(L.PANEL_Y0 + L.PANEL_VALUE_DY), self.f_s, value, CENTER | VCENTER)
 
     def draw_prayers(self, dc, now, watch_offset):
         c, s, p = self.c, self.s, self.p
         is24 = s.get("is24", True)
         if s["lat"] == 0 and s["lon"] == 0:
             dc.setColor(c[T["DIM"]], -1)
-            dc.drawText(p(140 - L.PANEL_DX), p(L.PANEL_Y0 + 8), self.f_xs, self.str["SetLocation"], CENTER | VCENTER)
-            dc.drawText(p(140 - L.PANEL_DX), p(L.PANEL_Y0 + 20), self.f_xs, self.str["SetLocation2"], CENTER | VCENTER)
+            dc.drawText(p(140 - L.PANEL_DX), p(L.PANEL_Y0 + L.PANEL_NAME_DY), self.f_xs, self.str["SetLocation"], CENTER | VCENTER)
+            dc.drawText(p(140 - L.PANEL_DX), p(L.PANEL_Y0 + L.PANEL_VALUE_DY), self.f_xs, self.str["SetLocation2"], CENTER | VCENTER)
             return None
         offset = s["utc_offset"] if s.get("tz_manual") else watch_offset
         tz = offset / 3600.0

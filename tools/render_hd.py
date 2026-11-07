@@ -579,7 +579,7 @@ def cartouches(art, st):
 
 
 def fixed_icons(art, st, hub_diamond=True):
-    """Crescent under 12, sunrise/sunset suns, cartouche icons, hub diamond."""
+    """Crescent under 12, sunrise/sunset suns, hub diamond."""
     crescent(art, st, 140, L["CRESCENT_Y"], 6)
     metal = art.metal(80, 120, st["metal"])
     for sgn, rising in ((-1, True), (1, False)):
@@ -599,16 +599,7 @@ def fixed_icons(art, st, hub_diamond=True):
         m = art.mask(sun)
         art.add(hexc("#ffb347") * 0.5, art.blur(m, 2.0), 0.8)
         art.paint(metal, m)
-    # cartouche icons
-    iy = L["PANEL_Y0"] + L["PANEL_H"] / 2.0
-    lx = 140 - L["PANEL_DX"] - L["PANEL_W"] / 2.0 + 11
-    rx = 140 + L["PANEL_DX"] - L["PANEL_W"] / 2.0 + 11
-    m = art.mask(lambda d, u: (circle(d, u, lx, iy - 1, 4.2, fill=255),
-                               d.rectangle([u(lx - 5.5), u(iy - 1), u(lx + 5.5), u(iy + 6)], fill=255),
-                               d.line([(u(lx), u(iy - 5)), (u(lx), u(iy - 8.5))], fill=255, width=max(1, int(u(1.0))))))
-    art.add(hexc(st["glow"]) * 0.3, art.blur(m, 1.5), 0.8)
-    art.paint(art.metal(iy - 8, iy + 6, st["metal"]), m)
-    crescent(art, st, rx, iy, 5)
+    # no icons in the prayer cartouches: their text uses the whole width (owner request)
     if not hub_diamond:
         return
     # hub diamond

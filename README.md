@@ -1,4 +1,4 @@
-# Luxe Hijri Prayer
+# Muslim Watch
 
 Luxury analog-digital Connect IQ **watch face** with Islamic prayer times, written in Monkey C,
 for **round colour Garmin watches** — 121 models, MIP and AMOLED, 218 to 466 px:
@@ -157,7 +157,7 @@ store/                          store artwork (reference renders)
 2. Add the **secrets** `GARMIN_USERNAME` and `GARMIN_PASSWORD` (your Garmin account: the SDK
    device files require a login). They are encrypted and never appear in the code or the logs.
 3. Push, or run *Actions → Build → Run workflow* (mode `preview`, `all` or `iq`).
-4. Download the artifact *LuxeHijriPrayer-…*: one `.prg` per device
+4. Download the artifact *MuslimWatch-…*: one `.prg` per device
    (`fr255s`, `fenix7s`, `fenix7`, `fenix7xpro`, `venu2s`, `fr165`, `epix2pro47mm`,
    `epix2pro51mm` in preview mode), the unit-test build and the compiler logs.
 
@@ -176,7 +176,7 @@ The Store requires every version of the app to be signed with **the same** devel
 3. Repository *Settings → Secrets and variables → Actions → New repository secret*:
    name `CIQ_DEVELOPER_KEY`, value = the pasted text. It is encrypted, never shown in the logs,
    and the key file is deleted from the runner at the end of each job.
-4. *Actions → Build → Run workflow*, mode `iq`: the artifact contains `LuxeHijriPrayer.iq`, ready
+4. *Actions → Build → Run workflow*, mode `iq`: the artifact contains `MuslimWatch.iq`, ready
    to upload at <https://apps.garmin.com/developer/>. Without the secret the `iq` build stops
    with an error instead of producing a package signed with a throw-away key.
 
@@ -193,9 +193,9 @@ The Store requires every version of the app to be signed with **the same** devel
    ```
 4. Compile and start the simulator (repeat `-d` for other devices, e.g. `epix2pro47mm`, `fr265`):
    ```sh
-   monkeyc -f monkey.jungle -d fenix7xpro -o bin/LuxeHijriPrayer.prg -y ~/garmin/developer_key.der -w
+   monkeyc -f monkey.jungle -d fenix7xpro -o bin/MuslimWatch.prg -y ~/garmin/developer_key.der -w
    connectiq &
-   monkeydo bin/LuxeHijriPrayer.prg fenix7xpro
+   monkeydo bin/MuslimWatch.prg fenix7xpro
    ```
 5. Unit tests:
    ```sh
@@ -203,7 +203,7 @@ The Store requires every version of the app to be signed with **the same** devel
    monkeydo bin/test.prg fenix7xpro -t
    ```
 6. Install on a watch: copy the `.prg` built for that device to `GARMIN/APPS/` over USB.
-7. Store package (all devices): `monkeyc -f monkey.jungle -e -r -o bin/LuxeHijriPrayer.iq -y ~/garmin/developer_key.der`,
+7. Store package (all devices): `monkeyc -f monkey.jungle -e -r -o bin/MuslimWatch.iq -y ~/garmin/developer_key.der`,
    upload at <https://apps.garmin.com/developer/> (beta first). Texts: `docs/STORE.md`.
 
 Never commit the developer key: `*.der`, `*.pem`, `*.prg` and `*.iq` are git-ignored.
@@ -216,10 +216,11 @@ pip install -r tools/requirements.txt      # Pillow (with raqm), adhanpy, astral
 python3 tools/gen_settings.py               # settings, properties and their EN/FR strings
 python3 tools/build_assets.py               # fonts per screen size and family, Ayah fonts, vector art, icon
 python3 tools/gen_ayat_doc.py               # -> docs/AYAT.md
-python3 tools/build_hd.py                   # HD dial images: 9 sizes x 9 styles x 4 backgrounds (~15 min)
+python3 tools/build_hd.py                   # HD dial images: 9 sizes x 8 styles x 4 backgrounds (~10 min)
+python3 tools/bump_version.py               # next version (manifest.xml, About menu, CHANGELOG): once per delivery
 python3 tools/check_project.py              # resources, settings, palette, fonts, syntax
 python3 tools/validate_calculations.py      # -> docs/validation-report.md
-python3 tools/check_layout.py               # -> docs/layout-report.md (8 screen sizes, EN + FR)
+python3 tools/check_layout.py               # -> docs/layout-report.md (9 screen sizes, EN + FR, digital face)
 python3 tools/make_previews.py              # -> docs/previews/, store/
 tools/ci_build.sh <key.der> preview         # compile with a local SDK (preview | all | iq | tests)
 ```

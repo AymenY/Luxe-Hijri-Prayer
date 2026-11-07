@@ -1,4 +1,4 @@
-# Compiles Luxe Hijri Prayer with the official Connect IQ SDK on GitHub's runners.
+# Compiles Muslim Watch with the official Connect IQ SDK on GitHub's runners.
 #
 # One-time setup (repository Settings -> Secrets and variables -> Actions):
 #   secrets   GARMIN_USERNAME, GARMIN_PASSWORD   your Garmin account (device files need a login)
@@ -139,7 +139,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: LuxeHijriPrayer-${{ env.MODE }}-${{ github.sha }}
+          name: MuslimWatch-${{ env.MODE }}-${{ github.sha }}
           path: |
             bin/*.prg
             bin/*.iq

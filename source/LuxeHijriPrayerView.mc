@@ -8,7 +8,7 @@ import Toybox.System;
 import Toybox.Time;
 import Toybox.WatchUi;
 
-// Luxe Hijri Prayer watch face for round colour Garmin watches (218 to 454 px, MIP and AMOLED).
+// Muslim Watch watch face for round colour Garmin watches (218 to 454 px, MIP and AMOLED).
 //
 // Geometry is defined for a 280 x 280 dial (source/Layout.mc) and scaled to the screen with
 // p(); bitmap fonts come in one set per screen size (resource qualifiers).
@@ -993,8 +993,8 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         var vc = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
         if (!mSettings.locationSet) {
             dc.setColor(c[Themes.DIM], Graphics.COLOR_TRANSPARENT);
-            dc.drawText(p(Layout.CX - Layout.PANEL_DX), p(Layout.PANEL_Y0 + 8), mFontXS, mSetLocation, vc);
-            dc.drawText(p(Layout.CX - Layout.PANEL_DX), p(Layout.PANEL_Y0 + 20), mFontXS, mSetLocation2, vc);
+            dc.drawText(p(Layout.CX - Layout.PANEL_DX), p(Layout.PANEL_Y0 + Layout.PANEL_NAME_DY), mFontXS, mSetLocation, vc);
+            dc.drawText(p(Layout.CX - Layout.PANEL_DX), p(Layout.PANEL_Y0 + Layout.PANEL_VALUE_DY), mFontXS, mSetLocation2, vc);
             return;
         }
         var offset = mSettings.tzManual ? mSettings.utcOffsetSeconds : clock.timeZoneOffset;
@@ -1023,36 +1023,19 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     // Cartouche content: icon on the left, name above value. `next` selects the mosque icon.
     hidden function drawPanel(dc as Graphics.Dc, cx as Number, next as Boolean, prayer as Number, jum as Boolean,
                               value as String, valueColor as Number) as Void {
-        var c = mColors;
         var vc = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
-        var x0 = cx - p(Layout.PANEL_W) / 2;
-        var ix = x0 + p(11);
-        var iy = p(Layout.PANEL_Y0 + Layout.PANEL_H / 2);
-        dc.setColor(c[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
-        if (mDial != null) {
-            // icons are part of the HD dial
-        } else if (next) {
-            dc.fillCircle(ix, iy, p(4));
-            dc.fillRectangle(ix - p(5), iy, p(10) + 1, p(6));
-            dc.fillRectangle(ix, iy - p(7), 1, p(3));
-        } else {
-            dc.fillCircle(ix, iy, p(5));
-            dc.setColor(c[Themes.PLATE], Graphics.COLOR_TRANSPARENT);
-            dc.fillCircle(ix + p(2), iy - p(2), p(4));
-            dc.setColor(c[Themes.GOLD], Graphics.COLOR_TRANSPARENT);
-            dc.fillCircle(ix + p(4), iy + p(2), 1);
-        }
-        var tx = x0 + p(20) + (p(Layout.PANEL_W) - p(22)) / 2;
+        // no icon: the name and the time are centred on the whole cartouche (owner request)
+        var tx = cx;
         dc.setColor(mText, Graphics.COLOR_TRANSPARENT);
         if (mSettings.prayerArabic) {
             // ArSmall glyphs "N".."R": the Arabic names of Fajr, Dhuhr, Asr, Maghrib, Isha; "S" Jumu'ah
             var k = jum ? 5 : [0, -1, 1, 2, -1, 3, 4][prayer] as Number;
-            dc.drawText(tx, p(Layout.PANEL_Y0 + 8), mFontAr, (('N' as Char).toNumber() + k).toChar().toString(), vc);
+            dc.drawText(tx, p(Layout.PANEL_Y0 + Layout.PANEL_NAME_DY), mFontAr, (('N' as Char).toNumber() + k).toChar().toString(), vc);
         } else {
-            dc.drawText(tx, p(Layout.PANEL_Y0 + 8), mFontXS, jum ? mJumuahName : mPrayerNames[prayer] as String, vc);
+            dc.drawText(tx, p(Layout.PANEL_Y0 + Layout.PANEL_NAME_DY), mFontXS, jum ? mJumuahName : mPrayerNames[prayer] as String, vc);
         }
         dc.setColor(valueColor, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(tx, p(Layout.PANEL_Y0 + 20), mFontS, value, vc);
+        dc.drawText(tx, p(Layout.PANEL_Y0 + Layout.PANEL_VALUE_DY), mFontS, value, vc);
     }
 
     // Sun on the horizon with rays and an up/down arrow, time below.

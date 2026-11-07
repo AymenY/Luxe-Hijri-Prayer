@@ -2,6 +2,16 @@
 
 Remaining release steps: `docs/RELEASE_CHECKLIST.md`.
 
+## 1.0.8 (2026-11-07)
+* The project is now called **Muslim Watch** (app name, watch menu, Store listing, docs, build
+  files `MuslimWatch-<device>.prg` and `MuslimWatch.iq`); the app id does not change.
+* Version number in manifest.xml, shown in About; `tools/bump_version.py` increments it for each
+  delivery and writes `source/Version.mc` (checked by `tools/check_project.py`).
+* Prayer cartouches without the dome and crescent icons: the prayer name and its time are centred
+  on the whole cartouche, clear of the border; the names keep their 11-12 px size (they had grown
+  with the Hijri date font and ran into the time below) and are centred exactly.
+* Layout check: texts of the cartouches against the border and against each other.
+
 ## 1.0.0 — release candidate (2026-11-05)
 * New style **Scarlet Noir** (black, red and white).
 * **About** at the end of the watch menu: version (also set in manifest.xml), "Proudly Made By

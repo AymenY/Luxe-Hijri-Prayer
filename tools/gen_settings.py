@@ -154,7 +154,7 @@ MENU = [
         ("LocationMode", ("Position", "Position")),
         ("#gps", ("Use current position", "Utiliser la position actuelle"))]),
 ]
-MENU_TEXTS = [("M_Title", ("Luxe Hijri Prayer", "Luxe Hijri Prayer")),
+MENU_TEXTS = [("M_Title", ("Muslim Watch", "Muslim Watch")),
               ("M_GpsNone", ("No position: start a GPS activity first", "Pas de position : lancez d'abord une activité GPS")),
               ("M_JumuahOff", ("Computed Dhuhr", "Dhohr calculé")),
               # About (root menu, last entry)

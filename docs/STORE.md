@@ -17,13 +17,13 @@ renders and must be replaced by real simulator or device screenshots before subm
 
 ## English
 
-**Title:** Luxe Hijri Prayer
+**Title:** Muslim Watch
 
 **Short description:** Luxury analog watch face with prayer times, Hijri date, Moon and Quran verse.
 
 **Description:**
 
-Luxe Hijri Prayer is an analog watch face inspired by fine watchmaking and Islamic art, for
+Muslim Watch is an analog watch face inspired by fine watchmaking and Islamic art, for
 round Garmin displays (MIP and AMOLED).
 
 * Next prayer with a live countdown, and the following prayer with its time
@@ -63,13 +63,13 @@ the settings there). Permission used: *Sensor history* (to display Body Battery 
 
 ## Français
 
-**Titre :** Luxe Hijri Prayer
+**Titre :** Muslim Watch
 
 **Description courte :** Cadran analogique de luxe : heures de prière, date hégirienne, lune et verset.
 
 **Description :**
 
-Luxe Hijri Prayer est un cadran analogique inspiré de la haute horlogerie et de l'art islamique,
+Muslim Watch est un cadran analogique inspiré de la haute horlogerie et de l'art islamique,
 pour les écrans ronds Garmin (MIP et AMOLED).
 
 * Prochaine prière avec compte à rebours, et la prière suivante avec son heure

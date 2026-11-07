@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the bundled resources of Luxe Hijri Prayer (reproducible, no network needed).
+"""Generate the bundled resources of Muslim Watch (reproducible, no network needed).
 
 Outputs (one font set per supported round screen size, selected by Connect IQ resource
 qualifiers; 280 x 280 is the base set in resources/):
@@ -283,6 +283,9 @@ def build_ayah_fonts(folder, k, L):
 AR_DIGITS = "٠١٢٣٤٥٦٧٨٩"
 AR_SMALL_PX = 14  # at 280 px (11 was hard to read on the watch; 12 still small for the Hijri date)
 DIGIT_AR_SCALE = 1.0   # IBM Plex digits in ArSmall: pixel size relative to the Amiri size
+# The prayer names "N".."S" keep the former 12 px (at 280 px): at 14 px they ran into the time
+# below them in the cartouches (seen on a fenix 7X Pro). Each name is centred on the font's line.
+AR_NAME_PX = 11
 # prayer names in the cartouches (setting PrayerNames): glyphs "N".."R"
 PRAYERS_AR = ["الفجر", "الظهر", "العصر", "المغرب", "العشاء", "الجمعة"]   # "S": Jumu'ah (Friday)
 
@@ -314,6 +317,15 @@ def build_arabic_small_font(folder, k):
             img = Image.new("L", (w, h), 0)
             ImageDraw.Draw(img).text((-bbox[0], -bbox[1]), text, font=dfont, fill=255, anchor="ls")
             glyphs.append((ord(code), img, 0, ascent + bbox[1], w + 1))
+            widths[code] = w
+            continue
+        if "N" <= code <= "S":
+            nsize = max(8, int(AR_NAME_PX * k) - (1 if k < 0.9 or k > 1.5 else 0))
+            nb = amiri(nsize).getbbox(text, direction="rtl", language="ar", anchor="ls")
+            w, h = nb[2] - nb[0], nb[3] - nb[1]
+            img = arabic_image((w + 2, h + 2), (1 - nb[0], 1 - nb[1]), text, nsize, anchor="ls")
+            img = img.crop(img.getbbox())       # no transparent margin: the cartouche is tight
+            glyphs.append((ord(code), img, 0, (ascent + descent - img.height) // 2, img.width + 1))
             widths[code] = w
             continue
         bbox = font.getbbox(text, direction="rtl", language="ar", anchor="ls")

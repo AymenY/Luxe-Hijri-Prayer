@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Compile Luxe Hijri Prayer with the Connect IQ SDK (monkeyc must be on PATH).
+# Compile Muslim Watch with the Connect IQ SDK (monkeyc must be on PATH).
 #
 #   tools/ci_build.sh <developer_key.der> [preview|all|iq|tests]
 #
 #   preview  one device per screen size and display type (default)
 #   all      every product listed in manifest.xml
-#   iq       the Store package bin/LuxeHijriPrayer.iq (all products, release build)
+#   iq       the Store package bin/MuslimWatch.iq (all products, release build)
 #   tests    the unit-test build for fenix7xpro (run it in the simulator with monkeydo -t)
 #
 # Outputs go to bin/: one .prg per device and a build log per device in bin/logs/.
@@ -24,9 +24,9 @@ failed=0
 build() {  # device
     local dev="$1"
     echo "::group::monkeyc $dev"
-    if monkeyc -f monkey.jungle -d "$dev" -o "bin/LuxeHijriPrayer-$dev.prg" -y "$KEY" -w \
+    if monkeyc -f monkey.jungle -d "$dev" -o "bin/MuslimWatch-$dev.prg" -y "$KEY" -w \
             > "bin/logs/$dev.log" 2>&1; then
-        echo "OK   $dev ($(du -k "bin/LuxeHijriPrayer-$dev.prg" | cut -f1) KB)"
+        echo "OK   $dev ($(du -k "bin/MuslimWatch-$dev.prg" | cut -f1) KB)"
     else
         echo "FAIL $dev"
         failed=1
@@ -39,16 +39,16 @@ case "$MODE" in
     preview) for d in $PREVIEW; do build "$d"; done ;;
     all)     for d in $ALL; do build "$d"; done ;;
     iq)
-        if monkeyc -f monkey.jungle -e -r -o bin/LuxeHijriPrayer.iq -y "$KEY" -w > bin/logs/iq.log 2>&1; then
-            echo "OK   bin/LuxeHijriPrayer.iq ($(du -k bin/LuxeHijriPrayer.iq | cut -f1) KB)"
+        if monkeyc -f monkey.jungle -e -r -o bin/MuslimWatch.iq -y "$KEY" -w > bin/logs/iq.log 2>&1; then
+            echo "OK   bin/MuslimWatch.iq ($(du -k bin/MuslimWatch.iq | cut -f1) KB)"
         else
             echo "FAIL iq"; failed=1
         fi
         cat bin/logs/iq.log ;;
     tests)
-        if monkeyc -f monkey.jungle -d fenix7xpro -o bin/LuxeHijriPrayer-tests.prg -y "$KEY" -w --unit-test \
+        if monkeyc -f monkey.jungle -d fenix7xpro -o bin/MuslimWatch-tests.prg -y "$KEY" -w --unit-test \
                 > bin/logs/tests.log 2>&1; then
-            echo "OK   unit-test build (run: monkeydo bin/LuxeHijriPrayer-tests.prg fenix7xpro -t)"
+            echo "OK   unit-test build (run: monkeydo bin/MuslimWatch-tests.prg fenix7xpro -t)"
         else
             echo "FAIL unit-test build"; failed=1
         fi

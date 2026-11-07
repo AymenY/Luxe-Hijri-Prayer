@@ -64,6 +64,8 @@ module Layout {
     const PANEL_W = 66;
     const PANEL_Y0 = 178;
     const PANEL_H = 28;
+    const PANEL_NAME_DY = 8;     // prayer name (line 1) and time or countdown (line 2), from PANEL_Y0
+    const PANEL_VALUE_DY = 20;
 
     // Ayah: no cartouche and no reference; the verse sits on the dial, inside a circle clear of
     // the hour indices and above the 6 numeral. The small battery line goes below it.

@@ -48,16 +48,18 @@ class Check:
             x += g["xadvance"]
         return (min(xs), min(ys), max(xs), max(ys))
 
-    def inside(self, box, name, r=None):
+    def inside(self, box, name, r=None, corner=0):
+        """box inside the circle of radius r; `corner`: rounded corners of that radius (px)."""
         r = (r or L.SAFE_R) * self.k
-        worst = max(math.hypot(x - self.c, y - self.c) for x in (box[0], box[2]) for y in (box[1], box[3]))
+        b = (box[0] + corner, box[1] + corner, box[2] - corner, box[3] - corner)
+        worst = max(math.hypot(x - self.c, y - self.c) for x in (b[0], b[2]) for y in (b[1], b[3])) + corner
         if worst > r:
             self.fail.append("%s outside the safe circle (%.1f > %.1f px)" % (name, worst, r))
 
     def add(self, name, box, check_circle=True):
         self.boxes[name] = box
         if check_circle:
-            self.inside(box, name)
+            self.inside(box, name, corner=self.p(7) if name.startswith("panel") else 0)
 
 
 FAM = "luxe"
@@ -114,11 +116,13 @@ def check_size(size, report):
         ck.add("hijri_latin-" + lang, ck.text_box("luxe_s", widest("luxe_s", size, [
             "30 %s" % s["Hijri%d" % m] for m in range(1, 13)]), p(140), p(L.HIJRI_Y)))
         ck.add("hijri_latin_year-" + lang, ck.text_box("luxe_s", "1448 %s" % s["HijriSuffix"], p(140), p(L.HIJRI_Y2)))
-        # battery line under the verse: icon (20 units with its gap) then "100%"
-        tb = ck.text_box("luxe_s", "100%", p(140) + p(10), p(L.BATT_Y))
-        bb = (tb[0] - p(20), min(tb[1], p(L.BATT_Y) - p(4)), tb[2], max(tb[3], p(L.BATT_Y) + p(5)))
+        # battery line, centred under the cartouches: icon (20 units with its gap) then "100%"
+        tb = ck.text_box("luxe_s", "100%", 0, p(L.BATT_Y))
+        w = tb[2] - tb[0]
+        x0 = p(140) - (w + p(20)) // 2
+        bb = (x0, min(tb[1], p(L.BATT_Y) - p(4)), x0 + p(20) + w, max(tb[3], p(L.BATT_Y) + p(5)))
         ck.add("battery", bb)
-        ck.inside(bb, "battery", L.AYAH_AREA_R)
+        ck.inside(bb, "battery", L.SAFE_R)
         # gauge content must fit inside the ring
         rin = p(L.GAUGE_R) - max(1, p(L.GAUGE_PEN)) // 2
         for key in face.LABELS + ["LabelMi", "LabelDay", "LabelNight"]:
@@ -129,14 +133,30 @@ def check_size(size, report):
                 ck.fail.append("gauge label %s/%s (%d px) crosses the ring" % (lang, s[key], b[2] - b[0]))
         # cartouche text
         names = [s["Prayer%d" % i] for i in (0, 2, 3, 5, 6, 7)]   # 7: Jumu'ah (Fridays)
-        area = p(L.PANEL_W) - p(22)
+        area = p(L.PANEL_W) - 2      # whole cartouche width inside its 1 px border (no icon)
         for t, fn in [(widest("luxe_xs", size, names), "luxe_xs"), (widest("ar_small", size, list("NOPQRS")), "ar_small"),
                       ("23h59", "luxe_s"), ("00:00", "luxe_s"),
                       (s["SetLocation"], "luxe_xs"), (s["SetLocation2"], "luxe_xs")]:
             w = face.font(fontname_for(fn), size).width(t)
-            limit = area if t not in (s["SetLocation"], s["SetLocation2"]) else p(L.PANEL_W) - 4
+            limit = area - 2 * max(1, p(2)) if t not in (s["SetLocation"], s["SetLocation2"]) else p(L.PANEL_W) - 4
             if w > limit:
                 ck.fail.append("cartouche text %s/'%s' (%d px) wider than its area (%d px)" % (lang, t, w, limit))
+        # cartouche: the prayer name (line 1) must not touch the time or countdown (line 2), and both
+        # must stay inside the cartouche
+        # air between the texts and the cartouche border: 2 px on the sides (at 280 px, scaled),
+        # 1 px above and below (two lines in a 28 px cartouche)
+        m = 1
+        y0, y1 = p(L.PANEL_Y0) + 1 + m, p(L.PANEL_Y0 + L.PANEL_H) - 1 - m
+        vals = [ck.text_box("luxe_s", v, 0, p(L.PANEL_Y0 + L.PANEL_VALUE_DY)) for v in ("23h59", "00:00", "10h08")]
+        vtop, vbot = min(b[1] for b in vals), max(b[3] for b in vals)
+        for nm, fn in [(n, "ar_small") for n in "NOPQRS"] + [(n, "luxe_xs") for n in names]:
+            b = ck.text_box(fn, nm, 0, p(L.PANEL_Y0 + L.PANEL_NAME_DY))
+            if b[3] > vtop:          # adjacent rows allowed, never overlapping
+                ck.fail.append("cartouche name %s/'%s' touches the value below (%d >= %d)" % (lang, nm, b[3], vtop))
+            if b[1] < y0:
+                ck.fail.append("cartouche name %s/'%s' above the cartouche" % (lang, nm))
+        if vbot > y1:
+            ck.fail.append("cartouche value below the cartouche (%d > %d)" % (vbot, y1))
 
     # values inside the ring
     inner = 2 * (p(L.GAUGE_R) - max(1, p(L.GAUGE_PEN)) // 2) - 2
@@ -183,7 +203,12 @@ def check_size(size, report):
     # overlaps
     for name, b in ck.boxes.items():
         for i, (gx, gy) in enumerate(gauges):
-            gap = box_circle_gap(b, gx, gy, disc)
+            if name.startswith("panel"):
+                # rounded rectangle (corner radius 7 at 280 px, as drawn): exact distance
+                rr = p(7)
+                gap = box_circle_gap((b[0] + rr, b[1] + rr, b[2] - rr, b[3] - rr), gx, gy, disc) - rr
+            else:
+                gap = box_circle_gap(b, gx, gy, disc)
             if gap < 1:
                 ck.fail.append("%s overlaps gauge %d (gap %.1f px)" % (name, i + 1, gap))
     names = list(ck.boxes)

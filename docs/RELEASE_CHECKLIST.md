@@ -16,12 +16,15 @@ Legend: ✅ done · ⬜ to do by the owner (needs the SDK simulator, the watch o
 
 ## Before submission
 
+* ⬜ Version: `python3 tools/bump_version.py` once per delivery (current version in `manifest.xml`,
+  shown in the watch menu → About)
+
 * ⬜ Create your permanent developer key **once** and keep it safe, outside the repository (README,
   “Store package”). Every future update must be signed with the same key.
 * ⬜ Add it as the GitHub secret `CIQ_DEVELOPER_KEY`, then run *Actions → Build → Run workflow*
   with mode `iq` (the Store package)
 * ⬜ On the watch: watch face → Customise opens the settings menu; change a few settings
-* ⬜ Simulator (SDK on a computer): unit tests `monkeydo bin/LuxeHijriPrayer-tests.prg fenix7xpro -t`
+* ⬜ Simulator (SDK on a computer): unit tests `monkeydo bin/MuslimWatch-tests.prg fenix7xpro -t`
   (8 tests); *File → View Memory* on the largest AMOLED (454 / 466 px) and on fr255s (218 px)
 * ⬜ **Simulator, Connect IQ 3 digital face: *File → View Memory* on a 96 KB watch (fenix6s,
   fr245, vivoactive3) and on fenix6 (112 KB), with every background and the settings menu.**
@@ -34,7 +37,7 @@ Legend: ✅ done · ⬜ to do by the owner (needs the SDK simulator, the watch o
 
 ## Store
 
-* ⬜ Upload `bin/LuxeHijriPrayer.iq` at <https://apps.garmin.com/developer/> as a **beta** first,
+* ⬜ Upload `bin/MuslimWatch.iq` at <https://apps.garmin.com/developer/> as a **beta** first,
   install it from the Store link, test, then publish
 * ⬜ Listing texts and privacy statement from `docs/STORE.md`
 * ⬜ The app id in `manifest.xml` must never change after the first upload

@@ -8,9 +8,6 @@ import Toybox.WatchUi;
 // Application.Properties, the same storage as the Garmin Connect settings, and applied at once.
 module SettingsMenu {
 
-    // App version shown in About; must match the version in manifest.xml (tools/check_project.py)
-    const VERSION = "1.0.0";
-
     function root() as WatchUi.Menu2 {
         var menu = new WatchUi.Menu2({:title => text(Rez.Strings.M_Title)});
         var groups = MenuTable.groups();
@@ -28,7 +25,7 @@ module SettingsMenu {
         var rows = [[Rez.Strings.M_PrayerCalc, Rez.Strings.M_PrayerCalcV], [Rez.Strings.M_Hijri, Rez.Strings.M_HijriV],
                     [Rez.Strings.M_Quran, Rez.Strings.M_QuranV], [Rez.Strings.M_Fonts, Rez.Strings.M_FontsV],
                     [Rez.Strings.M_Privacy, Rez.Strings.M_PrivacyV]];
-        menu.addItem(new WatchUi.MenuItem(text(Rez.Strings.M_Title), VERSION, 0, null));
+        menu.addItem(new WatchUi.MenuItem(text(Rez.Strings.M_Title), AppVersion.VERSION, 0, null));
         menu.addItem(new WatchUi.MenuItem(text(Rez.Strings.M_Credit), null, 1, null));
         menu.addItem(new WatchUi.MenuItem(text(Rez.Strings.M_Thanks), text(Rez.Strings.M_ThanksV), 2, null));
         for (var i = 0; i < rows.size(); i++) {
