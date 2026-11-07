@@ -156,7 +156,19 @@ MENU = [
 ]
 MENU_TEXTS = [("M_Title", ("Luxe Hijri Prayer", "Luxe Hijri Prayer")),
               ("M_GpsNone", ("No position: start a GPS activity first", "Pas de position : lancez d'abord une activité GPS")),
-              ("M_JumuahOff", ("Computed Dhuhr", "Dhohr calculé"))]
+              ("M_JumuahOff", ("Computed Dhuhr", "Dhohr calculé")),
+              # About (root menu, last entry)
+              ("M_About", ("About", "À propos")),
+              ("M_PrayerCalc", ("Prayer times", "Heures de prière")),
+              ("M_PrayerCalcV", ("Computed on the watch (astronomy)", "Calculées sur la montre (astronomie)")),
+              ("M_Hijri", ("Hijri calendar", "Calendrier hégirien")),
+              ("M_HijriV", ("Tabular, adjustable ±2 days", "Tabulaire, réglable ±2 jours")),
+              ("M_Quran", ("Quran text", "Texte du Coran")),
+              ("M_QuranV", ("Tanzil.net (CC BY 3.0)", "Tanzil.net (CC BY 3.0)")),
+              ("M_Fonts", ("Fonts (SIL OFL)", "Polices (SIL OFL)")),
+              ("M_FontsV", ("Amiri, Barlow, IBM Plex, Cinzel, Rajdhani", "Amiri, Barlow, IBM Plex, Cinzel, Rajdhani")),
+              ("M_Privacy", ("Privacy", "Confidentialité")),
+              ("M_PrivacyV", ("No data leaves the watch", "Aucune donnée ne quitte la montre"))]
 
 
 def menu_source(table, option_ids):

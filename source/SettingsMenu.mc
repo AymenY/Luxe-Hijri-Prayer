@@ -8,11 +8,30 @@ import Toybox.WatchUi;
 // Application.Properties, the same storage as the Garmin Connect settings, and applied at once.
 module SettingsMenu {
 
+    // App version shown in About; must match the version in manifest.xml (tools/check_project.py)
+    const VERSION = "1.0.0";
+
     function root() as WatchUi.Menu2 {
         var menu = new WatchUi.Menu2({:title => text(Rez.Strings.M_Title)});
         var groups = MenuTable.groups();
         for (var i = 0; i < groups.size(); i++) {
             menu.addItem(new WatchUi.MenuItem(text((groups[i] as Array)[0]), null, i, null));
+        }
+        // last entry: About (item id = number of groups)
+        menu.addItem(new WatchUi.MenuItem(text(Rez.Strings.M_About), null, groups.size(), null));
+        return menu;
+    }
+
+    // About: name and version, how the times are computed, sources and licences, privacy
+    function about() as WatchUi.Menu2 {
+        var menu = new WatchUi.Menu2({:title => text(Rez.Strings.M_About)});
+        var rows = [[Rez.Strings.M_PrayerCalc, Rez.Strings.M_PrayerCalcV], [Rez.Strings.M_Hijri, Rez.Strings.M_HijriV],
+                    [Rez.Strings.M_Quran, Rez.Strings.M_QuranV], [Rez.Strings.M_Fonts, Rez.Strings.M_FontsV],
+                    [Rez.Strings.M_Privacy, Rez.Strings.M_PrivacyV]];
+        menu.addItem(new WatchUi.MenuItem(text(Rez.Strings.M_Title), VERSION, 0, null));
+        for (var i = 0; i < rows.size(); i++) {
+            var r = rows[i] as Array;
+            menu.addItem(new WatchUi.MenuItem(text(r[0]), text(r[1]), i + 1, null));
         }
         return menu;
     }
@@ -88,7 +107,12 @@ class LuxeRootDelegate extends WatchUi.Menu2InputDelegate {
     }
 
     function onSelect(item as WatchUi.MenuItem) as Void {
-        var group = MenuTable.groups()[item.getId() as Number] as Array;
+        var groups = MenuTable.groups();
+        if ((item.getId() as Number) >= groups.size()) {
+            WatchUi.pushView(SettingsMenu.about(), new LuxeAboutDelegate(), WatchUi.SLIDE_LEFT);
+            return;
+        }
+        var group = groups[item.getId() as Number] as Array;
         var items = group[1] as Array;
         var menu = new WatchUi.Menu2({:title => SettingsMenu.text(group[0])});
         for (var i = 0; i < items.size(); i++) {
@@ -203,5 +227,16 @@ class LuxeVersesDelegate extends WatchUi.Menu2InputDelegate {
         if (item instanceof WatchUi.ToggleMenuItem) {
             SettingsMenu.store("AyahInc" + ((item.getId() as Number) + 1).format("%02d"), item.isEnabled());
         }
+    }
+}
+
+// About: information only, selecting a line does nothing (Back closes it).
+class LuxeAboutDelegate extends WatchUi.Menu2InputDelegate {
+
+    function initialize() {
+        Menu2InputDelegate.initialize();
+    }
+
+    function onSelect(item as WatchUi.MenuItem) as Void {
     }
 }

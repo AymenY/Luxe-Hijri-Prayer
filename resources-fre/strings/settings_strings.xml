@@ -180,4 +180,15 @@
     <string id="M_Title">Luxe Hijri Prayer</string>
     <string id="M_GpsNone">Pas de position : lancez d&apos;abord une activité GPS</string>
     <string id="M_JumuahOff">Dhohr calculé</string>
+    <string id="M_About">À propos</string>
+    <string id="M_PrayerCalc">Heures de prière</string>
+    <string id="M_PrayerCalcV">Calculées sur la montre (astronomie)</string>
+    <string id="M_Hijri">Calendrier hégirien</string>
+    <string id="M_HijriV">Tabulaire, réglable ±2 jours</string>
+    <string id="M_Quran">Texte du Coran</string>
+    <string id="M_QuranV">Tanzil.net (CC BY 3.0)</string>
+    <string id="M_Fonts">Polices (SIL OFL)</string>
+    <string id="M_FontsV">Amiri, Barlow, IBM Plex, Cinzel, Rajdhani</string>
+    <string id="M_Privacy">Confidentialité</string>
+    <string id="M_PrivacyV">Aucune donnée ne quitte la montre</string>
 </strings>

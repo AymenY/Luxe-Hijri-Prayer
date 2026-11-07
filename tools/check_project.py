@@ -117,6 +117,11 @@ def main():
         if "SensorHistory" in allsrc and "SensorHistory" not in perms:
             errors.append("manifest: SensorHistory used but permission not declared")
 
+    # the About menu shows the version of the manifest
+    mver = re.search(r'<iq:application[^>]*\sversion="([^"]+)"', open(os.path.join(ROOT, "manifest.xml")).read())
+    sver = re.search(r'const VERSION = "([^"]+)";', open(os.path.join(ROOT, "source", "SettingsMenu.mc")).read())
+    if not mver or not sver or mver.group(1) != sver.group(1):
+        errors.append("SettingsMenu.VERSION does not match the application version in manifest.xml")
     # Connect IQ 3 watches accept at most about 250 members per Rez module
     if len(res["Strings"]) > 250:
         errors.append("%d string resources: Connect IQ 3 watches allow about 250 (Rez.Strings)" % len(res["Strings"]))

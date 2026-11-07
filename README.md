@@ -73,7 +73,8 @@ and the “GARMIN fēnix” wordmark (Garmin trademark; replaced by a crescent).
 Everything is customisable, in two places that share the same values:
 
 * **on the watch**: hold the menu button on the watch face → *Watch face* → *Settings* (or
-  *Customise*), then *Appearance*, *Complications*, *Date & verse*, *Prayers*, *Location*. This
+  *Customise*), then *Appearance*, *Complications*, *Date & verse*, *Prayers*, *Location* and
+  *About* (version, how the times are computed, sources and licences, privacy). This
   also works for a sideloaded `.prg`. *Location → Use current position* stores the last GPS
   position known to the watch (start any GPS activity once if none is available).
 * **in the Garmin Connect app** (watch face → Settings), for an app installed from the Store.

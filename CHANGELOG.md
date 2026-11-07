@@ -4,6 +4,9 @@ Remaining release steps: `docs/RELEASE_CHECKLIST.md`.
 
 ## 1.0.0 — release candidate (2026-11-05)
 * New style **Scarlet Noir** (black, red and white).
+* **About** at the end of the watch menu: version (also set in manifest.xml), prayer times computed
+  on the watch, tabular Hijri calendar, Quran text from Tanzil.net (CC BY 3.0), fonts (SIL OFL),
+  privacy (no data leaves the watch).
 * New style **E-Ink**: black ink on white paper like an electronic-paper screen; flat palette
   colours without shadow or glow, the mosque illustration printed as an inverted ink drawing,
   daylight ring and Moon dial in greys, red seconds hand.
