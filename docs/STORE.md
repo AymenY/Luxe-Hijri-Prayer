@@ -54,6 +54,8 @@ mosque timetable; use the adjustment settings to align them. The Hijri date is a
 
 No weather, temperature, altitude or compass data is shown.
 
+Proudly Made By A. Y. — with thanks to my family for their support.
+
 **Privacy:** the watch face works entirely offline. It does not collect or transmit any personal
 data and makes no network requests. Your position is used only on the watch to compute prayer
 times; it is stored in the watch-face settings on your watch (and in Garmin Connect if you edit
@@ -101,6 +103,8 @@ aligner. La date hégirienne est un calendrier calculé (tabulaire) qui peut dif
 l'observation locale du croissant ; utilisez le réglage de correction.
 
 Aucune donnée météo, température, altitude ou boussole n'est affichée.
+
+Proudly Made By A. Y. — avec mes remerciements à ma famille pour son soutien.
 
 **Confidentialité :** le cadran fonctionne entièrement hors ligne. Il ne collecte ni ne transmet
 aucune donnée personnelle et n'effectue aucune requête réseau. Votre position sert uniquement,
