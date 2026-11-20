@@ -22,7 +22,7 @@ module Themes {
     const WARN = 14;     // low battery
     const TICK = 15;     // minute track
 
-    const COUNT = 8;
+    const COUNT = 9;
 
     // Order must match the "StylePreset" list in resources/settings/settings.xml.
     const PRESETS = [
@@ -49,12 +49,19 @@ module Themes {
          0x000000, 0x555555, 0xAAAAAA, 0xFF0000, 0x000000, 0x000000, 0xFF0000, 0x000000],
         // H  E-Ink Inverse: white ink on black, red seconds hand
         [0x000000, 0x000000, 0x555555, 0x555555, 0xFFFFFF, 0xAAAAAA, 0xFFFFFF, 0xFFFFFF,
-         0xFFFFFF, 0xAAAAAA, 0x555555, 0xFF0000, 0x000000, 0xFFFFFF, 0xFF0000, 0xFFFFFF]
+         0xFFFFFF, 0xAAAAAA, 0x555555, 0xFF0000, 0x000000, 0xFFFFFF, 0xFF0000, 0xFFFFFF],
+        // I  Floral: the Friday dial every day (palette, dial, numerals, hands), without the greeting
+        [0x000055, 0x000000, 0x0055AA, 0x00AA00, 0xFFAA00, 0xAA5500, 0x00AAFF, 0x55AAFF,
+         0xFFFFFF, 0xAAAAAA, 0x0055AA, 0x00AAFF, 0xFF0000, 0xFFFFFF, 0xFF5500, 0xFFFFAA]
     ];
 
     // Presets whose gauges use one colour per data type (as in the approved concept)
     // instead of the preset accent.
-    const MULTICOLOR = [true, false, false, true, false, false, false, false];
+    const MULTICOLOR = [true, false, false, true, false, false, false, false, true];
+
+    // Floral style: drawn with the Friday dial, numerals and hands (FRIDAY, FRIDAY_HANDS,
+    // FRIDAY_NUMERALS, Backgrounds.FRIDAY) on every day, but the verse is kept: no greeting.
+    const FLORAL = 8;
 
     // Friday dial (from 00:00 until Asr, setting FridayDesign), whatever the style: Sidi Bou Said
     // blue wrought iron, gold hour ring, white text, jasmine (STAR) and geranium (SIL) on the

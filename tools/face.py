@@ -62,7 +62,7 @@ FRIDAY, FRIDAY_HANDS = _friday()
 FRIDAY_NUMERALS = T["FRIDAY_NUMERALS"]
 FAMILIES = ["luxe", "classic", "sport"]
 PRESET_NAMES = ["Luxury Blue", "Royal Gold", "Emerald Night", "Ice Silver", "Scarlet Noir", "Oasis Gold", "E-Ink",
-                "E-Ink Inverse"]
+                "E-Ink Inverse", "Floral"]
 BACKGROUNDS = ["bg_mosque", "bg_geometric", "bg_marble", "bg_night"]
 RESOLUTIONS = [218, 240, 260, 280, 360, 390, 416, 454, 466]
 
@@ -313,7 +313,8 @@ class Face:
     def apply(self, friday):
         """Mirror of applySettings(): colours, dial and numerals of the style, or of the Friday dial."""
         st, size = self.s, self.size
-        self.friday = friday
+        self.friday = friday                    # greeting: Friday until Asr only
+        friday = friday or st["preset"] == T["FLORAL"]   # Floral style: Friday look every day
         self.c = FRIDAY if friday else PRESETS[st["preset"]]
         self.multi = st.get("gauge_colors", 0) == 0 and (friday or MULTICOLOR[st["preset"]])
         ink = not friday and st["preset"] == T["INK"]     # E-Ink styles: grey daylight ring and Moon

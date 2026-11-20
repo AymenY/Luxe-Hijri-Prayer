@@ -84,7 +84,7 @@ The settings and the watch menu are generated from `tools/gen_settings.py` (Engl
 
 | Group | Setting | Choices (default first) |
 |---|---|---|
-| Appearance | Style | Luxury Blue, Royal Gold, Emerald Night, Ice Silver, Scarlet Noir (black, red, white), Oasis Gold (high contrast), E-Ink (black on white), E-Ink Inverse (white on black) |
+| Appearance | Style | Luxury Blue, Royal Gold, Emerald Night, Ice Silver, Scarlet Noir (black, red, white), Oasis Gold (high contrast), E-Ink (black on white), E-Ink Inverse (white on black), Floral (the Friday design every day, without the greeting) |
 | Appearance | Background | Mosque at night (illustration), Islamic geometric pattern, Black marble, Night sky |
 | Appearance | Dial numerals | Arabic (12 3 6 9), Indian (Eastern Arabic) |
 | Appearance | Font | Modern (Barlow), Classic (Cinzel + Barlow), Sport (Rajdhani); digits always in IBM Plex Sans Condensed (distinct 5 / 6 / 8 / 9) |

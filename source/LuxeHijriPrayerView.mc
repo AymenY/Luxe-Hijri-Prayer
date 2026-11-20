@@ -132,7 +132,9 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
     function applySettings() as Void {
         mSettings.load();
         var st = mSettings;
-        var friday = mFriday && st.fridayDesign;
+        // Friday look: the Friday dial until Asr, or the Floral style (same design, no greeting;
+        // the greeting itself depends on mFriday only, see drawAyah)
+        var friday = (mFriday && st.fridayDesign) || st.preset == Themes.FLORAL;
         mColors = (friday ? Themes.FRIDAY : Themes.PRESETS[st.preset]) as Array<Number>;
         mMulticolor = (st.gaugeColors == 0) && (friday || (Themes.MULTICOLOR[st.preset] as Boolean));
         // E-Ink styles: daylight ring and Moon dial in greys
