@@ -226,6 +226,32 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         return null;
     }
 
+    // HD dial that could not be loaded (memory still held by the settings menu, for example):
+    // try again once a minute, and drop the vector fallback buffer as soon as it loads.
+    hidden var mDialRetryMin as Number = -1;
+
+    (:hd)
+    hidden function retryDial(clock as System.ClockTime) as Void {
+        if (mDial != null || isDigital() || clock.min == mDialRetryMin) {
+            return;
+        }
+        mDialRetryMin = clock.min;
+        var st = mSettings;
+        var friday = (mFriday && st.fridayDesign) || st.preset == Themes.FLORAL;
+        mStaticRef = null;   // free the fallback buffer first, the dial needs that memory
+        mDial = friday ? loadFridayDial() : loadDial(st.preset, st.background);
+        if (mDial != null) {
+            mNums = loadNumerals(friday ? Themes.FRIDAY_NUMERALS : st.preset, st.dialDigits);
+            mBgOps = null;
+            mFrameOps = null;
+        }
+        mStaticDirty = true;
+    }
+
+    (:lite)
+    hidden function retryDial(clock as System.ClockTime) as Void {
+    }
+
     // HD dial for style s and background b; null if it cannot be loaded (e.g. out of memory).
     // (:hd) code is built for Connect IQ 4+ watches, which get the HD images (monkey.jungle);
     // the (:lite) versions below are built for Connect IQ 3 watches: vector dial, no images.
@@ -407,7 +433,13 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
             return null;
         }
         if (ref has :get) {
-            return ref.get();
+            // the graphics pool can fail to restore the bitmap when memory is short (seen on a
+            // fenix 7X after a style change: "Failed invoking <symbol>"); draw without it then
+            try {
+                return ref.get();
+            } catch (e) {
+                return null;
+            }
         }
         return ref;
     }
@@ -435,6 +467,7 @@ class LuxeHijriPrayerView extends WatchUi.WatchFace {
         var target = (frame != null) ? frame.getDc() : dc;
         setAntiAlias(target);
 
+        retryDial(clock);
         var dial = mDial;
         if (dial == null && mStaticRef == null && (Graphics has :createBufferedBitmap)) {
             // HD dial unavailable (e.g. after a settings change): vector static layer instead
