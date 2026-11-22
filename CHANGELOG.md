@@ -2,6 +2,14 @@
 
 Remaining release steps: `docs/RELEASE_CHECKLIST.md`.
 
+## 1.0.9 (2026-11-22)
+* New style **Floral**: the Friday design (Sidi Bou Said blue wrought iron, jasmine and geranium,
+  gold hour ring) every day, without the Friday greeting; it reuses the Friday dial, so it adds no
+  images.
+* Fix: crash after a style change when the HD dial could not be loaded (on a fenix 7X the memory
+  was still held by the settings menu): the vector fallback is drawn directly and a missing HD
+  dial is reloaded once a minute.
+
 ## 1.0.8 (2026-11-07)
 * The project is now called **Muslim Watch** (app name, watch menu, Store listing, docs, build
   files `MuslimWatch-<device>.prg` and `MuslimWatch.iq`); the app id does not change.
